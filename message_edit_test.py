@@ -1,4 +1,3 @@
-message_remove_test.py
 def test_message_edit(token, message_id, message):
     assert message_send(token, message_id, message) == []
     # ValueError when:
