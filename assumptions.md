@@ -1,0 +1,3 @@
+- channel_leave assumptions
+  - Author: Owen Chandler
+  - assuming that if a user is not a part of a channel that the functions fails with no message/exception
