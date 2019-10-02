@@ -1,3 +1,10 @@
+role: student, teammate, professor, tutor, UNSW,
+MEMBER, ADMIN, OWNER
+poster, reader, member (not) in channel
+
+what's the different of slack and slackr? why not using slack instead
+
+
 17. message_send
 As a user, I shall send a message to the group so that I can share my point of views with everyone.
 
