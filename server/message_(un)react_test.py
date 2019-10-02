@@ -1,3 +1,6 @@
+import pytest
+import message_(un)react
+
 def test_message_react(token, message_id, react_id):
     assert message_react(token, message_id, react_id) == []
     # ValueError when:

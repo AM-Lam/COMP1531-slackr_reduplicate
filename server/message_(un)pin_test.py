@@ -1,3 +1,6 @@
+import pytest
+import message_(un)pin
+
 def test_message_pin(token, message_id):
     assert message_pin(token, message_id) == []
     # ValueError when:

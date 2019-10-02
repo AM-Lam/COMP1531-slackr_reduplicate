@@ -1,2 +1,2 @@
-def test_user_profile(token, u_id):
+def user_profile(token, u_id):
     
