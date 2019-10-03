@@ -17,10 +17,10 @@ def message_remove(token, message_id):
         raise ValueError("The message is no longer exists")
         pass
 
-    # AccessError: Message with message_id edited by authorised user is not the poster of the message
-    
     # AccessError: Message with message_id was not sent by the authorised user making this request
+
     # AccessError: Message with message_id was not sent by an owner of this channel
+    
     # AccessError: Message with message_id was not sent by an admin or owner of the slack
 
 
