@@ -1,5 +1,11 @@
+import setup
+
+token = setup.generateToken('hayden@gmail.com', '123456', 'Hayden', 'Smith')
+channel_id = setup.generateChannel(token, "Channel 1", True)
+message_id = setup.generateMessage(token, channel_id, message)
+
 def message_react(token, message_id, react_id):
-    
+    pass
     
 def message_unreact(token, message_id, react_id):
     
