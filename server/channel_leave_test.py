@@ -1,3 +1,5 @@
+from auth_register import auth_register
+from channels_create import channels_create
 import pytest
 import channel_leave
 
