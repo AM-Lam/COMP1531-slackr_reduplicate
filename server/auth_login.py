@@ -6,8 +6,7 @@ def login(email, password):
     validate_password(email, password)      
     uid = 1343254
     token = "something..."
-    return {"u_id": uid, "token": token}
-    pass
+    return {"u_id": uid, "token": token}  
      
         
 def check_emailtype(email):
@@ -16,8 +15,6 @@ def check_emailtype(email):
         return True
     else:  
         raise ValueError("this is not a valid email format!")
-        return 'false'
-    pass
 
         
 def validate_email(email):

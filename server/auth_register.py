@@ -1,5 +1,6 @@
 import re
 
+
 def register(email, password, name_first, name_last):
     check_regEmailtype(email)
     validate_regEmail(email)
@@ -9,7 +10,6 @@ def register(email, password, name_first, name_last):
     uid = 1343254
     token = "something..."
     return {"u_id": uid, "token": token}
-    pass
 
 def check_regEmailtype(email):
     regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
@@ -17,8 +17,6 @@ def check_regEmailtype(email):
         return True
     else:  
         raise ValueError("this is not a valid email format!")
-        return 'false'
-    pass
 
 def validate_regEmail(email):
     #raise ValueError("error!!")
@@ -32,25 +30,19 @@ def check_password_strength(password):
     # to check if the password is at least 5 digits
     if len(password) >= 5:
         return True
-        pass
     else:
         raise ValueError("Password is too short!")
-    pass
 
 def check_first(name_first):
     # not more than 50 characters 
     if len(name_first) < 50:
         return True
-        pass
     else:
         raise ValueError("first name is too long!")
-    pass
 
 def check_last(name_last):
     # not more than 50 characters
     if len(name_last) < 50:
         return True
-        pass
     else:
         raise ValueError("first name is too long!")
-    pass
