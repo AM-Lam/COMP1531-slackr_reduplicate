@@ -3,7 +3,7 @@ import auth_register
 
 def test_successfulRegister():
     # assuming user1 currently does not exist
-    token = auth_register.register('user1@gmail.com' ,'passew@321', 'user', 'one')
+    token = auth_register.auth_register('user1@gmail.com' ,'passew@321', 'user', 'one')
     assert token['token'] is not None
     assert token['u_id'] is not None
 

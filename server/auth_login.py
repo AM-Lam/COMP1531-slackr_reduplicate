@@ -1,10 +1,10 @@
 import re
     
-def login(email, password):
+def auth_login(email, password):
     check_emailtype(email)
     validate_email(email)
     validate_password(email, password)      
-    uid = 1343254
+    uid = 1343254   #just for the testing
     token = "something..."
     return {"u_id": uid, "token": token}  
      
