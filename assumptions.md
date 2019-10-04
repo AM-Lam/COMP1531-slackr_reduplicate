@@ -9,3 +9,7 @@
 - channel_removeowner assumptions
   - Author: Owen Chandler
   - assume that an owner CAN remove themselves as an owner of a channel
+
+- channel_join assumptions
+  - Author: Owen Chandler
+  - assume that trying to join a non-existent channel will not raise any exceptions and fail quietely
