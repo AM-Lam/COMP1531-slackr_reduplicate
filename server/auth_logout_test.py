@@ -16,7 +16,6 @@ def test_validtoken(tokenlog):
     dictlog = auth_login.login("arpit@gmail.com", "passwording")
     tokenlog = dictlog["token"]
     assert(auth_logout.auth_logout(tokenlog)) #assuming a successful logout returns a true boolean
-    pass
 
 # invalid token test should fail
 def test_invalidtoken(tokenlog):
