@@ -13,3 +13,7 @@
 - channel_join assumptions
   - Author: Owen Chandler
   - assume that trying to join a non-existent channel will not raise any exceptions and fail quietely
+
+- channels_create assumptions
+  - Author: Owen Chandler
+  - assume that two, or more, channels can have the same name
