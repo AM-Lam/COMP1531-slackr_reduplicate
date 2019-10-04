@@ -9,7 +9,7 @@ from message_(un)sendOredit import message_send
 # message_id = generateMessage(token, channel_id, message)
 
 #format of u_id_dic: {u_id: token}
-# u_id_dic = {'123': '123', 456': '456', '789': '789', '159': '159'}
+# u_id_dic = {'123': '123', 456': '456', '789': '789', '159': '159', 'AD': 'AD'}
 
 # token = setup.generate_token('hayden@gmail.com', '123456', 'Hayden', 'Smith')
 # channel_id = setup.generate_channel(token, "Channel 1", True)
@@ -20,6 +20,9 @@ from message_(un)sendOredit import message_send
 # permission_id = {'123': 'member' ,'456': 'admin', '789': 'member', 'AD': 'admin', '159': owner}
 
 class AccessError(Exception): 
+    pass
+
+class Error(Exception):
     pass
     
 def auth_register(email, password, firstN, lastN):
