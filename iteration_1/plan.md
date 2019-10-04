@@ -20,30 +20,79 @@ I am taking the functions:
 	Exception: ValueError when: name_first is more than 50 characters, 	name_last is more than 50 characters
 	Description: Update the authorised user's first and last name
 
+	1. 1 Hour
+	2. 	Check if token is valid
+		Check if first name is valid
+		Check if last name is valid
+		Assign new names to profile
+
 	user_profile_setemail(token, email); return void
 	Exception: ValueError when: Email entered is not a valid email, Email 	address is already being used by another user
 	Description: Update the authorised user's email address
+
+	1. 1 hour
+	2.	Check if token is valid
+		Check if email is valid
+		Check if email is being used
+		Assign new email to profile
 
 	user_profile_sethandle(token, handle_str); return void
 	Exception: ValueError when:handle_str is no more than 20 characters
 	Description: Update the authorised user's handle (i.e. display name)
 
+	1. 1 hour
+	2.	Check if token is valid
+		Check if handle is valid
+		Assign new email to profile
+
 	user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, 	y_end); return void
 	Exception: ValueError when: img_url is returns an HTTP status other 	than 200, x_start, y_start, x_end, y_end are all within the 		dimensions of the image at the URL.
 	Description: Given a URL of an image on the internet, crops the image 	within bounds (x_start, y_start) and (x_end, y_end). Position (0,0) 	is the top left.
+
+	1. 2 hours
+	2. 	Check if token is valid
+		Check if img_url is valid
+		Check if x coords are valid
+		Check if y coords are valid
+		Pass coords, img_url to profile
 
 	standup_start(token, channel_id); return {time_finish}
 	Exception: ValueError when:Channel (based on ID) does not exist, 	AccessError whenThe authorised user is not a member of the channel 	that the message is within
 	Description: For a given channel, start the standup period whereby 	for the next 15 minutes if someone calls "standup_send" with a 		message, it is buffered during the 15 minute window then at the end 	of the 15 minute window a message will be added to the message queue 	in the channel from the user who started the standup.
 
+	1. 4 hours
+	2.	Check if token is valid
+		Check if channel is valid
+		Check if user can access channel
+		Engage standup buffer
+		Hold for standup_send
+
 	standup_send(token, channel_id, message); return void
 	Exception: ValueError when: Channel (based on ID) does not exist, 	Message is more than 1000 characters, AccessError when The authorised 	user is not a member of the channel that the message is within, If 	the standup time has stopped
 	Description: Sending a message to get buffered in the standup queue, 	assuming a standup is currently active
+
+	1. 4 hours
+	2.	Check if token is valid
+		Check if channel is valid
+		Check if user can access channel
+		Check if standup time is active
+		Check is message isn't too long
+		Post message to channel
+		Send message to standup queue
 
 	search(token, query_str); return {messages}
 	Exception: N/A
 	Description: Given a query string, return a collection of messages 	that match the query
 
+	1. 2 hours
+	2. 	Check if token is valid
+		Search message database
+		Identify matches (binary search)
+		Return message list
+
 	admin_userpermission_change(token, u_id, permission_id); return void
 	Exception: ValueError when: u_id does not refer to a valid user, 	permission_id does not refer to a value permission, AccessError 	when The authorised user is not an admin or owner
 	Description: Given a User by their user ID, set their permissions to 	new permissions described by permission_id
+
+	1. 3 hours
+	2. 	Check if token is valid
