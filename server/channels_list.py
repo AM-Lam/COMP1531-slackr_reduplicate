@@ -8,5 +8,5 @@ def channels_list.py(token):
     # python code I could write
     channels = []
     
-    return channels
+    return { "channels" : channels }
 

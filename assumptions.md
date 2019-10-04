@@ -13,3 +13,7 @@
 - channel_join assumptions
   - Author: Owen Chandler
   - assume that trying to join a non-existent channel will not raise any exceptions and fail quietely
+
+- channels_listall assumptiosn
+  - Author: Owen Chandler
+  - assume that listall means listall, including private channels
