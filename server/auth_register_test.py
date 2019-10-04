@@ -28,7 +28,7 @@ def test_regEmailtype_good3(): ######################
     # email id has a plus
     email = 'firstname+lastname@domain.com'
     assert(auth_register.check_regEmailtype(email))
-    '
+    
 def test_regEmailtype_good4():
     # domain as an ip
     email = 'email@123.123.123.123'
