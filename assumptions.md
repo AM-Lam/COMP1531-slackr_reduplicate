@@ -17,3 +17,4 @@
 - channels_create assumptions
   - Author: Owen Chandler
   - assume that two, or more, channels can have the same name
+  - assume that a user doesn't need any special permissions to create a channel (we can easily fix this later if untrue)
