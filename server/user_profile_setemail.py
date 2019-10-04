@@ -13,7 +13,7 @@ def user_profile_setemail(token, email):
     check_if_email_valid(email)
     check_email_database(email)
     change_email(u_id, email)
-    return void
+    return
 
 def check_if_email_valid(email):
     regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'

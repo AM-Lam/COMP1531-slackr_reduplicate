@@ -15,7 +15,7 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
     check_start_coords(x_start, y_start)
     check_end_coords(x_end, y_end)
     change_photo(img_url, x_start, y_start, x_end, y_end)
-    return void
+    return
 
 def check_imgurl(img_url):
     if urllib.request.urlopen(img_url).getcode() == 200:

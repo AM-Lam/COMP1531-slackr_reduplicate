@@ -9,9 +9,9 @@ def user_profile_sethandle(token, handle_str):
     u_id = 12345
     handle_check(handle_str)
     handle_in_use_check(handle_str)
-    change_handle(u_id, handle)
+    change_handle(u_id, handle_str)
 
-    return void
+    return
 
 def handle_check(handle_str):
     if len(handle_str) < 20 and len(handle_str) > 0:
@@ -27,6 +27,6 @@ def handle_in_use_check(handle_str):
     else:
         raise ValueError("Handle is already in use.")
 
-def change_handle(u_id, handle):
+def change_handle(u_id, handle_str):
     # change first and last name in the database (which doesn't exist yet)
     pass

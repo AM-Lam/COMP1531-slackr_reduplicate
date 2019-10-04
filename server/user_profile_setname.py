@@ -12,7 +12,7 @@ def user_profile_setname(token, name_first, name_last):
     last_name_check(name_last)
     change_names(u_id, name_first, name_last)
 
-    return void
+    return
 
 def first_name_check(name_first):
     if len(name_first) < 50 and len(name_first) > 0:
