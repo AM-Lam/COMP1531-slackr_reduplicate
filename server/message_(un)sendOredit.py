@@ -6,7 +6,7 @@ channel_id = setup.generateChannel(token, "Channel 1", True)
 messageId = "456789"
 
 def message_send(token, channel_id, message):
-    # ValueError when:Message is more than 1000 characters
+    # ValueError: Message is more than 1000 characters
     if (len(message) > 1000):
         raise ValueError("The message is too long. Please keep it within 1000 characters.")   
 
@@ -15,7 +15,6 @@ def message_remove(token, message_id):
     # ValueError when:Message (based on ID) no longer exists
     if message_id == None:
         raise ValueError("The message is no longer exists")
-        pass
 
     # AccessError: Message with message_id was not sent by the authorised user making this request
 
