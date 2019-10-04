@@ -1,6 +1,7 @@
 import pytest
 from channels_list import channels_list
 from channels_create import channels_create
+from channel_leave import channel_leave
 from auth_register import auth_register
 
 
