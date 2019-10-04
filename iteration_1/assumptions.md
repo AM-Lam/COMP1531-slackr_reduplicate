@@ -10,4 +10,5 @@ For message_edit/(un)react, I assume the creator of that message is the only can
 For message_pin, I assume every member in the channel can see what message is pinned.
 For message_(un)pin, I assume the admin is the only can pin or unpin the message.
 For message_(un)pin, I assume more than one messages can be pin.
-For user_profile, I assume I can get the details of email, name(first and last) and handle are valid.
+For user_profile, I assume I can get the details of email, name(first and last) and handle which are valid from u_id.
+For user_profile, I assume handle means that .
