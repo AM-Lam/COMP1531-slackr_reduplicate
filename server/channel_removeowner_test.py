@@ -7,9 +7,9 @@ from channel_addowner import channel_addowner
 
 def test_channel_removeowner():
     # boilerplate creation of users and channels
-    user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
-    user2 = auth_register("good@email.com", "4321", "Jen", "Bobs")
-    user3 = auth_register("great@email.com", "2143", "Jane", "Doe")
+    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
+    user2 = auth_register("good@email.com", "987654321", "Jen", "Bobs")
+    user3 = auth_register("great@email.com", "00002143", "Jane", "Doe")
     
     channel1 = channels_create(user1["token"], "Channel 1", True)
     channel2 = channels_create(user1["token"], "Channel 2", True)
