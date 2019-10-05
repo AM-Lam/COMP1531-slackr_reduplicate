@@ -1,13 +1,13 @@
 import re
 
 
-def register(email, password, name_first, name_last):
+def auth_register(email, password, name_first, name_last):
     check_regEmailtype(email)
     validate_regEmail(email)
     check_password_strength(password)
     check_first(name_first)
     check_last(name_last)
-    uid = 1343254
+    uid = 1343254           #just for the testing 
     token = "something..."
     return {"u_id": uid, "token": token}
 

@@ -3,12 +3,12 @@ import re
 import auth_login
 import auth_register
 
-user_1 = auth_register.register('user1@domain.com' , 'passew@321' , 'user' , 'a')
+user_1 = auth_register.auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
 #user_2 = auth_register.register('user2@domain.com' , 'vscod231343' 'ussr' , 'b')
 #user_3 = auth_register.register('user3@domain.com.au' , 'vsdco23111' 'person' , 'c')
 
 def test_successfulLogin():
-    token = auth_login.login('user1@gmail.com' ,'passew@321')
+    token = auth_login.auth_login('user1@gmail.com' ,'passew@321')
     assert token['token'] is not None
     assert token['u_id'] is not None
 
@@ -228,7 +228,7 @@ def test_validate_password3():
 
 def test_validate_password4():
     # what if the email and password combo is valid? -->
-    dictio = auth_login.login('user1@domain.com' ,'passew@321')
+    dictio = auth_login.auth_login('user1@domain.com' ,'passew@321')
     assert dictio['token'] is not None
     assert dictio['u_id'] is not None
     
