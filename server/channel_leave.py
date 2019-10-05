@@ -1,5 +1,5 @@
 # comment this out until these functions are written
-from channel_list import channel_list
+from channels_list import channels_list
 from channel_details import channel_details
 
 
@@ -9,7 +9,7 @@ def channel_leave(token, channel_id):
     uid_ = 111
 
     # check if channel exists, if it does not throw a ValueError
-    if channel_id not in [c["channel_id"] for c in channel_list(token)]:
+    if channel_id not in [c["channel_id"] for c in channels_list(token)]:
         raise ValueError
 
     # otherwise remove the user with this token from the channel
