@@ -15,7 +15,7 @@ def test_user_profile_setname():
     # trying to input a last name longer than 50 characters
     pytest.raises(ValueError, user_profile_setname, user["token"], "Jane", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")
 
-    # assuming we allow mononymous names, at least one value needs to be filled (first name)
+    # assuming we allow mononymous names, at least one value needs to be filled
     assert user_profile_setname(user["token"], "Plato", "") == None
 
     # trying to input an empty name
