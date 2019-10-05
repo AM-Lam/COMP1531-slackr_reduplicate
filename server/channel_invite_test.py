@@ -17,7 +17,7 @@ uid2 = user2['u_id']
 uidfaux = 999999999999999999999999999999999999999999999999999999999999999999
 
 # now we create a channel
-unswchannel = channels_create(token1, unswchannel, True)
+unswchannel = channel_create.channels_create(token1, unswchannel, True)
 unswchannelid = unswchannel['channel_id']
 # user1 is now a part of unswchannel
 
