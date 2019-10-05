@@ -1,8 +1,8 @@
 from search import search
-from auth_register import register
+from auth_register import auth_register
 
 def test_search():
-    user = register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "12345", "John", "Doe")
 
     # find all the matching messages (nothing)
     assert search(user["token"], "hewwo") == []

@@ -18,4 +18,4 @@ def test_admin_userpermission_change():
     pytest.raises(ValueError, admin_userpermission_change, user["token"], 12345, 3)
 
     # if the user is not an admin/owner
-    # pytest.raises(AccessError, admin_userpermission_change, "badtoken", 12345, -1)
+    pytest.raises(AccessError, admin_userpermission_change, "badtoken", 12345, -1)
