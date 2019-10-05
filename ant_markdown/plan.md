@@ -18,7 +18,7 @@ Before we approach any of these functions, we would like to have a quick standup
 
 After this, I will take an extensive look at the specifications given by the front_end team for my specific functions, including what I should return if there is an Exception. This will likely take up the bulk of the tests. As for other tests, I would plan to have successful tests, and tests if certain variables are invalid. I doubt we will have many edge cases, but if we do we'll try to address them as they occur.
 
-EDIT: I have looked at my own functions and have thought of them as such:
+**EDIT:** I have looked at my own functions and have thought of them as such:
 
 user_profile_setname(token, name_first, name_last)
 	1. I estimate this function in its entirety would take 1 hour.
