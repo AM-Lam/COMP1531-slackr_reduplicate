@@ -13,7 +13,7 @@ def test_channels_list():
     channel1 = channels_create(user1["token"], "Channel 1", True)
     
     # try to see the channels of a user with no channels
-    assert channels_list(user2["token"]) == []
+    assert channels_list(user2["token"]) == {"channels" : []}
     
     # try to see the channels of a user that owns one public channel
     assert channels_list(user1["token"]) == [{
@@ -40,7 +40,7 @@ def test_channels_list():
             "id" : channel2["channel_id"],
             "name" : "Channel 2"
         },
-    ]
+    ]}
     
     # create a private channel, test that it is shown in the list
     channel3 = channels_create(user1["token"], "Channel 3", False)
@@ -57,7 +57,7 @@ def test_channels_list():
             "id" : channel3["channel_id"],
             "name" : "Channel 3"
         },
-    ]
+    ]}
     
     # test that if a channel only has one channel, and it is private, that it
     # is shown in the list
