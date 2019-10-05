@@ -12,7 +12,7 @@ permission_id = {'123': 'member' ,'456': 'admin', '789': 'member', 'AD': 'admin'
 pinned_dic = {'message_id':'123', 'id': '123'}
 
 def message_pin(token, message_id):
-    # ValueError when:
+
     #  message_id is not a valid message
     if message_id not in message_id_dic:
         raise ValueError("Message is not exists.")
@@ -22,13 +22,32 @@ def message_pin(token, message_id):
     #  Message with ID message_id is already pinned
     if message_id in pinned_dic:
         raise ValueError("The message is pinned.")
-    # AccessError when:
+
     #  The authorised user is not a member of the channel that the message is within
     # check whether the user is a member in the channel or not
     token_of_message = message_id_dic[message_id][0]
     if message_id_dic[message_id][1] in channel_list(token_of_message):
         raise AccessError("You are not a member in the channel.")
     
+    # if the function is working
+    pinned_dic[message_id] = token
     
 def message_unpin(token, message_id):
-    pass
+    #  message_id is not a valid message
+    if message_id not in message_id_dic:
+        raise ValueError("Message is not exists.")
+    #  The authorised user is not an admin
+    if message_id_dic[message_id][0] == 'member':
+        raise ValueError("Sorry, you don't have access to unpin the message.")
+    #  Message with ID message_id is already unpinned
+    if message_id not in pinned_dic:
+        raise ValueError("The message is unpinned.")
+
+    #  The authorised user is not a member of the channel that the message is within
+    # check whether the user is a member in the channel or not
+    token_of_message = message_id_dic[message_id][0]
+    if message_id_dic[message_id][1] in channel_list(token_of_message):
+        raise AccessError("You are not a member in the channel.")
+    
+    # if the function is working
+    del pinned_dic[message_id]
