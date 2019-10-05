@@ -7,8 +7,8 @@ from auth_register import auth_register
 
 def test_channels_list():
     # boilerplate user/channel creation code
-    user1 = auth__register("valid@email.com", "1234", "Bob", "Jones")
-    user2 = auth_register("new@email.com", "4321", "Doug", "Jones")
+    user1 = auth__register("valid@email.com", "123456789", "Bob", "Jones")
+    user2 = auth_register("new@email.com", "987654321", "Doug", "Jones")
     
     channel1 = channels_create(user1["token"], "Channel 1", True)
     
@@ -16,22 +16,24 @@ def test_channels_list():
     assert channels_list(user2["token"]) == {"channels" : []}
     
     # try to see the channels of a user that owns one public channel
-    assert channels_list(user1["token"]) == [{
+    assert channels_list(user1["token"]) == { "channels" : [{
         "id" : channel1["channel_id"],
         "name" : "Channel 1"
-    }]
+    }]}
     
     # add user2 to channel1 and check that we can list it as belonging to that
     # channel
     channel_join(user2["token"], channel1["channel_id"])
-    assert channels_list(user2["token"]) == [{
-        "id" : channel1["channel_id"],
-        "name" : "Channel 1"
-    }]
+    assert channels_list(user2["token"]) == { "channels" : [
+        {
+            "id" : channel1["channel_id"],
+            "name" : "Channel 1"
+        }
+    ]}
     
     # create a new channel, test that multiple channels are shown
     channel2 = channels_create(user1["token"], "Channel 2", True)
-    assert channels_list(user1["token"]) == [
+    assert channels_list(user1["token"]) == { "channels" : [
         {
             "id" : channel1["channel_id"],
             "name" : "Channel 1"
@@ -44,7 +46,7 @@ def test_channels_list():
     
     # create a private channel, test that it is shown in the list
     channel3 = channels_create(user1["token"], "Channel 3", False)
-    assert channels_list(user1["token"]) == [
+    assert channels_list(user1["token"]) == { "channels" : [
         {
             "id" : channel1["channel_id"],
             "name" : "Channel 1"
@@ -63,12 +65,12 @@ def test_channels_list():
     # is shown in the list
     channel_leave(user1["token"], channel1["channel_id"])
     channel_leave(user1["token"], channel2["channel_id"])
-    assert channels_list(user1["token"]) == [{
+    assert channels_list(user1["token"]) == { "channels" : [
         {
             "id" : channel3["channel_id"],
             "name" : "Channel 3"
         }
-    ]
+    ]}
     
     
     
