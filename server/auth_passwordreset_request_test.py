@@ -5,7 +5,6 @@ import auth_login
 
 
 auth_register.auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
-auth_login.login('user1@gmail.com' ,'passew@321')
 
 ###########################################################################################################################################
 def test_Validate_email():
