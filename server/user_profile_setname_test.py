@@ -1,10 +1,10 @@
 import pytest
 from user_profile_setname import user_profile_setname
-from auth_register import register
+from auth_register import auth_register
 
 
 def test_user_profile_setname():
-    user = register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "12345", "John", "Doe")
 
     # this test should pass with no issue
     assert user_profile_setname(user["token"], "Jane", "Smith") == None

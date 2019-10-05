@@ -1,9 +1,9 @@
 from user_profile_sethandle import user_profile_sethandle
-from auth_register import register
+from auth_register import auth_register
 import pytest
 
 def test_user_profile_sethandle():
-    user = register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "12345", "John", "Doe")
 
     # this test should pass with no issue
     assert user_profile_sethandle(user["token"], "handle") == None
