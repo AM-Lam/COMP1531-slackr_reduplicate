@@ -11,7 +11,7 @@ import channel_invite
 def test_channel_real():
     with pytest.raises(ValueError , match=r"*"):
         invalid_channel = 9999999999999999999999999999999999999999999999999999999999999999999
-        channel_details.check_channel_existance(invalid_channel)
+        channel_details.check_channel_existence(invalid_channel)
 
 # user looking for details is not a member of the channel
 def test_user_status():
