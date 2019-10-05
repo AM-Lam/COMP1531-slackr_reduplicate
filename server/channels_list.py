@@ -1,4 +1,4 @@
-def channels_list.py(token):
+def channels_list(token):
     # first grab the u_id associated with this token, we'll need to interact
     # with a database for this
     u_id = 111
