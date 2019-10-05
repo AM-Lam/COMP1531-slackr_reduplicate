@@ -1,13 +1,15 @@
 import pytest
 from access_error import AccessError
 from channel_addowner import channel_addowner
+from auth_register import auth_register
+from channels_create import channels_create
 
 
-def channel_addowner_test():
+def test_channel_addowner():
     # boilerplate setting up of users and channels
-    user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
-    user2 = auth_register("good@email.com", "4321", "Jone", "Bobs")
-    user3 = auth_register("amazing@email.com", "2143", "John", "Boo")
+    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
+    user2 = auth_register("good@email.com", "987654321", "Jone", "Bobs")
+    user3 = auth_register("amazing@email.com", "00002143", "John", "Boo")
     
     channel1 = channels_create(user1["token"], "Channel 1", True)
     channel2 = channels_create(user1["token"], "Channel 2", True)
