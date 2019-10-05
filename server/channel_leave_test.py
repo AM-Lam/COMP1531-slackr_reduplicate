@@ -1,7 +1,8 @@
+import pytest
+from channel_leave import channel_leave
 from auth_register import auth_register
 from channels_create import channels_create
-import pytest
-import channel_leave
+
 
 
 def test_channel_leave():
@@ -11,19 +12,16 @@ def test_channel_leave():
     channel2 = channels_create(user1["token"], "A New Channel", False)
 
     # first check the simplest case, if the user can leave a channel they are in
-    assert channel_leave.channel_leave(user1["token"], 
-                                       channel1["channel_id"]) == {}
+    assert channel_leave(user1["token"], channel1["channel_id"]) == {}
 
     # now try to leave a private channel
-    assert channel_leave.channel_leave(user1["token"], 
-                                       channel2["channel_id"]) == {}
+    assert channel_leave(user1["token"], channel2["channel_id"]) == {}
 
     # now check that attempting to leave a non-existent channel raises an 
     # exception
-    pytest.raises(ValueError, channel_leave.channel_leave, 
-                  user1["token"], 404)
+    pytest.raises(ValueError, channel_leave, user1["token"], 404)
 
     # try to leave a channel the user is not a part of - this should fail 
     # quietely (see assumptions.md)
-    assert channel_leave.channel_leave(user1["token"], 404) == {}
+    assert channel_leave(user1["token"], 404) == {}
 
