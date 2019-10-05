@@ -26,8 +26,8 @@ def check_valid_user(u_id):
         raise ValueError("This user does not exist.")
 
 def check_valid_permission(permission_id):
-    # assuming that 0 = user, 1 = admin, owner
-    if permission_id != 0 and permission_id != 1:
+    # assuming that 0 = user, 1 = admin, 2 = owner
+    if permission_id < 0 or permission_id > 2:
         raise ValueError("Permission does not exist.")
     else:
         return True
