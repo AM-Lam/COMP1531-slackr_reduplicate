@@ -2,7 +2,9 @@ import pytest
 import message_(un)pin
 
 def test_message_pin(token, message_id):
-    assert message_pin(token, message_id) == []
+    assert message_pin(token, message_id) == None
+    assert message_pin('123','id') == None
+    assert message_pin('123','message_id') == None
     # ValueError when:
     #  message_id is not a valid message within a channel that the authorised user has joined
     #  The authorised user is not an admin

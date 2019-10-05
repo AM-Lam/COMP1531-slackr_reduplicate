@@ -14,6 +14,11 @@ For message_remove, I assume all the message_id is stored in a dictionary called
 For message_remove, I assume channel_details can be used to check whether the user is existing in the channel.
 For message_remove, I assume permission_id is stored in a dictionary as key is the token and value is permission of the owner of token.
 For message_edit/(un)react, I assume the creator of that message is the only can edit the message even admin and owner cannot edit the message.
+For message_react/(unreact), I assume I can get the list of channels that the user's joining by getting u_id's dictionary. 
+For message_react/(unreact), I assume the channel that the message posted in can be found in message_id's dictionary. 
+For message_react/(unreact), I assume the react_id is store in a dictionary with the information of token, message_id and the react type . 
+For message_react/(unreact), I assume react_id is represented by a react_id_type to check which reaction to pick. 
+For message_react/(unreact), I assume the pinned messages are keeping track in a dictionary. 
 For message_pin, I assume every member in the channel can see what message is pinned.
 For message_(un)pin, I assume the admin is the only can pin or unpin the message.
 For message_(un)pin, I assume more than one messages can be pin.
@@ -23,3 +28,4 @@ For user_profile, I assume handle means that the username of the user.
 I assume when the user register, first name of the user is the username.
 I assume permission_id of anyone is 'member' except the owner or channel_addowner, admin_userpermission_change is implemented.
 I assume admin of the slackr is also an admin of any channel under slackr. Same applied to owner.
+I assume user can join in multiple channels.

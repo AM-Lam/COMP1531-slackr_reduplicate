@@ -2,7 +2,7 @@ import setup
 from setup import AccessError
 # TODO
 # Have to include the related file name later
-from channel_details.file import channel_details
+from channel_list.file import channel_list
 
 token = setup.generate_token('hayden@gmail.com', '123456', 'Hayden', 'Smith')
 channel_id = setup.generate_channel(token, "Channel 1", True)
@@ -34,8 +34,9 @@ def message_remove(token, message_id):
         raise AccessError("You have no permission to remove the message. Messages can only be deleted by sender or admin.")
 
     token_of_message = message_id_dic[message_id][0]
-    # if channel_details succeed, it should return None
-    if channel_details(token_of_message, message_id_dic[message_id][1]) != None:
+    # if channel_list succeed, it should list of channels that the user being
+    # check whether the user is a member in the channel or not
+    if message_id_dic[message_id][1] in channel_list(token_of_message):
         if permission_id[token_of_message] == 'member':  
             #  Person who make the request is not an admin or owner in the channel so they don't have permission to remove the message
             raise AccessError("You don't have access to remove the message. Only the sender or admin shall make this request.")
@@ -67,7 +68,7 @@ def message_edit(token, message_id, message):
             raise ValueError("The message is too long. Please keep it within 1000 characters.")   
     #     2) If the authorised user is an admin, is a any message within a channel that the authorised user has joined
     else:
-        raise ValueError("Only writer of the message have the permission to edit the message")   
+        raise ValueError("Only author of the message have the permission to edit the message")   
 
     # if the function is executed, i suppose this is the way to change the message's content
     message_id_dic['token'] = message
