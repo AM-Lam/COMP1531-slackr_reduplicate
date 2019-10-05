@@ -5,7 +5,7 @@ from channels_create import channels_create
 from channel_join import channel_join
 
 
-def channel_join_test():
+def test_channel_join():
     user1 = auth_register("valid@email.com", "strong-password", "John", "Doe")
     user2 = auth_register("good@email.com", "another-password", "Jack", "Doe")
     
