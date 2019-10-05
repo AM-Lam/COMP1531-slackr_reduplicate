@@ -14,6 +14,12 @@
   - Author: Owen Chandler
   - assume that trying to join a non-existent channel will not raise any exceptions and fail quietely
 
+- channels_create assumptions
+  - Author: Owen Chandler
+  - assume that two, or more, channels can have the same name
+  - assume that a user doesn't need any special permissions to create a channel (we can easily fix 
+    this later if untrue)
+
 - message_sendlater assumptions
   - Author: Owen Chandler
   - assume that time_sent is a datetime object
