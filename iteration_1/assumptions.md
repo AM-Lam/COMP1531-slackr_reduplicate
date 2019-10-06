@@ -17,9 +17,12 @@ From message_send to user_profile
     -u_id_dic:{u_id: {email, first name, last name, handle}}
     -message_id_dic: {message_id: {token, channel_id}}
     -permission_id_dic: {token: permission} # permission: 'member', 'admin', 'owner'
-    -react_type_list: {}
+    # keep track of the existing channels in the slackr
+    -channel_list: {channel_id} # eg.{channel1, channel2,...}
+    # keep track of the valid react that can be used in the slackr
+    -react_type_list: {react_id} # eg.{like,love, smile}
     -react_id_dic: {react_id: {token, message_id, react type}}
-    -pinned_dic: {message_id: }
+    -pinned_list: {message_id}
 
 -message_send:
     -assume the message contains any type of characters like space, upper or lower cases, numbers, or ,./<>;':"()_*&^%$#@!~`-+=. 

@@ -8,8 +8,8 @@ message_id = "456789"
 message_id_dic = {'message_id': {'123', 'channel1'}, 'message': {'456', 'channel 1'}, 'id': {'123', 'Channel 1'}}
 message_id = setup.generateMessage(token, channel_id, message)
 permission_id = {'123': 'member' ,'456': 'admin', '789': 'member', 'AD': 'admin', '159': owner}
-#format of pinned_list = {token: message_id}
-pinned_dic = {'message_id':'123', 'id': '123'}
+#format of pinned_dic = {token: message_id}
+pinned_list = {'message_id', 'id'}
 
 def message_pin(token, message_id):
 
@@ -20,7 +20,7 @@ def message_pin(token, message_id):
     if message_id_dic[message_id][0] == 'member':
         raise ValueError("Sorry, you don't have access to pin the message.")
     #  Message with ID message_id is already pinned
-    if message_id in pinned_dic:
+    if message_id in pinned_list:
         raise ValueError("The message is pinned.")
 
     #  The authorised user is not a member of the channel that the message is within
@@ -30,7 +30,7 @@ def message_pin(token, message_id):
         raise AccessError("You are not a member in the channel.")
     
     # if the function is working
-    pinned_dic[message_id] = token
+    pinned_list.append = message_id
     
 def message_unpin(token, message_id):
     #  message_id is not a valid message
@@ -40,7 +40,7 @@ def message_unpin(token, message_id):
     if message_id_dic[message_id][0] == 'member':
         raise ValueError("Sorry, you don't have access to unpin the message.")
     #  Message with ID message_id is already unpinned
-    if message_id not in pinned_dic:
+    if message_id not in pinned_list:
         raise ValueError("The message is unpinned.")
 
     #  The authorised user is not a member of the channel that the message is within
@@ -50,4 +50,4 @@ def message_unpin(token, message_id):
         raise AccessError("You are not a member in the channel.")
     
     # if the function is working
-    del pinned_dic[message_id]
+    pinned_list.remove(message_id)

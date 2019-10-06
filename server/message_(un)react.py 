@@ -6,13 +6,12 @@ message_id = "456789"
 # format of message_id_dic: 'message_id':{'token', 'channel_id'}
 message_id_dic = {'message_id': {'123', 'channel1'}, 'message': {'456', 'channel 1'}, 'id': {'123', 'Channel 1'}}
 message_id = setup.generateMessage(token, channel_id, message)
-permission_id = {'123': 'member' ,'456': 'admin', '789': 'member', 'AD': 'admin', '159': owner}
-# format of react_id_dic: react_id: {token, react_type, messsage_id}
-react_id_dic = {'react': {'123','like','message_id'}, 'reacted': {'456', 'sad','message'}}
+# format of react_id_dic: react_id: {token, messsage_id, react_type}
+react_id_dic = {'react': {'123','message_id','like'}, 'reacted': {'456'','message', 'sad}}
 react_id_type = {'like', 'love', 'sad', 'hate', 'smile', 'angry'}
 # TODO
 # Add more detail to the u_id_dic
-u_id_dic = {'123': '123', 456': '456', '789': '789', '159': '159', 'AD': 'AD'}
+u_id_dic = {'123': '123', '456': '456', '789': '789', '159': '159', 'AD': 'AD'}
 
 def message_react(token, message_id, react_id):
     # assume we can get the list of channels that the user's joining by getting u_id's dictionary
@@ -47,10 +46,10 @@ def message_unreact(token, message_id, react_id):
         raise ValueError("Invalid message.")
     #  react_id is not a valid React ID
     if react_id not in react_id_type:
-        return ValueError("Please enter a valid React.")
+        return ValueError("Please enter a valid React number.")
     #  Message with ID message_id already contains an active React with ID react_id
     if message_id_dic[react_id][1] != None:
-        return ValueError("You reacted before. Please don't repeat.")
+        return ValueError("Cannot unreact this message.")
 
     # If the function is working, delete the record of react in dictionary    
     del react_id_dic[react_id]
