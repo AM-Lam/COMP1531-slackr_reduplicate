@@ -1,7 +1,6 @@
 import setup
 from setup import u_id_list
 from setup import u_id_dic
-from setup import Error
 
 def user_profile(token, u_id):
     
@@ -13,3 +12,4 @@ def user_profile(token, u_id):
         # details cannot be found based on u_id
     else:
         raise ValueError("This username is not existed. Please try again")
+        
