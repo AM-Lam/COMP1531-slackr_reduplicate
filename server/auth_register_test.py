@@ -3,7 +3,7 @@ import auth_register
 
 def test_successfulRegister():
     # assuming user1 currently does not exist
-    token = auth_register.register('user1@gmail.com' ,'passew@321', 'user', 'one')
+    token = auth_register.auth_register('user1@gmail.com' ,'passew@321', 'user', 'one')
     assert token['token'] is not None
     assert token['u_id'] is not None
 
@@ -28,7 +28,7 @@ def test_regEmailtype_good3(): ######################
     # email id has a plus
     email = 'firstname+lastname@domain.com'
     assert(auth_register.check_regEmailtype(email))
-    '
+    
 def test_regEmailtype_good4():
     # domain as an ip
     email = 'email@123.123.123.123'

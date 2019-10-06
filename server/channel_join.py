@@ -5,19 +5,20 @@ from channels_listall import channels_listall
 def channel_join(token, channel_id):
     # first try to get the relevant u_id from the provided token, this will need
     # us to interact with a database and retrieve data presumably
-    u_id = get_uid_from_token(token)
+    u_id = 111
     
     # next we have to check whether or not the given user is an admin, again
     # we'll probably need to interact with a db for this
-    is_admin = user_is_admin(u_id)
+    # is_admin = user_is_admin(u_id)
     found_channel = False
 
-    for channel in channels_listall(token):
+    for channel in channels_listall(token)["channels"]:
         # somehow check if the channel is private, another database interaction
-        if channel_private(channel["id"]) and not is_admin:
-            raise AccessError("Cannot join private channel as regular user")
+        # it should probably look like what's below
+        # if channel_private(channel["channel_id"]) and not is_admin:
+        #   raise AccessError("Cannot join private channel as regular user")
         
-        if channel["id"] == channel_id:
+        if channel["channel_id"] == channel_id:
             found_channel = True
             break
 
