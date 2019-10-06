@@ -17,7 +17,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     # member of the channel)
     channel_exists = False
     for channel in channels_listall(token):
-        if channel_id == channel["id"]:
+        if channel_id == channel["channel_id"]:
             # check whether or not the user is authorised to send messages in
             # this channel, I presume we will need to access a database to do
             # this
