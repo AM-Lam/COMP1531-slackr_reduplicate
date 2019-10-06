@@ -6,7 +6,6 @@ import pytest
 
 
 auth_register.auth_register('user1@gmail.com' ,'passew@321', 'user', 'one')
-auth_login.auth_login('user1@gmail.com' ,'passew@321')
 auth_passwordreset_request('user1@gmail.com')
 
 def test_check_reset_code():
