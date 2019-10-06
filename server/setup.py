@@ -1,5 +1,5 @@
-from auth_register.file import auth_register
-from channel_create.file import channel_create
+from auth_register import auth_register
+from channels_create import channels_create
 
 class AccessError(Exception): 
     pass
@@ -16,13 +16,13 @@ def generate_token(email, password, firstN, lastN):
     
 def generate_channel(token, name, is_public):
     channel_create_dic = {}
-    channel_create_dic = channel_create(token, name, is_public)
+    channel_create_dic = channels_create(token, name, is_public)
     channel_id = channel_create_dic[name]
     return channel_id
 
 def generate_message(token, channel_id, message):
     message_id_id_dic = {}
-    message_id_dic = message_send(token,channel_id message)
+    message_id_dic = message_send(token, channel_id, message)
     message_id = channel_create_dic[message]
     return message_id
 # hardcore the user 
