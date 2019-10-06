@@ -1,5 +1,5 @@
 import pytest
-from channel_leave.file import channel_leave
+from channel_leave import channel_leave
 
     
 def test_message_unpin():
@@ -28,7 +28,7 @@ def test_message_unpin():
             message_unpin('admin2', 1)
 
     #  The authorised user is not a member of the channel that the message is within
-    def test_error_leave_channel:
+    def test_error_leave_channel():
         message_pin('admin1', 1)
         channel_leave('admin1', 1)
         with pytest.raises(AccessError) :
