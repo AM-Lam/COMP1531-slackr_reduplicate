@@ -10,7 +10,7 @@ def test_message_pin():
     assert message_pin('owner', 3) == None
     assert message_pin('owner', 4) == None
 
-    with pytest.raise(ValueError)
+    with pytest.raises(ValueError):
     #  message_id is not a valid message within a channel that the authorised user has joined
         message_pin('admin1', 456)
 
@@ -28,6 +28,6 @@ def test_message_pin():
     #  The authorised user is not a member of the channel that the message is within
     def test_error_leave_channel():
         channel_leave('admin2', 3)
-        with pytest.raises(AccessError) :
+        with pytest.raises(AccessError):
             message_pin('admin2', 2)
     
