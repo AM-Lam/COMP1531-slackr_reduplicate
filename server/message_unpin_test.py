@@ -11,7 +11,7 @@ def test_message_unpin():
         message_pin('owner', 3)
         message_unpin('owner', 3)
     
-    with pytest.raise(ValueError)
+    with pytest.raises(ValueError)
     #  message_id is not a valid message within a channel that the authorised user has joined
         message_unpin('admin1', 78)
     #  The authorised user is not an admin

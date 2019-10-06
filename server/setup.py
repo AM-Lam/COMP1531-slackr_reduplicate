@@ -1,5 +1,5 @@
-from auth_register.file import auth_register
-from channel_create.file import channel_create
+from auth_register import auth_register
+from channel_create import channel_create
 
 class AccessError(Exception): 
     pass
