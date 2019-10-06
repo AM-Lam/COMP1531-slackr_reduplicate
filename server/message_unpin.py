@@ -5,19 +5,18 @@ from setup import message_id_dic
 from setup import pinned_list
 from channel_list.file import channel_list
 
-def message_pin(token, message_id):
-
+def message_unpin(token, message_id):
     #  message_id is not a valid message
     if message_id not in message_id_list:
         raise ValueError("Message is not exists.")
 
     #  The authorised user is not an admin
     if id_of_channel not in channel_list(token_of_message):
-        raise ValueError("Sorry, you don't have access to pin the message.")
+        raise ValueError("Sorry, you don't have access to unpin the message.")
     
-    #  Message with ID message_id is already pinned
-    if token in pinned_list[message_id]:
-        raise ValueError("The message is pinned.")
+    #  Message with ID message_id is already unpinned
+    if token not in pinned_list[message_id]:
+        raise ValueError("The message is not pinned. Please try again.")
 
     #  The authorised user is not a member of the channel that the message is within
     # check whether the user is a member in the channel or not
@@ -27,5 +26,4 @@ def message_pin(token, message_id):
         raise AccessError("You are not a member in the channel.")
     
     # if the function is working
-    pinned_list[message_id].append(token)
-    
+    pinned_list[message_id].remove(token)

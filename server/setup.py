@@ -82,13 +82,3 @@ pinned_list = {1: 'admin1', 5: 'owner'}
 # token = generateToken('hayden@gmail.com', '123456', 'Hayden', 'Smith')
 # channel_id = generateChannel(token, "Channel 1", True)
 # message_id = generateMessage(token, channel_id, "message")
-
-#format of u_id_dic: {u_id: token}
-# u_id_dic = {'123': 'person1', '456': 'person2', '789': 'person3', '159': ''owner'', 'AD': 'AD'}
-
-# token = setup.generate_token('hayden@gmail.com', '123456', 'Hayden', 'Smith')
-# channel_id = setup.generate_channel(token, "Channel 1", True)
-# channel_id_list = {'channel 1', 'Channel 1', 'channel1'}
-# message_id = "456789"
-# # format of message_id_dic: 'message_id':{'token', 'channel_id'}
-# message_id_dic = {'message_id': {'person1', {'channel1', 'Channel 1'}}, 'message': {'person2', {'channel 1', 'Channel 1', 'channel1'}}, 'id': {'person1', 'Channel 1'}}
