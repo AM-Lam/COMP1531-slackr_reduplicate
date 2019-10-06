@@ -1,45 +1,66 @@
 import pytest
-import message_(un)pin
+from channel_leave.file import channel_leave
 
-def test_message_pin(token, message_id):
+def test_message_pin():
     # assert message_pin(token, message_id) == None
-    
-    assert message_pin('456','message') == None
-    
+    assert message_pin('admin1', 1) == None
+    assert message_pin('admin1', 5) == None
+    assert message_pin('admin2', 2) == None
+    assert message_pin('owner', 3) == None
+    assert message_pin('owner', 4) == None
+
     with pytest.raise(ValueError)
     #  message_id is not a valid message within a channel that the authorised user has joined
-        message_pin('123','message__')
+        message_pin('admin1', 456)
+
     #  The authorised user is not an admin
-        message_pin('123','id')
-        message_pin('123','message_id')
+        message_pin('admin1', 3)
+        message_pin('admin1', 4)
+        message_pin('admin2', 1)
+
     #  Message with ID message_id is already pinned
     def double_pin():
-        message_pin('456','message')
+        message_pin('admin2', 2)
         with pytest.raise(ValueError):
-            message_pin('456','message')
+            message_pin('admin2', 2)
 
     with pytest.raises(AccessError): 
     #  The authorised user is not a member of the channel that the message is within
-        message_pin('456','id')
+    def test_error_leave_channel:
+        channel_leave('admin2', 3)
+        with pytest.raises(AccessError) :
+            message_pin('admin2', 2)
     
     
-def test_message_unpin(token, message_id):
-    assert message_unpin(token, message_id) == None
+def test_message_unpin():
+    #assert message_unpin(token, message_id) == None
+    assert message_unpin('admin1', 1) == None
+    assert message_unpin('owner', 5) == None
+
+    def test_basic_case:
+        message_pin('owner', 3)
+        message_unpin('owner', 3)
     
     with pytest.raise(ValueError)
     #  message_id is not a valid message within a channel that the authorised user has joined
-        message_unpin('123','message__')
+        message_unpin('admin1', 78)
     #  The authorised user is not an admin
-        message_unpin('123','id')
-        message_unpin('123','message_id')
-    #  Message with ID message_id is already unpinned
-    def double_pin():
-        message_pin('456','message')
-        message_unpin('456','message')
-        with pytest.raise(ValueError):
-            message_unpin('456','message')
+        message_unpin('person1', 1)
+        message_unpin('person2', 3)
+        message_unpin('person3', 1)
+        message_unpin('person3', 2)
 
-    with pytest.raises(AccessError): 
+    #  Message with ID message_id is already unpinned
+    def double_unpin():
+        message_pin('admin2', 1)
+        message_unpin('admin2', 1)
+        with pytest.raise(ValueError):
+            message_unpin('admin2', 1)
+
     #  The authorised user is not a member of the channel that the message is within
-        message_unpin('456','id')
+    def test_error_leave_channel:
+        message_pin('admin1', 1)
+        channel_leave('admin1', 1)
+        with pytest.raises(AccessError) :
+            message_unpin('admin1', 1)
     

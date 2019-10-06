@@ -5,6 +5,7 @@ from setup import message_id_dic
 from setup import permission_id_list
 from setup import permission_id_dic
 from setup import AccessError
+from channel_list.file import channel_list
 
 # TODO
 # Have to include the related file name later
@@ -39,7 +40,7 @@ def message_remove(token, message_id):
     id_of_channel = message_id_dic[message_id][1]
     # if channel_list succeed, it should list of channels that the user being
     # check whether the user is a member in the channel or not
-    if id_of_channel in channel_list(token_of_message):
+    if id_of_channel not in channel_list(token_of_message):
         if permission_id_dic[token_of_message][id_of_channel] == 3:  
             #  Person who make the request is not an admin or owner in the channel so they don't have permission to remove the message
             raise AccessError("You don't have access to remove the message. Only the sender or admin shall make this request.")

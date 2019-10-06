@@ -56,7 +56,7 @@ message_id_dic = {
 
 permission_id_list: {1, 2, 3}
 
-#Based on different channels user have different permission
+# Based on different channels user have different permission
 # permission_id_dic = {token: {channel_id: permission_id}}
 permission_id_dic = {
     'person1': {1: 3, 2: 3},
@@ -66,6 +66,17 @@ permission_id_dic = {
     'admin2': {2: 2, 3: 3},
     'owner': {1: 1, 2: 1, 3: 1}
 }
+
+# format of react_id_dic: message_id: {token, messsage_id, react_id}
+react_id_dic = {
+    1: {'owner', 1, 1}, 
+    2: {'person3', 2, 5}
+}
+
+react_id_type = {1:'like', 2:'love', 3:'sad', 4:'hate', 5:'smile', 6:'angry'}
+
+#pinned_list: {message_id: token}
+pinned_list = {1: 'admin1', 5: 'owner'}
 
 
 # token = generateToken('hayden@gmail.com', '123456', 'Hayden', 'Smith')

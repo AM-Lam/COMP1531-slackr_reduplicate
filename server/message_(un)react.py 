@@ -1,55 +1,55 @@
 import setup
 
-token = setup.generateToken('hayden@gmail.com', '123456', 'Hayden', 'Smith')
-channel_id_dic = {1:channel 1, 2:'Channel 1', 3:'channel1'}
-message_id = "456789"
-# format of message_id_dic: 'message_id':{'token', 'channel_id'}
-message_id_dic = {'message_id': {'123', 'channel1'}, 'message': {'456', 'channel 1'}, 'id': {'123', 'Channel 1'}}
-message_id = setup.generateMessage(token, channel_id, message)
-# format of react_id_dic: react_id: {token, messsage_id, react_type}
-react_id_dic = {'react': {'123','message_id','like'}, 'reacted': {'456'','message', 'sad}}
-react_id_type = {'like', 'love', 'sad', 'hate', 'smile', 'angry'}
-# TODO
-# Add more detail to the u_id_dic
-u_id_dic = {'123': '123', '456': '456', '789': '789', '159': '159', 'AD': 'AD'}
+from setup import channel_id_dic
+from setup import message_id_list
+from setup import message_id_dic
+from setup import react_id_dic
+from channel_list.file import channel_list
 
 def message_react(token, message_id, react_id):
     # assume we can get the list of channels that the user's joining by getting u_id's dictionary
     # message_id is not a valid message within a channel that the authorised user has joined
     # message does not exist
-    if message_id == None:
-        message_unreact(token, message_id);
+    if message_id not in message_id_list:
         raise ValueError("The message no longer exists.")
+
     # user is not in the channel anymore
-    if message_id_dic[react_id][1] not in u_id_dic[token][channel]:
-        raise ValueError("Invalid message.")
+    token_of_message = message_id_dic[message_id][0]
+    id_of_channel = message_id_dic[message_id][1]
+    if id_of_channel not in channel_list(token_of_message):
+        raise ValueError("You are not a member of the channel.")
+
     #  react_id is not a valid React ID
     if react_id not in react_id_type:
-        return ValueError("Please enter a valid React.")
+        return ValueError("Please enter a valid react_id.")
     #  Message with ID message_id already contains an active React with ID react_id
-    if message_id_dic[react_id][1] != None:
+    if react_id_dic[message_id][2] != None:
         return ValueError("You reacted before. Please don't repeat.")
 
     # if the function is working
     # add the react_id into dictionary
-    react_id_dic[react_id] = {token, message_id}
+    react_id_dic[message_id] = {token, message_id, react_id}
     
 def message_unreact(token, message_id, react_id):
-
-    # ValueError when:  
+ 
     #  message_id is not a valid message within a channel that the authorised user has joined
-    if message_id == None:
-        message_unreact(token, message_id);
+    if message_id not in message_id_list:
+        message_unreact(token, message_id)
         raise ValueError("The message no longer exists.")
+
     # user is not in the channel anymore
-    if message_id_dic[react_id][1] not in u_id_dic[token][channel]:
+    token_of_message = message_id_dic[message_id][0]
+    id_of_channel = message_id_dic[message_id][1]
+    if id_of_channel not in channel_list(token_of_message):
         raise ValueError("Invalid message.")
+
     #  react_id is not a valid React ID
     if react_id not in react_id_type:
-        return ValueError("Please enter a valid React number.")
+        return ValueError("Please enter a valid react number.")
+
     #  Message with ID message_id already contains an active React with ID react_id
-    if message_id_dic[react_id][1] != None:
-        return ValueError("Cannot unreact this message.")
+    if react_id_dic[message_id][2] == None:
+        return ValueError("You haven't raect on this message.")
 
     # If the function is working, delete the record of react in dictionary    
     del react_id_dic[react_id]

@@ -1,7 +1,6 @@
 import pytest
 import message_(un)sendOredit
-from channel_leave
-.file import channel_leave
+from channel_leave.file import channel_leave
 
 
 def test_message_send():
