@@ -1,6 +1,6 @@
 For the second stage of the iteration there are a number of things that we should do in order to complete it properly and on-time. The first step in this is to break the requirements and functionality of the software into logical, modular chunks so that it is easy to work on different parts individually and see how they interact with each other. This division can be seen below:
 
-[image link]
+![alt text](https://drive.google.com/file/d/1NcTMOHCe8yb9xuoGI-xHfopTRRJ1KgG8/view?usp=sharing "Modules Diagram")
 
 Each of the functions that are needed fits into one of these modules.
 
