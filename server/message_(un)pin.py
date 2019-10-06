@@ -2,12 +2,15 @@ import setup
 from channel_list.file import channel_list
 
 token = setup.generateToken('hayden@gmail.com', '123456', 'Hayden', 'Smith')
-channel_id_list = {'channel 1', 'Channel 1', 'channel1'}
+channel_id_dic = {1:channel 1, 2:'Channel 1', 3:'channel1'}
 message_id = "456789"
 # format of message_id_dic: 'message_id':{'token', 'channel_id'}
 message_id_dic = {'message_id': {'123', 'channel1'}, 'message': {'456', 'channel 1'}, 'id': {'123', 'Channel 1'}}
 message_id = setup.generateMessage(token, channel_id, message)
-permission_id = {'123': 'member' ,'456': 'admin', '789': 'member', 'AD': 'admin', '159': owner}
+#Based on different channels user have different permission
+
+#permission_id_dic = {'123': 'member' ,'456': 'admin', '789': 'member', 'AD': 'admin', '159': owner}
+
 #format of pinned_dic = {token: message_id}
 pinned_list = {'message_id', 'id'}
 

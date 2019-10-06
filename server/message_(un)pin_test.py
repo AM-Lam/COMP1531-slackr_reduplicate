@@ -2,7 +2,8 @@ import pytest
 import message_(un)pin
 
 def test_message_pin(token, message_id):
-    assert message_pin(token, message_id) == None
+    # assert message_pin(token, message_id) == None
+    
     assert message_pin('456','message') == None
     
     with pytest.raise(ValueError)
