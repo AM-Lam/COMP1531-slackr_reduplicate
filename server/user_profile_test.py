@@ -1,5 +1,4 @@
 import pytest
-import user_profile
 
 def test_user_profile():
     # assert user_profile(token, u_id) == [{email, name_first, name_last, handle_str}]

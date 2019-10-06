@@ -12,3 +12,4 @@ def user_profile(token, u_id):
         # details cannot be found based on u_id
     else:
         raise ValueError("This username is not existed. Please try again")
+        
