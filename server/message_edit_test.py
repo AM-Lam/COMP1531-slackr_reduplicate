@@ -1,5 +1,4 @@
 import pytest
-from message_edit import message_edit
 
 def test_message_edit():
     assert message_edit('person1', 1, 'hello') == None

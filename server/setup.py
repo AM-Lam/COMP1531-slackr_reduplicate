@@ -54,7 +54,7 @@ message_id_dic = {
     5: {'admin1', 1}
 }
 
-permission_id_list: {1, 2, 3}
+permission_id_list = {1, 2, 3}
 
 # Based on different channels user have different permission
 # permission_id_dic = {token: {channel_id: permission_id}}
