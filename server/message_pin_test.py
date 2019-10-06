@@ -21,10 +21,9 @@ def test_message_pin():
     #  Message with ID message_id is already pinned
     def double_pin():
         message_pin('admin2', 2)
-        with pytest.raise(ValueError):
+        with pytest.raises(ValueError):
             message_pin('admin2', 2)
 
-    with pytest.raises(AccessError): 
     #  The authorised user is not a member of the channel that the message is within
     def test_error_leave_channel():
         channel_leave('admin2', 3)

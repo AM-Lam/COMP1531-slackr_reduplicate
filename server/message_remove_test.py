@@ -17,7 +17,7 @@ def test_message_remove():
         message_remove('person1', 123)
 
     # Message (based on ID) no longer exists
-    def test_message_no_longer_exist:
+    def test_message_no_longer_exist():
         # remove the message first
         message_send('person1', 1, 'a')
         message_remove('person1', 1)

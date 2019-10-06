@@ -24,7 +24,7 @@ def test_message_unpin():
     def double_unpin():
         message_pin('admin2', 1)
         message_unpin('admin2', 1)
-        with pytest.raise(ValueError):
+        with pytest.raises(ValueError):
             message_unpin('admin2', 1)
 
     #  The authorised user is not a member of the channel that the message is within
