@@ -1,9 +1,8 @@
-import setup
 from setup import channel_id_dic
 from setup import message_id_list
 from setup import message_id_dic
 from setup import pinned_list
-from channels_list.file import channels_list
+from channels_list import channels_list
 
 def message_pin(token, message_id):
 

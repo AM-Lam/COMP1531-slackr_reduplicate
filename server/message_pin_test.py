@@ -1,5 +1,6 @@
 import pytest
-from channel_leave.file import channel_leave
+from message_pin import message_pin
+from channel_leave import channel_leave
 
 def test_message_pin():
     # assert message_pin(token, message_id) == None
@@ -9,7 +10,7 @@ def test_message_pin():
     assert message_pin('owner', 3) == None
     assert message_pin('owner', 4) == None
 
-    with pytest.raise(ValueError)
+    with pytest.raises(ValueError):
     #  message_id is not a valid message within a channel that the authorised user has joined
         message_pin('admin1', 456)
 
@@ -21,13 +22,12 @@ def test_message_pin():
     #  Message with ID message_id is already pinned
     def double_pin():
         message_pin('admin2', 2)
-        with pytest.raise(ValueError):
+        with pytest.raises(ValueError):
             message_pin('admin2', 2)
 
-    with pytest.raises(AccessError): 
     #  The authorised user is not a member of the channel that the message is within
-    def test_error_leave_channel:
+    def test_error_leave_channel():
         channel_leave('admin2', 3)
-        with pytest.raises(AccessError) :
+        with pytest.raises(AccessError):
             message_pin('admin2', 2)
     

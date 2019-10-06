@@ -7,7 +7,7 @@ from auth_register import auth_register
 
 def test_channels_list():
     # boilerplate user/channel creation code
-    user1 = auth__register("valid@email.com", "123456789", "Bob", "Jones")
+    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
     user2 = auth_register("new@email.com", "987654321", "Doug", "Jones")
     
     channel1 = channels_create(user1["token"], "Channel 1", True)

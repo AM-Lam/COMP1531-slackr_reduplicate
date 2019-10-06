@@ -1,4 +1,3 @@
-import setup
 from setup import message_id_list
 from setup import message_id_dic
 from setup import AccessError

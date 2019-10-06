@@ -2,7 +2,7 @@ def auth_passwordreset_request(email):
     # this function will take an email and send a request email with a secret code
     pass
 
-def validate_email_existance():
+def validate_email_existence():
     # this function is to check if email exists on local database
     pass
 

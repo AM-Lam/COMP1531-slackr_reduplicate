@@ -9,7 +9,7 @@ auth_register.auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
 ###########################################################################################################################################
 def test_Validate_email():
     # what if the email does not exist in the database -->
-    pytest.raises(ValueError, auth_passwordreset_request.validate_email_existance, 'INVALIDeMAIL@domain.com')   
+    pytest.raises(ValueError, auth_passwordreset_request.validate_email_existence, 'INVALIDeMAIL@domain.com')   
 
 def test_Validate_email1():
     # user forgot to put the .au domain in the address-->

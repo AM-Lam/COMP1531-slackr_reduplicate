@@ -16,7 +16,7 @@ def test_channel_exists_or_not():
 # start greater than the total number of messages
 def test_is_start_too_big():
     user1 = auth_register.auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
-    user2 = auth_register.register('user2@domain.com' , 'vscod231343' 'ussr' , 'b')
+    user2 = auth_register.auth_register('user2@domain.com' , 'vscod231343' 'ussr' , 'b')
     user3 = auth_register.auth_register('user3@domain.com' , 'lollollmao' , 'the' , 'rabbit')
     token1 = user1['token']
     token2 = user2['token']

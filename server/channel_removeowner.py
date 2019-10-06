@@ -8,7 +8,7 @@ def channel_removeowner(token, channel_id, u_id):
     to_add = None
     # now check whether or not the channel actually exists, if it does exist
     # set it to a value and break out of the loop earlier
-    for channel in channels_list(token):
+    for channel in channels_list(token)["channels"]:
         if channel["channels_id"] == channel_id:
             to_add = channel
             break

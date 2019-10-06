@@ -11,6 +11,6 @@ def check_channel_existence(channel_id):
     # this function will have to check and verify if the channel is valid
     pass
 
-def verify_user_status(token, channel_id)
+def verify_user_status(token, channel_id):
     # this will check if the user is a part of the channel
     pass

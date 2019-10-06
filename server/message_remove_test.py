@@ -1,5 +1,5 @@
 import pytest
-from channels_leave import channels_leave
+from message_remove import message_remove
 
 def test_message_remove():
     # assert message_remove(token, message_id) == None
@@ -17,7 +17,7 @@ def test_message_remove():
         message_remove('person1', 123)
 
     # Message (based on ID) no longer exists
-    def test_message_no_longer_exist:
+    def test_message_no_longer_exist():
         # remove the message first
         message_send('person1', 1, 'a')
         message_remove('person1', 1)
@@ -27,7 +27,7 @@ def test_message_remove():
 
     # AccessError: 
     # if user is not a member of a certain channel anymore
-    def test_error_leave_channel:
+    def test_error_leave_channel():
         channel_leave('person1', 1)
         with pytest.raises(AccessError) :
             message_remove('person1', 1)
