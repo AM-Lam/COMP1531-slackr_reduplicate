@@ -10,7 +10,7 @@ def test_message_unreact():
         message_react('admin2', 4, 4)
         assert message_unreact('admin2', 4 , 4) == None
 
-    with pytest.raise(ValueError): 
+    with pytest.raises(ValueError): 
     #  message_id is not a valid message within a channel that the authorised user has joined
         message_unreact('person1', 88, 1)
         message_unreact('person3', 45, 1)

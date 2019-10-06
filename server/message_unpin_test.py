@@ -9,7 +9,7 @@ def test_message_unpin():
     assert message_unpin('admin1', 1) == None
     assert message_unpin('owner', 5) == None
 
-    def test_basic_case:
+    def test_basic_case():
         message_pin('owner', 3)
         message_unpin('owner', 3)
     
@@ -26,7 +26,7 @@ def test_message_unpin():
     def double_unpin():
         message_pin('admin2', 1)
         message_unpin('admin2', 1)
-        with pytest.raise(ValueError):
+        with pytest.raises(ValueError):
             message_unpin('admin2', 1)
 
     #  The authorised user is not a member of the channel that the message is within
