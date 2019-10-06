@@ -1,6 +1,4 @@
 import pytest
-from message_unpin import message_unpin
-from message_pin import message_pin
 from channel_leave import channel_leave
 
     
