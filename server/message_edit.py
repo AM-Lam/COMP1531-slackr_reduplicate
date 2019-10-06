@@ -1,4 +1,3 @@
-import setup
 from setup import channel_id_dic
 from setup import message_id_list
 from setup import message_id_dic
@@ -31,6 +30,6 @@ def message_edit(token, message_id, message):
     else:
         raise ValueError("Admin don't have the permission to edit the message. ")   
 
-    #psedo-code
+    # pseudo-code
     # if the function is executed, i suppose this is the way to change the message's content
     message_id_list[message_id] = message

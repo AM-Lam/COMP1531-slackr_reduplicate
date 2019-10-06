@@ -1,4 +1,5 @@
 import pytest
+from message_remove import message_remove
 from channels_leave import channels_leave
 
 def test_message_remove():
