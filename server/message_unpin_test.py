@@ -7,7 +7,7 @@ def test_message_unpin():
     assert message_unpin('admin1', 1) == None
     assert message_unpin('owner', 5) == None
 
-    def test_basic_case:
+    def test_basic_case():
         message_pin('owner', 3)
         message_unpin('owner', 3)
     

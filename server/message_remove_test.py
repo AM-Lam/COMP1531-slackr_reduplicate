@@ -27,7 +27,7 @@ def test_message_remove():
 
     # AccessError: 
     # if user is not a member of a certain channel anymore
-    def test_error_leave_channel:
+    def test_error_leave_channel():
         channel_leave('person1', 1)
         with pytest.raises(AccessError) :
             message_remove('person1', 1)

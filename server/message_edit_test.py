@@ -7,7 +7,7 @@ def test_message_edit():
     assert message_edit('admin1', 5, 'GKREgW2twKzcZ9wMe3zMsl0yf8OJfYOAB9I9DWd81pIPRmlq7v1p5j1tfifWu8kcoXkG1wu0qLK7xfhHlJUg12Yxr') == None
 
     # if user is not a member of a certain channel anymore
-    def test_error_leave_channel:
+    def test_error_leave_channel():
         channel_leave('person1', 1)
         with pytest.raises(AccessError) :
             message_edit('person1', 1)

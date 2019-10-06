@@ -22,7 +22,7 @@ def generate_channel(token, name, is_public):
 
 def generate_message(token, channel_id, message):
     message_id_id_dic = {}
-    message_id_dic = message_send(token,channel_id message)
+    message_id_dic = message_send(token,channel_id, message)
     message_id = channel_create_dic[message]
     return message_id
 # hardcore the user 

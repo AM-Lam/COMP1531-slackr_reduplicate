@@ -13,7 +13,7 @@ def test_check_reset_code():
     pytest.raises(ValueError, auth_passwordreset_reset.auth_passwordreset_reset, "INVALID-CODE")
 
 def test_code_is_not_string():
-    pytest.raises(ValueError, auth_passwordreset_reset.auth_passwordreset_reset, 123@!@)
+    pytest.raises(ValueError, auth_passwordreset_reset.auth_passwordreset_reset, "123@!@")
 
 #########################################################################################
 
