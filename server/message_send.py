@@ -4,7 +4,7 @@ from setup import message_id_dic
 from setup import AccessError
 from channels_list import channels_list
 
-def message_send(token, channel_id, message):
+def message_send():
     # Message is more than 1000 characters
     if (len(message) > 1000):
         raise ValueError("The message is too long. Please keep it within 1000 characters.")   
