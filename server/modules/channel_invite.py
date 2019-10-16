@@ -1,11 +1,11 @@
-import channel_join
+from .channel_join import  channel_join
 
 
 def channel_invite(token, channel_id, u_id):
     verify_user_validity(u_id)
     verify_token_not_member(token, channel_id, u_id)
     # now that all the detals have been verified we join the user to the channel
-    channel_join.channel_join(token, channel_id) ##<--------------------------------------
+    channel_join(token, channel_id) ##<--------------------------------------
     pass  
 
 def verify_token_not_member(token, channel_id, u_id):

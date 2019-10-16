@@ -1,10 +1,5 @@
-from setup import channel_id_dic
-from setup import message_id_list
-from setup import message_id_dic
-from setup import permission_id_list
-from setup import permission_id_dic
-from setup import AccessError
-from channels_list import channels_list
+from .access_error import AccessError
+from .channels_list import channels_list
 
 def message_remove(token, message_id):
     # Message (based on ID) no longer exists

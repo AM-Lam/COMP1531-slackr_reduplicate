@@ -1,7 +1,5 @@
-from setup import message_id_list
-from setup import message_id_dic
-from setup import AccessError
-from channels_list import channels_list
+from .access_error import AccessError
+from .channels_list import channels_list
 
 def message_send():
     # Message is more than 1000 characters

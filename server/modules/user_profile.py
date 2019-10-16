@@ -1,9 +1,4 @@
-import setup
-from setup import u_id_list
-from setup import u_id_dic
-
 def user_profile(token, u_id):
-    
     if u_id_list[token] == u_id:
         if u_id in u_id_dic: 
             return u_id_dic[u_id]

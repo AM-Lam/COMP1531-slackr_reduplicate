@@ -1,4 +1,4 @@
-from ch_details_access_error import AccessError
+from .access_error import AccessError
 
 
 def channel_details(token, channel_id):

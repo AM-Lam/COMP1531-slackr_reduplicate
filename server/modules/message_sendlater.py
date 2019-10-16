@@ -1,4 +1,4 @@
-from channels_listall import channels_listall
+from .channels_listall import channels_listall
 from datetime import datetime
 
 
