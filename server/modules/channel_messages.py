@@ -1,4 +1,4 @@
-from access_error import AccessError 
+from .access_error import AccessError 
 
 
 def channel_messages(token, channel_id, start):

@@ -1,4 +1,4 @@
-from channels_list import channels_list
+from .channels_list import channels_list
 
 
 def channel_removeowner(token, channel_id, u_id):

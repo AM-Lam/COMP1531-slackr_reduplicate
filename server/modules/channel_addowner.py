@@ -1,5 +1,5 @@
-from access_error import AccessError
-from channels_list import channels_list
+from .access_error import AccessError
+from .channels_list import channels_list
 
 
 def channel_addowner(token, channel_id, u_id):

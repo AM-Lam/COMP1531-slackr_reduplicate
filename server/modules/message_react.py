@@ -1,8 +1,4 @@
-from setup import channel_id_dic
-from setup import message_id_list
-from setup import message_id_dic
-from setup import react_id_dic
-from channels_list import channels_list
+from .channels_list import channels_list
 
 def message_react(token, message_id, react_id):
     # assume we can get the list of channels that the user's joining by getting u_id's dictionary
