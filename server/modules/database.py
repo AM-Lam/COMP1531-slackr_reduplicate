@@ -2,13 +2,14 @@ DATABASE = None
 
 
 class User:
-    def __init__(self, u_id, first_name, last_name, password, email):
+    def __init__(self, u_id, first_name, last_name, password, email, token):
         self._u_id = u_id 
         self._first_name = firstName
         self._last_name = lastName
         self._password = password
         self._email = email
         self._handle = firstName + lastName
+        self._token = token
     
     
     def get_user_data(self):
@@ -19,6 +20,7 @@ class User:
             "password" : self._password,
             "email" : self._email,
             "handle" : self._handle,
+            "token" : self._token,
         }
     
 
@@ -29,6 +31,7 @@ class User:
         self._password = new_data["password"]
         self._email = new_data["email"]
         self._handle = new_data["handle"]
+        self._token = new_data["token"]
 
 
 class Channel:
