@@ -24,12 +24,12 @@ print("Setup complete")
 
 class User:
     def __init__(self, u_id, firstName, lastName, password, email):
-        self.__u_id = u_id 
-        self.__first_name = firstName
-        self.__last_name = lastName
-        self.__password = password
-        self.__email = email
-        self.__handle = firstName + lastName
+        self._u_id = u_id 
+        self._first_name = firstName
+        self._last_name = lastName
+        self._password = password
+        self._email = email
+        self._handle = firstName + lastName
 
     def get_data(self, key):
         return self.key
@@ -40,11 +40,11 @@ class User:
 
 class channel:
     def __init__(self, channel_id, channel_name, message_id, member, public):
-        self.__channel_id = channel_id
-        self.__channel_name = channel_name
-        self.__message_id = message_id
-        self.__member = member     
-        self.__public = True #default
+        self._channel_id = channel_id
+        self._channel_name = channel_name
+        self._message_id = message_id
+        self._member = member     
+        self._public = True #default
 
     def get_data(self, key):
         return self.key
@@ -57,18 +57,18 @@ class channel:
         self.member = list
 
     def change_public(self):
-        if self.__public == True:
-            self.__public = False
+        if self._public == True:
+            self._public = False
         else 
-            self.__public = True
+            self._public = True
 
 class messages:
     def __init__(self, message_id, u_id, text, channel_id, time_stamps):
-        self.__message_id = message_id
-        self.__u_id = u_id
-        self.__text = text
-        self.__channel_id = channel_id
-        self.__time_stamps = time_stamps
+        self._message_id = message_id
+        self._u_id = u_id
+        self._text = text
+        self._channel_id = channel_id
+        self._time_stamps = time_stamps
 
     def get_data(self, key):
         return self.key
