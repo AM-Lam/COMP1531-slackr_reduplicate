@@ -31,6 +31,12 @@ class User:
         self.__email = email
         self.__handle = firstName + lastName
 
+    def get_data(self, key):
+        return self.key
+
+    def set_data(self, key, data):
+        self.key = data
+
 
 class channel:
     def __init__(self, channel_id, channel_name, message_id, member, public):
@@ -40,6 +46,22 @@ class channel:
         self.__member = member     
         self.__public = True #default
 
+    def get_data(self, key):
+        return self.key
+
+    def set_data(self, key, data):
+        self.key = data
+
+    # update member list with a new list
+    def update_member_list(self, list):
+        self.member = list
+
+    def change_public(self):
+        if self.__public == True:
+            self.__public = False
+        else 
+            self.__public = True
+
 class messages:
     def __init__(self, message_id, u_id, text, channel_id, time_stamps):
         self.__message_id = message_id
@@ -47,3 +69,9 @@ class messages:
         self.__text = text
         self.__channel_id = channel_id
         self.__time_stamps = time_stamps
+
+    def get_data(self, key):
+        return self.key
+
+    def set_data(self, key, data):
+        self.key = data
