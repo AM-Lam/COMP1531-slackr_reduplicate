@@ -3,6 +3,7 @@ import sys
 from flask_cors import CORS
 from json import dumps
 from flask import Flask, request
+from server import *
 
 APP = Flask(__name__)
 CORS(APP)
