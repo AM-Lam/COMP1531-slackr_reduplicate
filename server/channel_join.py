@@ -1,5 +1,5 @@
-from access_error import AccessError
-from channels_listall import channels_listall
+from .access_error import AccessError
+from .channels_listall import channels_listall
 
 
 def channel_join(token, channel_id):

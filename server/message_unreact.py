@@ -1,8 +1,4 @@
-from setup import channel_id_dic
-from setup import message_id_list
-from setup import message_id_dic
-from setup import react_id_dic
-from channels_list import channels_list
+from .channels_list import channels_list
 
     
 def message_unreact(token, message_id, react_id):

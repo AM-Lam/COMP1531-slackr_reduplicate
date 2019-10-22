@@ -1,8 +1,4 @@
-from setup import channel_id_dic
-from setup import message_id_list
-from setup import message_id_dic
-from setup import pinned_list
-from channels_list import channels_list
+from .channels_list import channels_list
 
 def message_unpin(token, message_id):
     #  message_id is not a valid message

@@ -1,4 +1,3 @@
-<<<<<<< assumptions.md
 =======
 - General Assumptions
   - assume we have the necessary funds/space/resources to host our backend.
@@ -200,4 +199,4 @@ admin_userpermission_change:
   - Author: Anthony Wallace
   - assume that there is no other way to access the database for a non admin/owner.
   - assume admin and owner have different permission levels
->>>>>>> assumptions.md
+

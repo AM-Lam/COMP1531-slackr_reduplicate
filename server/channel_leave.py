@@ -1,6 +1,6 @@
 # comment this out until these functions are written
-from channels_list import channels_list
-from channel_details import channel_details
+from .channels_list import channels_list
+from .channel_details import channel_details
 
 
 def channel_leave(token, channel_id):
