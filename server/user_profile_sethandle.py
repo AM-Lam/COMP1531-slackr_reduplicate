@@ -1,3 +1,5 @@
+import jwt
+
 #   user_profile_sethandle(token, handle_str);
 #   return void
 #   Exception: ValueError when:
@@ -6,12 +8,23 @@
 
 def user_profile_sethandle(token, handle_str):
     # find u_id associated with token (with non-existent database)
-    u_id = 12345
+    admin_user_id = check_valid_token(token)
+    
     handle_check(handle_str)
     handle_in_use_check(handle_str)
     change_handle(u_id, handle_str)
 
     return
+
+def check_valid_token(token):
+    # find the user ID associated with this token, else raise a ValueError
+    decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    try:
+        for x in database:
+            if x.get("u_id") == decoded_jwt.key():
+                return x.get("u_id")
+    except Exception as e:
+        raise ValueError("token invalid")
 
 def handle_check(handle_str):
     if len(handle_str) < 20 and len(handle_str) > 0:

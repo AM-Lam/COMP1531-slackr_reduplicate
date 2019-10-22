@@ -1,4 +1,5 @@
 import urllib
+import jwt
 
 #   user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end);
 #   return void
@@ -9,7 +10,7 @@ import urllib
 
 def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end):
     # find u_id associated with token (with non-existent database)
-    u_id = 12345
+    user_id = check_valid_token(token)
 
     check_imgurl(img_url)
     check_start_coords(x_start, y_start)
@@ -19,6 +20,16 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
     change_photo(img_url, x_start, y_start, x_end, y_end)
     return
 
+def check_valid_token(token):
+    # find the user ID associated with this token, else raise a ValueError
+    decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    try:
+        for x in database:
+            if x.get("u_id") == decoded_jwt.key():
+                return x.get("u_id")
+    except Exception as e:
+        raise ValueError("token invalid")
+        
 def check_imgurl(img_url):
     if urllib.request.urlopen(img_url).getcode() == 200:
         return True

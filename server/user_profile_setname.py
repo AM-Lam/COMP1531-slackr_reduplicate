@@ -1,3 +1,5 @@
+import jwt
+
 #   user_profile_setname(token, name_first, name_last);
 #   return void
 #   Exception: ValueError when:
@@ -7,13 +9,23 @@
 
 def user_profile_setname(token, name_first, name_last):
     # find u_id associated with token (with non-existent database)
-    u_id = 12345
+    admin_user_id = check_valid_token(token)
     first_name_check(name_first)
     last_name_check(name_last)
     change_names(u_id, name_first, name_last)
 
     return
 
+def check_valid_token(token):
+    # find the user ID associated with this token, else raise a ValueError
+    decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    try:
+        for x in database:
+            if x.get("u_id") == decoded_jwt.key():
+                return x.get("u_id")
+    except Exception as e:
+        raise ValueError("token invalid")
+    
 def first_name_check(name_first):
     if len(name_first) < 50 and len(name_first) > 0:
         return True
