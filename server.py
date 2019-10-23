@@ -52,6 +52,30 @@ def run_channels_create():
     return dumps(return_value)
 
 
+@APP.route('/channels/listall', methods=["POST"])
+def run_channels_listall():
+    """
+    Retrieve a list of all the channels that have been created and return
+    as a list of dictionaries. At the moment we are assuming that all users
+    can do this, regardless of what their token is but I will follow this up
+    with the stakeholders.
+    """
+    request_data = request.get_json()
+    return_value = ""
+
+    try:
+        return_value = channels_listall.channels_listall(
+            request_data["token"]
+        )
+    except Exception as e:
+        if e == access_error.AccessError:
+            return_value = "<h1>403 Access Forbidden</h1>"
+        else:
+            return_value = "<h1>404 Page Not Found</h1>"
+    
+    return dumps(return_value)
+
+
 if __name__ == '__main__':
     APP.run(port=(sys.argv[1] if len(sys.argv) > 1 else 5000))
 
