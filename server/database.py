@@ -1,14 +1,18 @@
+import pickle
+
+
 DATABASE = None
+SECRET = "MICHELFOUCAULT"
 
 
 class User:
     def __init__(self, u_id, first_name, last_name, password, email, token):
         self._u_id = u_id 
-        self._first_name = firstName
-        self._last_name = lastName
+        self._first_name = first_name
+        self._last_name = last_name
         self._password = password
         self._email = email
-        self._handle = firstName + lastName
+        self._handle = first_name + last_name
         self._token = token
     
     
@@ -35,12 +39,20 @@ class User:
 
 
 class Channel:
-    def __init__(self, channel_id, channel_name, messages, member, public):
-        self._channel_id = channel_id
-        self._channel_name = channel_name
-        self._messages = messages
-        self._members = members
-        self._public = public
+    def __init__(self, channel_id, channel_name, messages, members, public):
+        self._channel_id = channel_id       # id of the channel, increases 
+                                            # sequentially
+        
+        self._channel_name = channel_name   # channel name, string
+        
+        self._messages = messages           # messages in the channel, list
+                                            # of Message objects
+        
+        self._members = members             # members of the channel, list of
+                                            # u_ids
+        
+        self._public = public               # is the channel public, boolean 
+                                            # val
     
 
     def get_channel_data(self):
@@ -89,6 +101,17 @@ def update_data(new_database):
     global DATABASE
     DATABASE = new_database
     return DATABASE
+
+
+def get_secret():
+    global SECRET
+    return SECRET
+
+
+def save_data():
+    global DATABASE
+    with open("db_dump.p", "wb") as dump:
+        pickle.dump(DATABASE, dump)
 
 
 # initialise an empty database
