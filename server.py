@@ -52,6 +52,20 @@ def run_channels_create():
     return dumps(return_value)
 
 
+@APP.route('/channels/list', methods=["POST"])
+def run_channels_list():
+    request_data = request.get_json()
+    return_value = ""
+    try:
+        return_value = channels_list.channels_list(
+            request_data["token"]
+        )
+    except:
+        return_value = "<h1>403 Access Forbidden</h1>"
+    
+    return dumps(return_value)
+
+
 if __name__ == '__main__':
     APP.run(port=(sys.argv[1] if len(sys.argv) > 1 else 5000))
 

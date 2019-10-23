@@ -1,12 +1,18 @@
+import jwt
+from .access_error import AccessError
+from .database import *
+
+
 def channels_list(token):
-    # first grab the u_id associated with this token, we'll need to interact
-    # with a database for this
-    u_id = 111
-    
-    # at this point I imagine the best way to get a list of the users channels
-    # would be a database query of some sort, it would likely be faster than any
-    # python code I could write
-    channels = []
+    server_data = get_data()
+
+    if not server_data["tokens"].get(token, False):
+        raise AccessError
+
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
+
+    channels = [ c.frontend_format() for c in server_data["channels"]
+                if u_id in c._members ]
     
     return { "channels" : channels }
-
