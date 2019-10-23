@@ -8,11 +8,11 @@ SECRET = "MICHELFOUCAULT"
 class User:
     def __init__(self, u_id, first_name, last_name, password, email, token):
         self._u_id = u_id 
-        self._first_name = firstName
-        self._last_name = lastName
+        self._first_name = first_name
+        self._last_name = last_name
         self._password = password
         self._email = email
-        self._handle = firstName + lastName
+        self._handle = first_name + last_name
         self._token = token
     
     
@@ -117,7 +117,8 @@ def save_data():
 # initialise an empty database
 update_data({
     "users" : [],
-    "channels" : []
+    "channels" : [],
+    "tokens" : {}
 })
 
 print("Setup complete")
