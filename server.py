@@ -12,6 +12,10 @@ CORS(APP)
 def echo4():
     pass
 
+@APP.route('/login', methods=['POST'])
+def login():
+    request.form.get('token')
+
 @APP.route('/echo/get', methods=['GET'])
 def echo1():
     """ Description of function """

@@ -94,7 +94,8 @@ def update_data(new_database):
 # initialise an empty database
 update_data({
     "users" : [],
-    "channels" : []
+    "channels" : [],
+    "tokens" : {}
 })
 
 print("Setup complete")
