@@ -1,3 +1,5 @@
+from .database import *
+import jwt
 from .channels_list import channels_list
 
 def message_react(token, message_id, react_id):

@@ -1,3 +1,5 @@
+from .database import *
+import jwt
 from .access_error import AccessError
 from .channels_list import channels_list
 

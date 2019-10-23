@@ -1,4 +1,7 @@
 import pytest
+from .channels_create import channels_create
+from .auth_register import auth_register
+from .database import *
 
 def test_user_profile():
     # assert user_profile(token, u_id) == [{email, name_first, name_last, handle_str}]

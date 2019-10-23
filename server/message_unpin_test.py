@@ -1,5 +1,6 @@
 import pytest
-from channel_leave import channel_leave
+from .database import *
+from .channel_leave import channel_leave
 
     
 def test_message_unpin():

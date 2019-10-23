@@ -1,3 +1,5 @@
+from .database import *
+import jwt
 from .channels_list import channels_list
 
 def message_unpin(token, message_id):
