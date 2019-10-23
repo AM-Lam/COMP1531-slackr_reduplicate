@@ -1,15 +1,28 @@
+from .database import *
+import jwt
+
+
 def channels_create(token, name, is_public):
     # first check for a valid name
     if len(name) > 20:
         raise ValueError
     
     # now grab the u_id associated with the provided token
-    u_id = 111
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
     
-    # at this point we'll have to interact with a database, and add a new
-    # channel to it, this will likely include incrementing a value to get the
-    # channel_id, but we clearly can't do this at this stage of development
-    channel_id = 101
+    server_data = get_data()
+
+    # make our channel id just be the count of channels we already have
+    # incremented by 1, this way the channel_ids will increase sequentially
+    channel_id = len(server_data["channels"]) + 1
+
+    # at the start there will be no messages and the only member will be
+    # the creator of the channel
+    new_channel = Channel(channel_id, name, [], [u_id], is_public)
     
+    # add the channel to the server database
+    server_data["channels"].append(new_channel)
+
     # return the new channel's id
     return { "channel_id" : channel_id }
