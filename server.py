@@ -52,6 +52,21 @@ def run_channels_create():
     return dumps(return_value)
 
 
+@APP.route("/channel/leave", methods=["POST"])
+def run_channel_leave():
+    request_data = request.get_json()
+    return_value = ""
+    try:
+        return_value = channel_leave.channel_leave(
+            request_data["token"],
+            request_data["channel_id"]
+        )
+    except:
+        return_value = "<h1>403 Request Forbidden</h1>"
+    
+    return dumps(return_value)
+
+
 if __name__ == '__main__':
     APP.run(port=(sys.argv[1] if len(sys.argv) > 1 else 5000))
 
