@@ -125,3 +125,6 @@ dmypy.json
 
 # Other
 *.py~
+
+# database dump
+db_dump.p

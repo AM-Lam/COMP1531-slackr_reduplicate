@@ -1,14 +1,18 @@
+import pickle
+
+
 DATABASE = None
+SECRET = "MICHELFOUCAULT"
 
 
 class User:
     def __init__(self, u_id, first_name, last_name, password, email, token):
         self._u_id = u_id 
-        self._first_name = firstName
-        self._last_name = lastName
+        self._first_name = first_name
+        self._last_name = last_name
         self._password = password
         self._email = email
-        self._handle = firstName + lastName
+        self._handle = first_name + last_name
         self._token = token
     
     
@@ -35,12 +39,20 @@ class User:
 
 
 class Channel:
-    def __init__(self, channel_id, channel_name, messages, member, public):
-        self._channel_id = channel_id
-        self._channel_name = channel_name
-        self._messages = messages
-        self._members = members
-        self._public = public
+    def __init__(self, channel_id, channel_name, messages, members, public):
+        self._channel_id = channel_id       # id of the channel, increases 
+                                            # sequentially
+        
+        self._channel_name = channel_name   # channel name, string
+        
+        self._messages = messages           # messages in the channel, list
+                                            # of Message objects
+        
+        self._members = members             # members of the channel, dictionary
+                                            # with u_id as key and perm. as value
+        
+        self._public = public               # is the channel public, boolean 
+                                            # val
     
 
     def get_channel_data(self):
@@ -53,12 +65,11 @@ class Channel:
         }
     
 
-    def update_channel_data(self, new_data):
-        self._channel_id = new_data["channel_id"]
-        self._first_name = new_data["first_name"]
-        self._last_name = new_data["last_name"]
-        self._password = new_data["password"]
-        self._email = new_data["email"]
+    def frontend_format(self):
+        return {
+            "channel_id" : self._channel_id,
+            "name" : self._channel_name
+        }
 
 
 class Messages:
@@ -91,10 +102,22 @@ def update_data(new_database):
     return DATABASE
 
 
+def get_secret():
+    global SECRET
+    return SECRET
+
+
+def save_data():
+    global DATABASE
+    with open("db_dump.p", "wb") as dump:
+        pickle.dump(DATABASE, dump)
+
+
 # initialise an empty database
 update_data({
     "users" : [],
-    "channels" : []
+    "channels" : [],
+    "tokens" : {}
 })
 
 print("Setup complete")
