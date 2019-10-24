@@ -8,7 +8,7 @@ import jwt
 
 def user_profile_sethandle(token, handle_str):
     # find u_id associated with token (with non-existent database)
-    admin_user_id = check_valid_token(token)
+    u_id = check_valid_token(token)
     
     handle_check(handle_str)
     handle_in_use_check(handle_str)
@@ -33,13 +33,21 @@ def handle_check(handle_str):
         raise ValueError("Handle must be between 1 and 20 characters")
 
 def handle_in_use_check(handle_str):
-    # when database is implemented, check if the handle is already being used
-    # since the database doesn't exist yet, just pretend the test input "handle1" is already in use
-    if handle_str != "handle1":
-        return True
-    else:
-        raise ValueError("Handle is already in use.")
+    # check if the handle is already being used/exists within the database
+    global DATABASE
+    for x in DATABASE["handle"]:
+        if x.get("handle") != handle_str:
+            pass
+        else:
+            raise ValueError("Handle is already in use.")
+    return True
 
 def change_handle(u_id, handle_str):
-    # change first and last name in the database (which doesn't exist yet)
-    pass
+    # change handle in the database for associated user
+    global DATABASE
+    try:
+        for x in DATABASE["users"]:
+            if x.get("u_id") == u_id:
+                DATABASE.update_user_data({"handle": handle})
+    except Exception as e:
+        raise ValueError("Error: Couldn't change handle.")

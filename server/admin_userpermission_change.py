@@ -10,9 +10,8 @@ import jwt
 #   Description: Given a User by their user ID, set their permissions to new permissions described by permission_id
 
 def admin_userpermission_change(token, u_id, permission_id):
-    # find u_id associated with token (with non-existent database)
-    admin_user_id = check_valid_token(token)
 
+    admin_user_id = check_valid_token(token)
     check_valid_user(u_id)
     check_valid_permission(permission_id)
     check_owner_or_admin(admin_user_id)
@@ -22,18 +21,20 @@ def admin_userpermission_change(token, u_id, permission_id):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
+    global DATABASE
     decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
     try:
-        for x in database:
+        for x in DATABASE:
             if x.get("u_id") == decoded_jwt.key():
                 return x.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")
 
 def check_valid_user(u_id):
-    # currently we cannot check if u_ids are valid users so this just satisfies a rudimentary case
+    global DATABASE
+    # check if the u_id given currently exists within the global database
     try:
-        for x in database:
+        for x in DATABASE:
             if x.get("u_id") == u_id:
                 return True
     except Exception as e:
@@ -47,11 +48,14 @@ def check_valid_permission(permission_id):
         return True
 
 def check_owner_or_admin(token):
-    # we need to check if the permission_id associated with the token is an admin or owner
+    # check if the permission_id associated with the user is an admin or owner
+    global DATABASE
     try:
-        for x in database:
+        for x in DATABASE:
             if x.get("u_id") == token:
                 check_perm = x["permissions"]
+    except Exception as e:
+        raise ValueError("Could not access user permissions.")
 
     if check_perm < 1:
         raise AccessError("User cannot undertake this action.")
@@ -59,7 +63,12 @@ def check_owner_or_admin(token):
         return True
 
 def change_permission(u_id, permission_id):
-   try:
-    for x in database:
-        if x.get("u_id") == u_id:
-            x.["permissions"] = permission_id
+    # change global permissions for user in the global database
+    global DATABASE
+    try:
+        for x in DATABASE["users"]:
+            if x.get("u_id") == u_id:
+                DATABASE.update_permissions({"permissions": permission_id})
+    except Exception as e:
+        raise ValueError("Error: Couldn't change permissions.")
+

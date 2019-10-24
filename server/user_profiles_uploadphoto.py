@@ -39,7 +39,7 @@ def check_imgurl(img_url):
 def check_start_coords(x_start, y_start):
     # we don't know how to get image dimensions yet, so we will assume the max image size is 200x200
     IMG_LIMIT = 200;
-    if x_start >= 0 and y_start >= 0 and x_start <= 200 and y_start <= 200:
+    if x_start >= 0 and y_start >= 0 and x_start <= IMG_LIMIT and y_start <= IMG_LIMIT:
         return True
     else:
         raise ValueError("Co-ordinates out of bounds.")

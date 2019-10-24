@@ -9,7 +9,7 @@ import jwt
 
 def user_profile_setname(token, name_first, name_last):
     # find u_id associated with token (with non-existent database)
-    admin_user_id = check_valid_token(token)
+    u_id = check_valid_token(token)
     first_name_check(name_first)
     last_name_check(name_last)
     change_names(u_id, name_first, name_last)
@@ -27,17 +27,25 @@ def check_valid_token(token):
         raise ValueError("token invalid")
     
 def first_name_check(name_first):
+    # check if the first name is within length limits/if first name exists
     if len(name_first) < 50 and len(name_first) > 0:
         return True
     else:
         raise ValueError("First name must be between 1 and 50 characters.")
 
 def last_name_check(name_last):
+    # check if the last name is within length limits
     if len(name_last) < 50:
         return True
     else:
         raise ValueError("Last name cannot exceed 50 characters.")
 
 def change_names(u_id, name_first, name_last):
-    # change first and last name in the database (which doesn't exist yet)
-    pass
+    # change first and last name in the database for the associated user
+    global DATABASE
+    try:
+        for x in DATABASE["users"]:
+            if x.get("u_id") == u_id:
+                DATABASE.update_user_data({"first_name": name_first, "last_name": name_last})
+    except Exception as e:
+        raise ValueError("Error: Couldn't change name.")

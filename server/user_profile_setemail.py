@@ -9,12 +9,12 @@ import jwt
 #   Description: Update the authorised user's email address
 
 def user_profile_setemail(token, email):
-    # find u_id associated with token (with non-existent database)
-    admin_user_id = check_valid_token(token)
 
+    u_id = check_valid_token(token)
     check_if_email_valid(email)
     check_email_database(email)
     change_email(u_id, email)
+
     return
 
 def check_valid_token(token):
@@ -28,6 +28,7 @@ def check_valid_token(token):
         raise ValueError("token invalid")
 
 def check_if_email_valid(email):
+    # run the re module to identify if an email is valid
     regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
     if(re.search(regex, email)):
         return True
@@ -35,13 +36,22 @@ def check_if_email_valid(email):
         raise ValueError("Email is invalid.")
 
 def check_email_database(email):
-    # when database is implemented, check if the email is already being used
-    # since the database doesn't exist yet, just pretend the test input "cs1531@cse.unsw.edu.au" is already in use
-    if email != "cs1531@cse.unsw.edu.au":
-        return True
-    else:
-        raise ValueError("Email is already in use.")
+    # check if the email is already being used/is within the database
+    global DATABASE
+    for x in DATABASE["email"]:
+        if x.get("email") != email:
+            pass
+        else:
+            raise ValueError("Email is already in use.")
+    return True
+
 
 def change_email(u_id, email):
-    # change email in the database (which doesn't exist yet)
-    pass
+    # change email in the database for the specified user
+    global DATABASE
+    try:
+        for x in DATABASE["users"]:
+            if x.get("u_id") == u_id:
+                DATABASE.update_user_data({"email": handle})
+    except Exception as e:
+        raise ValueError("Error: Couldn't change email.")
