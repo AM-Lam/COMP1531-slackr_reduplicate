@@ -215,6 +215,21 @@ def run_channel_leave():
     return dumps(return_value)
 
 
+@APP.route("/channel/leave", methods=["POST"])
+def run_channel_leave():
+    request_data = request.get_json()
+    return_value = ""
+    try:
+        return_value = channel_leave.channel_leave(
+            request_data["token"],
+            request_data["channel_id"]
+        )
+    except:
+        return_value = "<h1>403 Request Forbidden</h1>"
+    
+    return dumps(return_value)
+
+
 @APP.route('/channels/listall', methods=["POST"])
 def run_channels_listall():
     """
