@@ -19,6 +19,10 @@ def message_send(token, channel_id, message):
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
     u_id = token_payload["u_id"]
 
+    # not an authorised user
+    if token not in server_data['token']:
+        raise AccessError 
+
     # if the user id not a member of the channel
     if u_id not in channels_list(list):
         raise AccessError #("You don't have access in this channel. Please try again after you join.")

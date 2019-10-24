@@ -16,6 +16,10 @@ def message_remove(token, message_id):
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
     u_id = token_payload["u_id"]
 
+    # not an authorised user
+    if token not in server_data['token']:
+        raise AccessError 
+
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
     for channel in server_data['channels']
