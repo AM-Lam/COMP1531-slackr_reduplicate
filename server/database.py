@@ -71,7 +71,10 @@ class Channel:
         self._last_name = new_data["last_name"]
         self._password = new_data["password"]
         self._email = new_data["email"]
-
+        
+    def add_message(self, message_id, u_id, text, channel_id, time_sent):
+        message = Messages(message_id, u_id, text, channel_id, time_sent)
+        self._messages.append(message)
 
 class Messages:
     def __init__(self, message_id, u_id, text, channel_id, time_sent):
