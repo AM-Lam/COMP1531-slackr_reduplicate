@@ -2,6 +2,7 @@ from .database import *
 import jwt
 from .access_error import AccessError
 from .channels_list import channels_list
+from .message_send_test import verify_message
 
 def message_remove(token, message_id):
     # Message (based on ID) no longer exists
