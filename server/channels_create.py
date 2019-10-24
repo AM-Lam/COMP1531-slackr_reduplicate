@@ -13,6 +13,8 @@ def channels_create(token, name, is_public):
     
     server_data = get_data()
 
+    print(server_data)
+
     # make our channel id just be the count of channels we already have
     # incremented by 1, this way the channel_ids will increase sequentially
     channel_id = len(server_data["channels"]) + 1
