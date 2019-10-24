@@ -48,8 +48,8 @@ class Channel:
         self._messages = messages           # messages in the channel, list
                                             # of Message objects
         
-        self._members = members             # members of the channel, list of
-                                            # u_ids
+        self._members = members             # members of the channel, dictionary
+                                            # with u_id as key and perm. as value
         
         self._public = public               # is the channel public, boolean 
                                             # val
@@ -65,12 +65,11 @@ class Channel:
         }
     
 
-    def update_channel_data(self, new_data):
-        self._channel_id = new_data["channel_id"]
-        self._first_name = new_data["first_name"]
-        self._last_name = new_data["last_name"]
-        self._password = new_data["password"]
-        self._email = new_data["email"]
+    def frontend_format(self):
+        return {
+            "channel_id" : self._channel_id,
+            "name" : self._channel_name
+        }
 
 
 class Messages:
