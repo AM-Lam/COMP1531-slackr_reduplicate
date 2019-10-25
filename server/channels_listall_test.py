@@ -1,13 +1,22 @@
 import pytest
-from auth_register import auth_register
-from channels_create import channels_create
-from channels_listall import channels_listall
+from .auth_register import auth_register
+from .channels_create import channels_create
+from .channels_listall import channels_listall
 
 
 def test_channels_listall():
-    # create some users and channels for testing
-    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
-    user2 = auth_register("good@email.com", "987654321", "Jone", "Bobs")
+    # create some users and channels for testing, commented for now
+    # until auth_register works
+    # user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
+    # user2 = auth_register("good@email.com", "987654321", "Jone", "Bobs")
+
+    user1 = {
+        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
+    }
+
+    user2 = {
+        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTEyIn0.d_eDRe4Br9kLoTBMgjxeoLGsP02srIBOoKbgZjEIO6o"
+    }
     
     # ensure that if there are no channels that none are shown
     assert channels_listall(user1["token"]) == {"channels" : []}
@@ -17,7 +26,7 @@ def test_channels_listall():
     # ensure that channels_listall shows channels you belong to
     assert channels_listall(user1["token"]) == {"channels" : [
         {
-            "id" : channel1["channel_id"],
+            "channel_id" : channel1["channel_id"],
             "name" : "Channel 1"
         }
     ]}
@@ -25,7 +34,7 @@ def test_channels_listall():
     # ensure that channels_listall shows channels you do not belong to
     assert channels_listall(user2["token"]) == {"channels" : [
         {
-            "id" : channel1["channel_id"],
+            "channel_id" : channel1["channel_id"],
             "name" : "Channel 1"
         }
     ]}
@@ -36,22 +45,22 @@ def test_channels_listall():
     
     assert channels_listall(user1["token"]) == {"channels" : [
         {
-            "id" : channel1["channel_id"],
+            "channel_id" : channel1["channel_id"],
             "name" : "Channel 1"
         },
         {
-            "id" : channel2["channel_id"],
+            "channel_id" : channel2["channel_id"],
             "name" : "Channel 2"
         }
     ]}
     
     assert channels_listall(user2["token"]) == {"channels" : [
         {
-            "id" : channel1["channel_id"],
+            "channel_id" : channel1["channel_id"],
             "name" : "Channel 1"
         },
         {
-            "id" : channel2["channel_id"],
+            "channel_id" : channel2["channel_id"],
             "name" : "Channel 2"
         }
     ]}
@@ -62,15 +71,15 @@ def test_channels_listall():
     
     assert channels_listall(user1["token"]) == {"channels" : [
         {
-            "id" : channel1["channel_id"],
+            "channel_id" : channel1["channel_id"],
             "name" : "Channel 1"
         },
         {
-            "id" : channel2["channel_id"],
+            "channel_id" : channel2["channel_id"],
             "name" : "Channel 2"
         },
         {
-            "id" : channel3["channel_id"],
+            "channel_id" : channel3["channel_id"],
             "name" : "Channel 3"
         }
     ]}
@@ -80,15 +89,15 @@ def test_channels_listall():
     
     assert channels_listall(user2["token"]) == {"channels" : [
         {
-            "id" : channel1["channel_id"],
+            "channel_id" : channel1["channel_id"],
             "name" : "Channel 1"
         },
         {
-            "id" : channel2["channel_id"],
+            "channel_id" : channel2["channel_id"],
             "name" : "Channel 2"
         },
         {
-            "id" : channel3["channel_id"],
+            "channel_id" : channel3["channel_id"],
             "name" : "Channel 3"
         }
     ]}
