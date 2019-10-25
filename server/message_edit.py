@@ -20,6 +20,7 @@ def message_edit(token, message_id, message):
     for channel in server_data['channels']
         for message in channel._messages
             # the message is not existed
+            # double check
             if message_id not in message._message_id:
                 raise AccessError 
 

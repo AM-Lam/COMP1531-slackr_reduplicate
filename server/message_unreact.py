@@ -4,25 +4,39 @@ from .channels_list import channels_list
 
     
 def message_unreact(token, message_id, react_id):
- 
-    #  message_id is not a valid message within a channel that the authorised user has joined
-    if message_id not in message_id_list:
-        message_unreact(token, message_id)
-        raise ValueError("The message no longer exists.")
+    server_data = get_data()
 
-    # user is not in the channel anymore
-    token_of_message = message_id_dic[message_id][0]
-    id_of_channel = message_id_dic[message_id][1]
-    if id_of_channel not in channels_list(token_of_message):
-        raise ValueError("Invalid message.")
+    # Message (based on ID) no longer exists
+    # or the message Id never exists
+    if message_id not in server_data['channels']._messages:
+        raise ValueError #("The message is not existing. Please try again")
 
-    #  react_id is not a valid React ID
-    if react_id not in react_id_type:
-        return ValueError("Please enter a valid react number.")
+    # now grab the u_id associated with the provided token
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
 
-    #  Message with ID message_id already contains an active React with ID react_id
-    if react_id_dic[message_id][2] == None:
-        return ValueError("You haven't raect on this message.")
+    # not an authorised user
+    if token not in server_data['token']:
+        raise AccessError 
 
-    # If the function is working, delete the record of react in dictionary    
-    del react_id_dic[react_id]
+    for channel in server_data['channels']
+        for message in channel._messages
+            # the message is not existed
+            # double check
+            if message_id not in message._message_id:
+                raise AccessError 
+            else:
+                if u_id in channels_list(token):
+                    # user can unreact to a message they are not reacting
+                    if u_id not in message.message_react:
+                        raise AccessError 
+                    else:
+                        for this_u_id in message.message_react:
+                            if this_u_id == u_id:
+                                if this_u_id['is_this_user_reacted'] == False:
+                                    raise ValueError 
+                                else:
+                                    # delete react
+                                    del this_u_id
+                            else:
+                                raise AccessError 

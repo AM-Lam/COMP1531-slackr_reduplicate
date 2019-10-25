@@ -102,7 +102,7 @@ class Messages:
         self._time_sent = time_sent         # time that the message is posted 
                                             # used for sendlater or standup
         self._reacts = reacts               # List of dictionaries
-                                            # with u_id as key, and react_id, is_this_user_reacted as values
+                                            # with u_id, react_id and is_this_user_reacted in each dictionary
                                             # is_this_user_reacted:whether or not the authorised user has been one of the reacts to this post
         self._pinned = False                # bool of whether the message is pinned or not
     
