@@ -2,7 +2,14 @@ from .database import *
 import jwt
 from .access_error import AccessError
 from .channels_list import channels_list
-from .message_send_test import verify_message
+
+def is_admin(u_id, obj_channel):
+    if u_id in obj_channel._members:
+        for person in obj_channel._members:
+            # and the request is sent by member of the channels
+            if person[u_id] == 'admin':
+                return True
+    return False
 
 def message_remove(token, message_id):
     server_data = get_data()
@@ -31,13 +38,7 @@ def message_remove(token, message_id):
             if message._message_id == message_id:
                 # if the request is not send by the poster 
                 if message._u_id != u_id:
-                        if u_id in channel._members:
-                            for person in channel._members:
-                                # and the request is sent by member of the channels
-                                if person[u_id] == 'member':
-                                    raise AccessError 
-                        # the user who send the request is not a member of the channel
-                        else: 
+                        if is_admin(u_id, channel) == False:
                             raise AccessError 
                 channel._messages.remove(message)
             

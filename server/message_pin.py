@@ -39,6 +39,8 @@ def message_pin(token, message_id):
                         else: 
                             raise AccessError 
 
+            if 
+
 
     #  Message with ID message_id is already pinned
     if token in pinned_list[message_id]:

@@ -34,7 +34,7 @@ def message_send(token, channel_id, message):
 
     # at the start there will be no messages and the only member will be
     # the creator of the channel
-    new_message = Messages(message_id, u_id, message, channel_id, time_sent)
+    new_message = Messages(message_id, u_id, message, channel_id, time_sent, [])
     
     channels_list = channels_listall(token)
     # add the message to the server database

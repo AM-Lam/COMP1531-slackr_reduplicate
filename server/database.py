@@ -93,12 +93,18 @@ class Channel:
 
  
 class Messages:
-    def __init__(self, message_id, u_id, text, channel_id, time_sent):
-        self._message_id = message_id
-        self._u_id = u_id
-        self._channel_id = channel_id
-        self._text = text
-        self._time_sent = time_sent
+    def __init__(self, message_id, u_id, text, channel_id, time_sent, reacts):
+        self._message_id = message_id       # id of the message in a channel, increases 
+                                            # sequentially
+        self._u_id = u_id                   # poster's u_id
+        self._channel_id = channel_id       # id of the channel where the message is posted
+        self._text = text                   # the content of the messages
+        self._time_sent = time_sent         # time that the message is posted 
+                                            # used for sendlater or standup
+        self._reacts = reacts               # List of dictionaries
+                                            # with u_id as key, and react_id, is_this_user_reacted as values
+                                            # is_this_user_reacted:whether or not the authorised user has been one of the reacts to this post
+        self._pinned = False                # bool of whether the message is pinned or not
     
 
     def get_message_data(self):
@@ -108,7 +114,19 @@ class Messages:
             "channel_id" : self._channel_id,
             "text" : self._text,
             "time_sent" : self._time_sent,
+            'reacts': self._reacts,
+            'is_pinned': self._pinned,
         }
+
+    def frontend_format(self):
+        return {
+            'message_id': self._message_id,
+            'u_id': self._u_id,
+            'message': self._test,
+            'time_created': self._time_sent,
+            'reacts': self._reacts,
+            'is_pinned': self._pinned,
+    }
 
 
 def get_data():
