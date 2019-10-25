@@ -33,7 +33,7 @@ def send_code(email, user_id):
         random_alph = random.choice(string.ascii_letters)     # getting a random alphabet
         ramdom_str = str(random_num) + random_alph            # appending the two toghter
         code = (hashlib.sha256(random_str.encode()).hexdigest())  # hashing the code
-        update_data["reset"][code] = email #<-------- Is this correct?
+        update_data["reset"][code] = email # adding the code email combo to the database for future refrence.
         msg.body = "your reset code is " + code
         mail.send(msg)
         return 'Mail sent!'
