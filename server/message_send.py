@@ -1,22 +1,24 @@
 import jwt
-from .database import *
+# from .database import *
+import database
 from datetime import datetime 
-from .access_error import AccessError
-from .channels_list import channels_list
-
+# from .access_error import AccessError
+import access_error
+# from .channels_list import channels_list
+import channels_list
 
 
 
 def message_send(token, channel_id, message):
     # Message is more than 1000 characters
     if len(message) > 1000:
-        raise ValueError# ("The message is too long. Please keep it within 1000 characters.")   
+        raise ValueError
     
-    server_data = get_data()
+    server_data = database.get_data()
 
     # not an authorised user
     if token not in server_data['token']:
-        raise AccessError 
+        raise access_error.AccessError 
 
     # now grab the u_id associated with the provided token
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
@@ -24,11 +26,11 @@ def message_send(token, channel_id, message):
 
     # not an authorised user
     if token not in server_data['token']:
-        raise AccessError 
+        raise access_error.AccessError 
 
     # if the user id not a member of the channel
-    if u_id not in channels_list(list):
-        raise AccessError #("You don't have access in this channel. Please try again after you join.")
+    if u_id not in channels_list.channels_list(list):
+        raise access_error.AccessError 
     
     # make our message id just be the count of messages we already have
     # incremented by 1, this way the message_ids will increase sequentially

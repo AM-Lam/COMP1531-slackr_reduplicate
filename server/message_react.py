@@ -1,6 +1,9 @@
-from .database import *
+#from .database import *
 import jwt
-from .channels_list import channels_list
+# from .access_error import AccessError
+import access_error
+# from .channels_list import channels_list
+import channels_list
 
 def message_react(token, message_id, react_id):
     server_data = get_data()
@@ -16,16 +19,16 @@ def message_react(token, message_id, react_id):
 
     # not an authorised user
     if token not in server_data['token']:
-        raise AccessError 
+        raise access_error.AccessError 
 
-    for channel in server_data['channels']
-        for message in channel._messages
+    for channel in server_data['channels']:
+        for message in channel._messages:
             # the message is not existed
             # double check
             if message_id not in message._message_id:
-                raise AccessError 
+                raise access_error.AccessError 
             else:
-                if u_id in channels_list(token):
+                if u_id in channels_list.channels_list(token):
                     # user can only react to same message once
                     if u_id not in message.message_react:
                         message.message_react.append(

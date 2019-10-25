@@ -1,7 +1,9 @@
-from .database import *
+#from .database import *
 import jwt
-from .access_error import AccessError
-from .channels_list import channels_list
+# from .access_error import AccessError
+import access_error
+#from .channels_list import channels_list
+import channels_list
 
 def is_admin(u_id, obj_channel):
     if u_id in obj_channel._members:
@@ -12,8 +14,8 @@ def is_admin(u_id, obj_channel):
     return False
 
 def message_remove(token, message_id):
-    server_data = get_data()
 
+    server_data = get_data()
     # Message (based on ID) no longer exists
     # or the message Id never exists
     if message_id not in server_data['channels']._messages:
@@ -25,22 +27,22 @@ def message_remove(token, message_id):
 
     # not an authorised user
     if token not in server_data['token']:
-        raise AccessError 
+        raise access_error.AccessError 
 
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
-    for channel in server_data['channels']
-        for message in channel._messages
+    for channel in server_data['channels']:
+        for message in channel._messages:
             # the message is not existed
             # double check
             if message_id not in message._message_id:
-                raise AccessError 
+                raise access_error.AccessError 
 
             if message._message_id == message_id:
                 # if the request is not send by the poster 
                 if message._u_id != u_id:
                         if is_admin(u_id, channel) == False:
-                            raise AccessError 
+                            raise access_error.AccessError 
                 channel._messages.remove(message)
             
 
