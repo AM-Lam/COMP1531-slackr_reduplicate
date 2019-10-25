@@ -49,6 +49,37 @@ def email_request():
     dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
     return dumps (dumpstring)
 
+<<<<<<< HEAD
+=======
+@APP.route('/auth/register', methods=['POST'])
+def register():
+    first_name = request.form.get('name_first')
+    last_name = request.form.get('name_last')
+    password = request.form.get('password')
+    email = request.form.get('email')
+    dumpstring = auth_register.auth_register(email, password, first_name, last_name)
+    return dumps (dumpstring)
+
+@APP.route('/auth/login', methods=['POST'])
+def login():
+    email = request.form.get('email')
+    password = request.form.get('password')
+    dumpstring = auth_login.auth_login(email, password)
+    return dumps (dumpstring)
+
+@APP.route('/auth/logout', methods=['POST'])
+def user_logout():
+    token = request.form.get('token')
+    dumpstring = auth_logout.auth_logout(token)
+    return dumps (dumpstring)
+
+@APP.route('/auth/passwordreset/request', methods=['POST'])
+def email_request():
+    email = request.form.get('email')
+    dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
+    return dumps (dumpstring)
+
+>>>>>>> a1148fe26df0ec76e21ea150dba7ef65d24a14c1
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
 def email_reset():
     reset_code = request.form.get('reset_code')
