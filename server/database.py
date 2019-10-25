@@ -2,18 +2,17 @@ import pickle
 
 
 DATABASE = None
-SECRET = "MICHELFOUCAULT"
+SECRET = "AVENGERS_SOCKS"
 
 
 class User:
-    def __init__(self, u_id, first_name, last_name, password, email, token):
+    def __init__(self, u_id, first_name, last_name, password, email):
         self._u_id = u_id 
         self._first_name = first_name
         self._last_name = last_name
         self._password = password
         self._email = email
         self._handle = first_name + last_name
-        self._token = token
     
     
     def get_user_data(self):
@@ -24,18 +23,31 @@ class User:
             "password" : self._password,
             "email" : self._email,
             "handle" : self._handle,
-            "token" : self._token,
         }
     
 
-    def update_user_data(self, new_data):
-        self._u_id = new_data["u_id"]
-        self._first_name = new_data["first_name"]
-        self._last_name = new_data["last_name"]
-        self._password = new_data["password"]
-        self._email = new_data["email"]
-        self._handle = new_data["handle"]
-        self._token = new_data["token"]
+    def update_user_id(self, new_id):
+        self._u_id = new_id
+
+
+    def update_user_first_name(self, new_fname):
+        self._first_name = new_fname
+
+
+    def update_user_last_name(self, new_lname):
+        self._last_name = new_lname
+
+
+    def update_user_password(self, new_password):
+        self._password = new_password
+
+
+    def update_user_email(self, new_email):
+        self._email = new_email
+
+        
+    def update_user_handle(self, new_handle):
+        self._handle = new_handle
 
 
 class Channel:
@@ -65,13 +77,21 @@ class Channel:
         }
     
 
+    def update_channel_data(self, new_data):
+        self._channel_id = new_data["channel_id"]
+        self._first_name = new_data["first_name"]
+        self._last_name = new_data["last_name"]
+        self._password = new_data["password"]
+        self._email = new_data["email"]
+        
+
     def frontend_format(self):
         return {
             "channel_id" : self._channel_id,
             "name" : self._channel_name
         }
 
-
+ 
 class Messages:
     def __init__(self, message_id, u_id, text, channel_id, time_sent):
         self._message_id = message_id
@@ -117,7 +137,9 @@ def save_data():
 update_data({
     "users" : [],
     "channels" : [],
-    "tokens" : {}
+    "tokens" : {},
+    "reset" : {} # <----- I am adding this field {'reset_code':'email'} <-to be able to store the reset
+                                     # code and to delete the code after the new password has been made
 })
 
 print("Setup complete")
