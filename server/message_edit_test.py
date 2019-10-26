@@ -1,9 +1,11 @@
 import pytest
+import jwt
 from .database import *
 from .access_error import AccessError
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .message_send import message_send
+from .message_remove import message_remove
 from .message_edit import message_edit
 
 def verify_message(message_obj, correct_data):
@@ -20,14 +22,12 @@ def test_message_edit():
         "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
     }
 
-    # channel_id = channels_create("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI", "channel1", True)
-    # db = get_data()
-    channel_id = 1
-
-    # try to create a valid message
+    db = get_data()
     message_1 = message_send(user1["token"], channel_id, "Hello")
+
     # check that the message exists
     assert message_1 is not None
+
     message_edit(user1["token"], message_1, "Hi")
     assert verify_message(db["message"][0], 
                         {
@@ -49,8 +49,10 @@ def test_no_message():
         "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
     }
 
-    # db = get_data()
-    
+    db = get_data()
+    message_1 = message_send(user1["token"], channel_id, "Hello")
+    message_remove(user1["token"], message_1)
+
     # message is not existed
     assert message_1 is None
     # the message is not existed
@@ -71,12 +73,9 @@ def test_invalid_user_admin():
     }
 
 
-    # channel_id = channels_create("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI", "channel1", True)
-    # db = get_data()
-    channel_id = 1
+    db = get_data()
+    message_1 = message_send(user1["token"], channel_id, "Hello")
 
-    # try to create a valid message
-    message_1 = message_send(user2["token"], channel_id, "Hello")
     # check that the channel exists
     assert message_1 is not None
     pytest.raises(AccessError, message_edit, user1["token"], 1, "hi")

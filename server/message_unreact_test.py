@@ -1,7 +1,11 @@
 import pytest
+import jwt
 from .database import *
 from .auth_register import auth_register
 from .channels_create import channels_create
+from .message_send import message_send
+from .message_remove import message_remove
+from .message_react import message_react
 from .message_unreact import message_unreact
 
 
@@ -19,10 +23,10 @@ def test_message_unreact():
         "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
     }
 
+    channel1 = channels_create(user1["token"], "Channel 1", True)
 
-    # channel_id = channels_create("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI", "channel1", True)
     channel_id = 1
-    # db = get_data()
+    db = get_data()
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id, "Hello")
@@ -67,7 +71,11 @@ def test_no_message():
         "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
     }
 
-    # db = get_data()
+    db = get_data()
+    channel1 = channels_create(user1["token"], "Channel 1", True)
+
+    message_1 = message_send(user1["token"], channel_id, "Hello")
+    message_remove(user1["token"], message_1)
 
     react_id = 1
     

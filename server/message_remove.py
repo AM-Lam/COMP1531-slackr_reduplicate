@@ -1,6 +1,10 @@
+import pytest
 import jwt
 from .database import *
-from .access_error import AccessError
+from .auth_register import auth_register
+from .channels_create import channels_create
+from .message_send import message_send
+from .message_remove import message_remove
 
 def is_admin(u_id, obj_channel):
     if u_id in obj_channel._members:

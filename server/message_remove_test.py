@@ -1,4 +1,5 @@
 import pytest
+import jwt
 from .database import *
 from .access_error import AccessError
 from .auth_register import auth_register
@@ -14,9 +15,9 @@ def test_message_remove():
         "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
     }
 
-    # channel_id = channels_create("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI", "channel1", True)
-    # db = get_data()
-    channel_id = 1
+    channel_id = channels_create(user1["token"], "Channel 1", True)
+
+    db = get_data()
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id, "Hello")
@@ -27,8 +28,8 @@ def test_message_remove():
     message_remove(user1["token"], message_1)
     # check that the database was correctly updated
     assert (db["message"][0] == None)
-    
-def test_no_message1():
+
+def test_no_message():
     # user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
 
     # just got the u_id by putting fake data into jwt.io
@@ -36,30 +37,16 @@ def test_no_message1():
         "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
     }
 
-    # db = get_data()
+    channel1 = channels_create(user1["token"], "Channel 1", True)
 
-    # message is not existed
-    assert message_1 is None
-    # the message is not existed
-    pytest.raises(ValueError, message_remove, user1["token"], 1)
-
-def test_no_message2():
-    # user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
-
-    # just got the u_id by putting fake data into jwt.io
-    user1 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
-    }
-
-    # channel_id = channels_create("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI", "channel1", True)
-    # db = get_data()
-    channel_id = 1
-
-    # try to create a valid message
+    db = get_data()
     message_1 = message_send(user1["token"], channel_id, "Hello")
-    # check that the channel exists
     assert message_1 is not None
+
     message_remove(user1["token"], message_1)
+
+    # check that the channel exists
+    assert message_1 is None
 
     # the message is no longer existed
     pytest.raises(ValueError, message_remove, user1["token"], message_1)
@@ -79,12 +66,11 @@ def test_invalid_user():
         "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMyJ9.QaiuthhOZ3vU8iRd7QDtbs89nDHpNo6lKgo_JPwpSj4"
     }
 
-    # channel_id = channels_create("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI", "channel1", True)
-    # db = get_data()
-    channel_id = 1
+    channel1 = channels_create(user1["token"], "Channel 1", True)
 
-    # try to create a valid message
+    db = get_data()
     message_1 = message_send(user1["token"], channel_id, "Hello")
+    
     # check that the channel exists
     assert message_1 is not None
     pytest.raises(AccessError, message_remove, user3["token"], message_1)
@@ -104,12 +90,10 @@ def test_admin_user():
     }
 
 
-    # channel_id = channels_create("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI", "channel1", True)
-    # db = get_data()
-    channel_id = 1
+    channel1 = channels_create(user1["token"], "Channel 1", True)
 
-    # try to create a valid message
-    message_1 = message_send(user2["token"], channel_id, "Hello")
+    db = get_data()
+    message_1 = message_send(user1["token"], channel_id, "Hello")
     # check that the message exists
     assert message_1 is not None
     message_remove(user1["token"], message_1)

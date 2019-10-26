@@ -1,8 +1,12 @@
 import pytest
+import jwt
 from .database import *
 from .auth_register import auth_register
 from .channels_create import channels_create
-from .channel_leave import channel_leave
+from .message_send import message_send
+from .message_remove import message_remove
+from .message_pin import message_pin
+from .message_unpin import message_unpin
 
 def test_message_unpin():
     # user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
@@ -19,7 +23,7 @@ def test_message_unpin():
     }
 
     # channel_id = channels_create("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI", "channel1", True)
-    channel_id = 1
+    channel1 = channels_create(user1["token"], "Channel 1", True)
     db = get_data()
 
     # try to create a valid message
@@ -40,7 +44,12 @@ def test_no_message1():
         "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
     }
 
-    # db = get_data()
+    db = get_data()
+    channel1 = channels_create(user1["token"], "Channel 1", True)
+
+    message_1 = message_send(user1["token"], channel_id, "Hello")
+    message_remove(user1["token"], message_1)
+
 
     # message is not existed
     assert message_1 is None
