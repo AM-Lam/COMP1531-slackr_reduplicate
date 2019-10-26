@@ -4,8 +4,9 @@ from .auth_passwordreset_request import *
 from .auth_register import *
 
 
-clear_data()
-auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
+def test_dummy_func():
+    clear_data()
+    auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
 
 
 ###########################################################################################################################################

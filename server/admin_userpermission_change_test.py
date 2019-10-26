@@ -5,10 +5,8 @@ from .access_error import AccessError
 import pytest
 
 
-clear_data()
-
-
 def test_admin_userpermission_change():
+    clear_data()
     user = auth_register("valid@email.com", "1234567890", "John", "Doe")
     
     # this test should pass with no issue

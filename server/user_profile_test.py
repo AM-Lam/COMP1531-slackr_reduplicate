@@ -4,10 +4,8 @@ from .access_error import *
 from .database import *
 
 
-clear_data()
-
-
 def test_user_profile():
+    clear_data()
     # assert user_profile(token, u_id) == [{email, name_first, name_last, handle_str}]
     assert user_profile('person1', 123) == {'hayden@gmail.com', 'Hayden', 'Smith', 'handle'}
     assert user_profile('person2', 456) == {'smith@gmail.com', 'Smith', 'Hayden', 'handler'}

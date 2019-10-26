@@ -2,9 +2,11 @@ import pytest
 from .auth_logout import *
 from .auth_register import *
 from .auth_login import *
+from .database import *
 
 
 def test_validtoken1():
+    clear_data()
     # following test should fail as user is not logged in!
     dictreg = auth_register("arpit@gmail.com", "passwording", "arpit", "rulania")
     tokenreg = dictreg["token"]
@@ -13,12 +15,14 @@ def test_validtoken1():
 
 # validtoken test should pass
 def test_validtoken():
+    clear_data()
     dictreg = auth_register("arpitrulania@gmail.com", "passwording", "arpit", "rulania")
     tokenlog = dictreg["token"]
     assert(auth_logout(tokenlog)['is_success']) == True #assuming a successful logout returns a true boolean
 
 # invalid token test should fail
 def test_invalidtoken():
+    clear_data()
     dictreg = auth_register("arpitinit@gmail.com", "passwording", "arpit", "rulania")
     tokenlog = "invalid"    # <-user tries to fool the system by passing any random token.
     pytest.raises(ValueError, auth_logout, tokenlog)

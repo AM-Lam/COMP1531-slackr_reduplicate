@@ -8,10 +8,9 @@ from .channels_create import channels_create
 from .database import *
 
 
-clear_data()
-
-
 def test_channel_addowner():
+    clear_data()
+    
     # boilerplate setting up of users and channels, commented until
     # auth_register working
     user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
