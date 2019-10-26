@@ -1,3 +1,6 @@
+from .access_error import AccessError
+import jwt
+
 #   user_profile_sethandle(token, handle_str);
 #   return void
 #   Exception: ValueError when:

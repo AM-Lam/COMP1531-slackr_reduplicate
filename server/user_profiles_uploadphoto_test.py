@@ -1,9 +1,10 @@
-from user_profiles_uploadphoto import user_profiles_uploadphoto
-from auth_register import auth_register
+from .user_profiles_uploadphoto import user_profiles_uploadphoto
+from .auth_register import auth_register
+from .access_error import AccessError
 import pytest
 
 def test_user_profiles_uploadphoto():
-    user = auth_register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "123456", "John", "Doe")
 
     # this test should pass with no issue
     assert user_profiles_uploadphoto(user["token"], "https://twitter.com/home", 0, 0, 200, 200) == None

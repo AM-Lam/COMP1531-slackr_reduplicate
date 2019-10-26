@@ -89,4 +89,8 @@ def end_standup(token, channel_id):
     while datetime.now() <= time_finish:
         time.sleep(1)
 
+    for x in DATABASE("channels"):
+    if x.get("channel_id") == channel_id:
+        x.update_channel_data({"standup": None})
+
     message_send(token, channel_id, MESSAGE_STANDUP)

@@ -1,3 +1,4 @@
+from .access_error import AccessError
 import urllib
 import jwt
 
@@ -10,7 +11,7 @@ import jwt
 
 def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end):
     # find u_id associated with token (with non-existent database)
-    #TODO: (note: this is not requried to be completed until iteration 3)
+    #TODO: (note: this is not required to be completed until iteration 3)
     user_id = check_valid_token(token)
 
     check_imgurl(img_url)

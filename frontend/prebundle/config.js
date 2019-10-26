@@ -1,2 +1,1 @@
-var BACKEND_PORT = 5002;
->>>>>>> master
+var BACKEND_PORT = 5001;

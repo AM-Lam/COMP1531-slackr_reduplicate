@@ -1,3 +1,5 @@
+from .access_error import AccessError
+
 #   search(token, query_str);
 #   return {messages}
 #   Exception: N/A

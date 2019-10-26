@@ -1,12 +1,12 @@
-from standup_send import standup_send
-from channels_create import channels_create
-from access_error import AccessError
+from .standup_send import standup_send
+from .channels_create import channels_create
+from .access_error import AccessError
 from datetime import timedelta, datetime
-from auth_register import auth_register
+from .auth_register import auth_register
 import pytest
 
 def test_standup_send():
-    user = auth_register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "123456", "John", "Doe")
     channel = channels_create(user["token"], "Channel 1", False)
     channel = "channel"
 

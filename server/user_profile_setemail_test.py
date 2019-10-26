@@ -1,9 +1,10 @@
-from user_profile_setemail import user_profile_setemail
-from auth_register import auth_register
+from .user_profile_setemail import user_profile_setemail
+from .auth_register import auth_register
+from .access_error import AccessError
 import pytest
 
 def test_user_profile_setemail():
-    user = auth_register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "123456", "John", "Doe")
 
     # this test should pass with no issue
     assert user_profile_setemail(user["token"], "z1234567@cse.unsw.edu.au") == None
