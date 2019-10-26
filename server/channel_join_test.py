@@ -3,6 +3,10 @@ from .access_error import *
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .channel_join import channel_join
+from .database import *
+
+
+clear_data()
 
 
 def test_channel_join():

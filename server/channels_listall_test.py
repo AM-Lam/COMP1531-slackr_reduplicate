@@ -2,6 +2,10 @@ import pytest
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .channels_listall import channels_listall
+from .database import *
+
+
+clear_data()
 
 
 def test_channels_listall():

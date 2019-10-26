@@ -240,12 +240,15 @@ def save_data():
         pickle.dump(DATABASE, dump)
 
 
-# initialise an empty database
-DATABASE = {
-    "users" : [],
-    "channels" : [],
-    "tokens" : {},
-    "reset" : {}
-}
+def clear_data():
+    global DATABASE
+    DATABASE = {
+        "users" : [],
+        "channels" : [],
+        "tokens" : {},
+        "reset" : {}
+    }
 
+
+clear_data()
 print("Setup complete")

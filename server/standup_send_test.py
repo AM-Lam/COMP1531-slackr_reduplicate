@@ -3,8 +3,11 @@ from .standup_send import standup_send
 from .channels_create import channels_create
 from .access_error import *
 from .auth_register import auth_register
+from .database import *
 from datetime import timedelta, datetime
 
+
+clear_data()
 
 
 def test_standup_send():

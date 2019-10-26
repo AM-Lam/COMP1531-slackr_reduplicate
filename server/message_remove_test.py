@@ -1,6 +1,11 @@
 import pytest
 from .access_error import *
 from .message_remove import message_remove
+from .database import *
+
+
+clear_data()
+
 
 def test_message_remove():
     # assert message_remove(token, message_id) == None

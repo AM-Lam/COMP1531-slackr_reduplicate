@@ -1,11 +1,14 @@
 import pytest
 import jwt
-from .database import get_secret
+from .database import *
 from .access_error import *
 from .channel_removeowner import channel_removeowner
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .channel_addowner import channel_addowner
+
+
+clear_data()
 
 
 def test_channel_removeowner():

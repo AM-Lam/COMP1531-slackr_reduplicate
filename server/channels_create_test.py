@@ -5,6 +5,9 @@ from .auth_register import auth_register
 from .database import *
 
 
+clear_data()
+
+
 def verify_channel(channel_obj, correct_data):
     # print(channel_obj.__dict__)
     if channel_obj.__dict__ == correct_data:

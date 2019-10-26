@@ -1,7 +1,12 @@
+from .database import *
 from .admin_userpermission_change import admin_userpermission_change
 from .auth_register import auth_register
 from .access_error import AccessError
 import pytest
+
+
+clear_data()
+
 
 def test_admin_userpermission_change():
     user = auth_register("valid@email.com", "12345", "John", "Doe")

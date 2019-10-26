@@ -1,6 +1,11 @@
 import pytest
 from .access_error import *
 from .message_edit import message_edit
+from .database import *
+
+
+clear_data()
+
 
 def test_message_edit():
     assert message_edit('person1', 1, 'hello') == None

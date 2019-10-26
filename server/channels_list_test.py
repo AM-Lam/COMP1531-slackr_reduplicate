@@ -4,6 +4,10 @@ from .channels_create import channels_create
 from .channel_join import channel_join
 from .channel_leave import channel_leave
 from .auth_register import auth_register
+from .database import *
+
+
+clear_data()
 
 
 def test_channels_list():

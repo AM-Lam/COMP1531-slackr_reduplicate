@@ -6,7 +6,10 @@ from .message_sendlater import message_sendlater
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .channel_messages import channel_messages
-from .database import get_secret, get_data
+from .database import *
+
+
+clear_data()
 
 
 def test_message_sendlater():

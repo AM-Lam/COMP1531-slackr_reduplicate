@@ -2,6 +2,10 @@ import pytest
 from .user_profiles_uploadphoto import user_profiles_uploadphoto
 from .auth_register import auth_register
 from .access_error import *
+from .database import *
+
+
+clear_data()
 
 
 def test_user_profiles_uploadphoto():

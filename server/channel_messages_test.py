@@ -1,9 +1,13 @@
+import pytest
 from .channel_messages import *
 from .channels_create import *
-import pytest
 from .auth_register import *
 from .channel_invite import *
 from .message_send import *
+from .database import *
+
+
+clear_data()
 
 
 #############################################################################################################################################

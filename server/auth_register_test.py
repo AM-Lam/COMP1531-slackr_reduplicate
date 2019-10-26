@@ -2,6 +2,10 @@ import pytest
 from .auth_register import *
 from .database import *
 
+
+clear_data()
+
+
 def test_successfulRegister():
     # assuming user1 currently does not exist
     token = auth_register('user1@gmail.com' ,'passew@321', 'user', 'one')

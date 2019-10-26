@@ -5,7 +5,10 @@ from .access_error import AccessError
 from .channel_addowner import channel_addowner
 from .auth_register import auth_register
 from .channels_create import channels_create
-from .database import get_secret
+from .database import *
+
+
+clear_data()
 
 
 def test_channel_addowner():

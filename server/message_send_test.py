@@ -1,6 +1,11 @@
 import pytest
 from .access_error import *
 from .message_send import message_send
+from .database import *
+
+
+clear_data()
+
 
 def test_message_send(token, channel_id, message):
     #basic cases

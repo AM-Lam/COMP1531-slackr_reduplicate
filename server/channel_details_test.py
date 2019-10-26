@@ -4,7 +4,10 @@ from .channel_details import *
 from .auth_register import *
 from .channels_create import *
 from .channel_invite import *
+from .database import *
 
+
+clear_data()
 
 
 # what if the channel does not exist?

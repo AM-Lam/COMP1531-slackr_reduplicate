@@ -1,6 +1,11 @@
 import pytest
 import re
 from .message_react import message_react
+from .database import *
+
+
+clear_data()
+
 
 def test_message_react():
     #assert message_react(token, message_id, react_id) == None

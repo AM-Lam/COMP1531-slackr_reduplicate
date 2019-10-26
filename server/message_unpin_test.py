@@ -2,6 +2,10 @@ import pytest
 from .access_error import *
 from .channel_leave import channel_leave
 from .message_unpin import message_unpin
+from .database import *
+
+
+clear_data()
 
     
 def test_message_unpin():

@@ -1,6 +1,11 @@
 import pytest
 from .access_error import *
 from .message_unreact import message_unreact
+from .database import *
+
+
+clear_data()
+
     
 def test_message_unreact():
     # assert message_unreact(token, message_id, react_id) == None
