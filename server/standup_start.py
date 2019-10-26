@@ -1,9 +1,10 @@
-from datetime import timedelta, datetime
-from .access_error import AccessError, ValueError
-from .message_send import message_send
-from .database import *
 import jwt
 import time
+from datetime import timedelta, datetime
+from .access_error import *
+from .message_send import message_send
+from .database import *
+
 
 #   standup_start(token, channel_id);
 #   return {time_finish}
@@ -64,7 +65,7 @@ def check_channel_member(u_id, channel_id):
             if u_id in member_list:
                 return True
             else:
-                raise AccessError("You are not a member of this channel.")
+                raise AccessError(description="You are not a member of this channel.")
     raise ValueError(description="Channel does not exist or cannot be found.")
 
 def start_standup(channel_id):
@@ -90,7 +91,8 @@ def end_standup(token, channel_id):
         time.sleep(1)
 
     for x in DATABASE("channels"):
-    if x.get("channel_id") == channel_id:
-        x.update_channel_data({"standup": None})
+        if x.get("channel_id") == channel_id:
+            x.update_channel_data({"standup": None})
+            break
 
     message_send(token, channel_id, MESSAGE_STANDUP)

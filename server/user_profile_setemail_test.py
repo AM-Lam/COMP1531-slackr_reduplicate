@@ -1,6 +1,8 @@
-from user_profile_setemail import user_profile_setemail
-from auth_register import auth_register
 import pytest
+from .user_profile_setemail import user_profile_setemail
+from .auth_register import auth_register
+from .access_error import *
+
 
 def test_user_profile_setemail():
     user = auth_register("valid@email.com", "12345", "John", "Doe")

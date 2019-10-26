@@ -1,5 +1,5 @@
 import pytest
-from .access_error import AccessError
+from .access_error import *
 from .channel_details import *
 from .auth_register import *
 from .channels_create import *

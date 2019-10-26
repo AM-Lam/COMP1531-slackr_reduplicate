@@ -1,5 +1,6 @@
 import pytest
-from message_send import message_send
+from .access_error import *
+from .message_send import message_send
 
 def test_message_send(token, channel_id, message):
     #basic cases

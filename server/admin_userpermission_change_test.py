@@ -1,6 +1,6 @@
-from admin_userpermission_change import admin_userpermission_change
-from auth_register import auth_register
-from access_error import AccessError
+from .admin_userpermission_change import admin_userpermission_change
+from .auth_register import auth_register
+from .access_error import AccessError
 import pytest
 
 def test_admin_userpermission_change():

@@ -1,4 +1,5 @@
 import pytest
+from .access_error import *
 from .channels_create import channels_create
 from .auth_register import auth_register
 from .database import *
@@ -13,12 +14,7 @@ def verify_channel(channel_obj, correct_data):
 
 def test_channels_create():
     # comment this out until we can ensure that auth_register is working
-    # user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
-
-    # just got the u_id by putting fake data into jwt.io
-    user1 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
-    }
+    user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
 
     db = get_data()
     

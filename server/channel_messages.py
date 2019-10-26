@@ -1,4 +1,4 @@
-from .access_error import AccessError 
+from .access_error import *
 from .database import *
 
 
@@ -19,7 +19,7 @@ def does_channel_exist(channel_id):
         if channels._channel_id == channel_id:  # set flag as one if channel exists.
             flag = 1
     if flag == 0:
-        raise ValueError("channel given does not exist!")
+        raise ValueError(description="channel given does not exist!")
 
 def is_start_greater_then_messages(start, channel_id):
     update_data = get_data()
@@ -47,7 +47,7 @@ def is_token_a_member_of_channel(token, channel_id):
                 if people == user_id:
                     flag = 1                    # flag is one if the user is a member of the channel.    
     if flag == 0:
-        raise AccessError('user is not a part of the channel... does not have correct permissions.')
+        raise AccessError(description='user is not a part of the channel... does not have correct permissions.')
 
 def retrive_message_list(channel_id, start, end):
     update_data = get_data()

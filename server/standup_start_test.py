@@ -1,9 +1,10 @@
-from standup_start import standup_start
-from channels_create import channels_create
-from access_error import AccessError
-from datetime import timedelta, datetime
-from auth_register import auth_register
 import pytest
+from .standup_start import standup_start
+from .channels_create import channels_create
+from .access_error import *
+from .auth_register import auth_register
+from datetime import timedelta, datetime
+
 
 def test_standup_start():
     user = auth_register("valid@email.com", "12345", "John", "Doe")

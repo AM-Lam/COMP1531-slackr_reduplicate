@@ -1,7 +1,8 @@
-from datetime import timedelta, datetime
-from .access_error import AccessError, ValueError
-from .database import *
 import jwt
+from datetime import timedelta, datetime
+from .access_error import *
+from .database import *
+
 
 #   standup_send(token, channel_id, message);
 #   return void
@@ -79,7 +80,7 @@ def check_valid_standup_time(channel_id):
         if x.get("channel_id") == channel_id:
             y = x.get_channel_data()
             if datetime.now() > y["standup"]:
-                raise AccessError ("The standup time has finished.")
+                raise AccessError(description="The standup time has finished.")
     raise ValueError(description="Channel does not exist or cannot be found.")
 
 def send_message(u_id, message):

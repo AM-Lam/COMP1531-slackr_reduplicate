@@ -11,12 +11,7 @@ from .database import get_secret, get_data
 
 def test_message_sendlater():
     server_data = get_data()
-    # user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
-
-    user1 = {
-        "token" : jwt.encode({"u_id" : "111"}, get_secret(), algorithm="HS256"),
-        "u_id" : "111"
-    }
+    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
     
     # create the channel we test with
     channel1 = channels_create(user1["token"], "Channel 1", True)

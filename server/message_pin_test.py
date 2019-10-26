@@ -1,6 +1,7 @@
 import pytest
-from message_pin import message_pin
-from channel_leave import channel_leave
+from .access_error import *
+from .message_pin import message_pin
+from .channel_leave import channel_leave
 
 def test_message_pin():
     # assert message_pin(token, message_id) == None

@@ -1,6 +1,8 @@
-from user_profiles_uploadphoto import user_profiles_uploadphoto
-from auth_register import auth_register
 import pytest
+from .user_profiles_uploadphoto import user_profiles_uploadphoto
+from .auth_register import auth_register
+from .access_error import *
+
 
 def test_user_profiles_uploadphoto():
     user = auth_register("valid@email.com", "12345", "John", "Doe")

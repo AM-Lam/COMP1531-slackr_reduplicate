@@ -1,6 +1,7 @@
 import pytest
-from user_profile_setname import user_profile_setname
-from auth_register import auth_register
+from .user_profile_setname import user_profile_setname
+from .auth_register import auth_register
+from .access_error import *
 
 
 def test_user_profile_setname():

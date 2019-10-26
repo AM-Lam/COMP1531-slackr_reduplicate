@@ -1,5 +1,5 @@
-from search import search
-from auth_register import auth_register
+from .search import search
+from .auth_register import auth_register
 
 def test_search():
     user = auth_register("valid@email.com", "12345", "John", "Doe")

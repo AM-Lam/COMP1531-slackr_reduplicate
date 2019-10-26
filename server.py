@@ -29,9 +29,6 @@ APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 CORS(APP)
 mail = Mail(APP)
-class ValueError(HTTPException):
-    code = 400
-    message = 'No message specified'
 
 
 APP.config.update(
@@ -41,7 +38,6 @@ APP.config.update(
     MAIL_USERNAME = 'deadthundersquirrels@gmail.com',
     MAIL_PASSWORD = "passnew%1"
 )
-
 
 
 @APP.route('/auth/register', methods=['POST'])
@@ -87,6 +83,7 @@ def email_reset():
     dumpstring = auth_passwordreset_reset.auth_passwordreset_reset(reset_code, new_password)
     return dumps (dumpstring)
 
+
 @APP.route('/channel/invite', methods=['POST'])
 def channel_invite_e():
     token = request.form.get('token')
@@ -95,12 +92,14 @@ def channel_invite_e():
     dumpstring = channel_invite.channel_invite(token,channel_id,u_id)
     return (dumpstring)
 
+
 @APP.route('/channel/details', methods=['GET'])
 def channel_details_e():
     token = request.form.get('token')
     channel_id = request.form.get('channel_id')
     dumpstring = channel_details.channel_details(token,channel_id)
     return (dumpstring)
+
 
 @APP.route('/channel/messages', methods=['GET'])
 def channel_messages_e():
@@ -109,21 +108,6 @@ def channel_messages_e():
     start = request.form.get('start')
     dumpstring = channel_messages.channel_messages(token,channel_id, start)
     return (dumpstring)
-    
-@APP.route('/echo/get', methods=['GET'])
-def echo1():
-    """ Description of function """
-    return dumps({
-        'echo' : request.args.get('echo'),
-    })
-
-
-@APP.route('/echo/post', methods=['POST'])
-def echo2():
-    """ Description of function """
-    return dumps({
-        'echo' : request.form.get('echo'),
-    })
 
 
 @APP.route('/channels/create', methods=["POST"])
@@ -183,6 +167,7 @@ def run_channel_join():
 
     return dumps(return_value)
 
+
 def send_code(email, user_id):
     try:
         with APP.app_context():
@@ -203,8 +188,6 @@ def send_code(email, user_id):
         return (str(e))
 
 
-
-
 @APP.route('/channel/addowner', methods=["POST"])
 def run_channel_addowner():
     request_data = request.get_json()
@@ -215,7 +198,6 @@ def run_channel_addowner():
     )
 
     return dumps(return_value)
-
 
 
 @APP.route('/channel/removeowner', methods=["POST"])
@@ -242,6 +224,7 @@ def run_message_sendlater():
 
     return dumps(return_value)
 
+
 @APP.route('/user/profile/setname', methods=["PUT"])
 def run_profile_setname():
     request_data = request.get_json()
@@ -253,6 +236,7 @@ def run_profile_setname():
 
     return dumps(return_value)
 
+
 @APP.route('/user/profile/setemail', methods=["PUT"])
 def run_profile_setemail():
     request_data = request.get_json()
@@ -263,6 +247,7 @@ def run_profile_setemail():
 
     return dumps(return_value)
 
+
 @APP.route('/user/profile/sethandle', methods=["PUT"])
 def run_profile_sethandle():
     request_data = request.get_json()
@@ -272,6 +257,7 @@ def run_profile_sethandle():
     )
 
     return dumps(return_value)
+
 
 @APP.route('/user/profile/uploadphoto', methods=["POST"])
 def run_profile_uploadphoto():
@@ -287,6 +273,7 @@ def run_profile_uploadphoto():
 
     return dumps(return_value)
 
+
 @APP.route('/standup/start', methods=["POST"])
 def run_standup_start():
     request_data = request.get_json()
@@ -296,6 +283,7 @@ def run_standup_start():
     )
 
     return dumps(return_value)
+
 
 @APP.route('/standup/send', methods=["POST"])
 def run_standup_send():
@@ -308,6 +296,7 @@ def run_standup_send():
 
     return dumps(return_value)
 
+
 @APP.route('/search', methods=["GET"])
 def run_search():
     request_data = request.get_json()
@@ -317,6 +306,7 @@ def run_search():
     )
 
     return dumps(return_value)
+
 
 @APP.route('/admin/userpermission/change', methods=["POST"])
 def run_admin_userpermission_change():
@@ -329,9 +319,9 @@ def run_admin_userpermission_change():
 
     return dumps(return_value)
 
+
 if __name__ == '__main__':
     APP.run(port=(sys.argv[1] if len(sys.argv) > 1 else 5000))
 
     # when the server exists dump the current database into a file
     atexit.register(database.save_data)
-

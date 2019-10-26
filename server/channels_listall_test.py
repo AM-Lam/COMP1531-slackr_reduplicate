@@ -7,16 +7,8 @@ from .channels_listall import channels_listall
 def test_channels_listall():
     # create some users and channels for testing, commented for now
     # until auth_register works
-    # user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
-    # user2 = auth_register("good@email.com", "987654321", "Jone", "Bobs")
-
-    user1 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.QPTH6fx8Z7D3E7GwZ9PybLC8I5Sfzna4pOM73yen1MM"
-    }
-
-    user2 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTEyIn0.z3zejfdHH-2ErKgGCoRlIAZnhV56T-F71k5JLRDBeXQ"
-    }
+    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
+    user2 = auth_register("good@email.com", "987654321", "Jone", "Bobs")
     
     # ensure that if there are no channels that none are shown
     assert channels_listall(user1["token"]) == {"channels" : []}

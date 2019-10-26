@@ -11,7 +11,7 @@ def channels_listall(token):
     # apparently we want everyone to be able to access
     # all the channels)
     if not database["tokens"].get(token, True):
-        raise AccessError
+        raise AccessError(description="Invalid token")
 
     # quick little list comprehension to return the channels in the format
     # we need

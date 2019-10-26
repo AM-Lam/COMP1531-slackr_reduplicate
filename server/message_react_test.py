@@ -1,6 +1,6 @@
 import pytest
 import re
-from message_react import message_react
+from .message_react import message_react
 
 def test_message_react():
     #assert message_react(token, message_id, react_id) == None
