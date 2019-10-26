@@ -57,7 +57,7 @@ def change_email(u_id, email):
         for x in DATABASE["users"]:
             y = x.get_user_data()
             if y.get("u_id") == u_id:
-                DATABASE.update_user_email(email)
-                break
+                x.update_user_email(email)
+                return True
     except Exception as e:
         raise ValueError("Error: Couldn't change email.")
