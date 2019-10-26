@@ -19,14 +19,19 @@ def search(token, query_str):
             if query_str in message:
                 message_match.append(message);
 
-    return messages
+    return message_match
 
 def check_valid_token(token):
-    global DATABASE
     # find the user ID associated with this token, else raise a ValueError
+    global DATABASE
+    global SECRET
+
+    token = jwt.decode(token, SECRET, algorithms=['HS256'])
+
     try:
-        for x in DATABASE:
-            if x.get("token") == token:
-                return x.get("u_id")
+        for x in DATABASE["users"]:
+            y = x.get_user_data()
+            if y.get("u_id") == token["u_id"]:
+                return y.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")

@@ -11,11 +11,11 @@ def test_channels_listall():
     # user2 = auth_register("good@email.com", "987654321", "Jone", "Bobs")
 
     user1 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
+        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.QPTH6fx8Z7D3E7GwZ9PybLC8I5Sfzna4pOM73yen1MM"
     }
 
     user2 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTEyIn0.d_eDRe4Br9kLoTBMgjxeoLGsP02srIBOoKbgZjEIO6o"
+        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTEyIn0.z3zejfdHH-2ErKgGCoRlIAZnhV56T-F71k5JLRDBeXQ"
     }
     
     # ensure that if there are no channels that none are shown

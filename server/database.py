@@ -2,18 +2,17 @@ import pickle
 
 
 DATABASE = None
-SECRET = "MICHELFOUCAULT"
+SECRET = "AVENGERS_SOCKS"
 
 
 class User:
-    def __init__(self, u_id, first_name, last_name, password, email, token):
+    def __init__(self, u_id, first_name, last_name, password, email):
         self._u_id = u_id 
         self._first_name = first_name
         self._last_name = last_name
         self._password = password
         self._email = email
         self._handle = first_name + last_name
-        self._token = token
     
     
     def get_user_data(self):
@@ -24,18 +23,31 @@ class User:
             "password" : self._password,
             "email" : self._email,
             "handle" : self._handle,
-            "token" : self._token,
         }
     
 
-    def update_user_data(self, new_data):
-        self._u_id = new_data["u_id"]
-        self._first_name = new_data["first_name"]
-        self._last_name = new_data["last_name"]
-        self._password = new_data["password"]
-        self._email = new_data["email"]
-        self._handle = new_data["handle"]
-        self._token = new_data["token"]
+    def update_user_id(self, new_id):
+        self._u_id = new_id
+
+
+    def update_user_first_name(self, new_fname):
+        self._first_name = new_fname
+
+
+    def update_user_last_name(self, new_lname):
+        self._last_name = new_lname
+
+
+    def update_user_password(self, new_password):
+        self._password = new_password
+
+
+    def update_user_email(self, new_email):
+        self._email = new_email
+
+        
+    def update_user_handle(self, new_handle):
+        self._handle = new_handle
 
 
 class Channel:
@@ -53,6 +65,10 @@ class Channel:
         
         self._public = public               # is the channel public, boolean 
                                             # val
+
+        self._standup = None                # when standup is active, gives time when
+                                            # standup finishes
+                                            # else it's None
     
 
     def get_channel_data(self):
@@ -62,8 +78,17 @@ class Channel:
             "messages" : self._messages,
             "members" : self._members,
             "public" : self._public,
+            "standup" : self._standup,
         }
     
+
+    def update_channel_data(self, new_data):
+        self._channel_id = new_data["channel_id"]
+        self._first_name = new_data["first_name"]
+        self._last_name = new_data["last_name"]
+        self._password = new_data["password"]
+        self._email = new_data["email"]
+        self._standup = new_data["standup"]
 
     def frontend_format(self):
         return {
@@ -71,14 +96,20 @@ class Channel:
             "name" : self._channel_name
         }
 
-
+ 
 class Messages:
-    def __init__(self, message_id, u_id, text, channel_id, time_sent):
-        self._message_id = message_id
-        self._u_id = u_id
-        self._channel_id = channel_id
-        self._text = text
-        self._time_sent = time_sent
+    def __init__(self, message_id, u_id, text, channel_id, time_sent, reacts):
+        self._message_id = message_id       # id of the message in a channel, increases 
+                                            # sequentially
+        self._u_id = u_id                   # poster's u_id
+        self._channel_id = channel_id       # id of the channel where the message is posted
+        self._text = text                   # the content of the messages
+        self._time_sent = time_sent         # time that the message is posted 
+                                            # used for sendlater or standup
+        self._reacts = reacts               # List of dictionaries
+                                            # with u_id as key, and react_id, is_this_user_reacted as values
+                                            # is_this_user_reacted:whether or not the authorised user has been one of the reacts to this post
+        self._pinned = False                # bool of whether the message is pinned or not
     
 
     def get_message_data(self):
@@ -88,17 +119,23 @@ class Messages:
             "channel_id" : self._channel_id,
             "text" : self._text,
             "time_sent" : self._time_sent,
+            'reacts': self._reacts,
+            'is_pinned': self._pinned,
         }
+
+    def frontend_format(self):
+        return {
+            'message_id': self._message_id,
+            'u_id': self._u_id,
+            'message': self._test,
+            'time_created': self._time_sent,
+            'reacts': self._reacts,
+            'is_pinned': self._pinned,
+    }
 
 
 def get_data():
     global DATABASE
-    return DATABASE
-
-
-def update_data(new_database):
-    global DATABASE
-    DATABASE = new_database
     return DATABASE
 
 
@@ -114,10 +151,11 @@ def save_data():
 
 
 # initialise an empty database
-update_data({
+DATABASE = {
     "users" : [],
     "channels" : [],
-    "tokens" : {}
-})
+    "tokens" : {},
+    "reset" : {}
+}
 
 print("Setup complete")

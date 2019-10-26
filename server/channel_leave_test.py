@@ -1,15 +1,22 @@
 import pytest
-from channel_leave import channel_leave
-from auth_register import auth_register
-from channels_create import channels_create
+from .channel_leave import channel_leave
+from .auth_register import auth_register
+from .channels_create import channels_create
 
 
 
 def test_channel_leave():
-    # boilerplate user and channel creation stuff
-    user1 = auth_register("valid@email.com", "verystrong", "John", "Doe")
+    # boilerplate user and channel creation stuff, comment out until
+    # auth_register is working
+    # user1 = auth_register("valid@email.com", "verystrong", "John", "Doe")
+    
+    user1 = {
+        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.QPTH6fx8Z7D3E7GwZ9PybLC8I5Sfzna4pOM73yen1MM"
+    }
+    
     channel1 = channels_create(user1["token"], "New Channel", True)
     channel2 = channels_create(user1["token"], "A New Channel", False)
+    channel3 = channels_create(user1["token"], "Good 'Ol Channel", True)
 
     # first check the simplest case, if the user can leave a channel they are in
     assert channel_leave(user1["token"], channel1["channel_id"]) == {}
@@ -23,5 +30,5 @@ def test_channel_leave():
 
     # try to leave a channel the user is not a part of - this should fail 
     # quietely (see assumptions.md)
-    assert channel_leave(user1["token"], 404) == {}
+    assert channel_leave(user1["token"], channel3["channel_id"]) == {}
 

@@ -20,12 +20,15 @@ def user_profile_setemail(token, email):
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
     global DATABASE
-    # find the user ID associated with this token, else raise a ValueError
-    # decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    global SECRET
+
+    token = jwt.decode(token, SECRET, algorithms=['HS256'])
+
     try:
-        for x in DATABASE:
-            if x.get("token") == token:
-                return x.get("u_id")
+        for x in DATABASE["users"]:
+            y = x.get_user_data()
+            if y.get("u_id") == token["u_id"]:
+                return y.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")
 
@@ -41,7 +44,8 @@ def check_email_database(email):
     # check if the email is already being used/is within the database
     global DATABASE
     for x in DATABASE["email"]:
-        if x.get("email") == email:
+        y = x.get_user_data()
+        if y.get("email") == email:
             raise ValueError("Email is already in use.")
     return True
 
@@ -50,7 +54,9 @@ def change_email(u_id, email):
     global DATABASE
     try:
         for x in DATABASE["users"]:
-            if x.get("u_id") == u_id:
+            y = x.get_user_data()
+            if y.get("u_id") == u_id:
                 DATABASE.update_user_data({"email": handle})
+                break
     except Exception as e:
         raise ValueError("Error: Couldn't change email.")

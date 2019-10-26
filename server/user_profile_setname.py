@@ -19,16 +19,18 @@ def user_profile_setname(token, name_first, name_last):
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
     global DATABASE
-    # find the user ID associated with this token, else raise a ValueError
-    # decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    global SECRET
+
+    token = jwt.decode(token, SECRET, algorithms=['HS256'])
+
     try:
-        for x in DATABASE:
-            if x.get("token") == token:
-                return x.get("u_id")
+        for x in DATABASE["users"]:
+            y = x.get_user_data()
+            if y.get("u_id") == token["u_id"]:
+                return y.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")
 
-    
 def first_name_check(name_first):
     # check if the first name is within length limits/if first name exists
     if len(name_first) < 50 and len(name_first) > 0:
@@ -48,7 +50,9 @@ def change_names(u_id, name_first, name_last):
     global DATABASE
     try:
         for x in DATABASE["users"]:
-            if x.get("u_id") == u_id:
+            y = x.get_user_data()
+            if y.get("u_id") == u_id:
                 DATABASE.update_user_data({"first_name": name_first, "last_name": name_last})
+                break
     except Exception as e:
         raise ValueError("Error: Couldn't change name.")

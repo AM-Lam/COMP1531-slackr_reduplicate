@@ -1,8 +1,8 @@
-from .channels_list import channels_list
 from datetime import timedelta, datetime
 from .access_error import AccessError
-from .channels_listall import channels_listall
+from .message_send import message_send
 import jwt
+import time
 
 #   standup_start(token, channel_id);
 #   return {time_finish}
@@ -20,17 +20,27 @@ def standup_start(token, channel_id):
     check_channel_member(u_id, channel_id)
     start_standup(channel_id)
 
-    time_finish = timedelta(minutes=15)
+    MESSAGE_STANDUP = ""
+
+    time_current = datetime.now()
+    time_finish = time_current + timedelta(minutes=15)
+
+    end_standup(token, channel_id)
 
     return time_finish
 
 def check_valid_token(token):
-    global DATABASE
     # find the user ID associated with this token, else raise a ValueError
+    global DATABASE
+    global SECRET
+
+    token = jwt.decode(token, SECRET, algorithms=['HS256'])
+
     try:
-        for x in DATABASE:
-            if x.get("token") == token:
-                return x.get("u_id")
+        for x in DATABASE["users"]:
+            y = x.get_user_data()
+            if y.get("u_id") == token["u_id"]:
+                return y.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")
 
@@ -51,15 +61,32 @@ def check_channel_member(u_id, channel_id):
         if x.get("channel_id") == channel_id:
             channel_dictionary = x.get_channel_data()
             member_list = channel_dictionary["members"]
-            for members in member_list:
-                if members.key() == u_id:
-                    return True
-    raise AccessError("You are not a member of this channel.")
+            if u_id in member_list:
+                return True
+            else:
+                raise AccessError("You are not a member of this channel.")
+    raise ValueError("Channel does not exist or cannot be found.")
 
 def start_standup(channel_id):
-    # maybe change an attribute in the channel class
-    # like channel.is_standup = True
-    # channel.standup_time = time_finish
-    # for now there is no implementation
-    # so we
-    pass
+    # give a timedate object to the database
+    global DATABASE
+    
+    time_current = datetime.now()
+    time_finish = time_current + timedelta(minutes=15)
+
+    for x in DATABASE("channels"):
+        if x.get("channel_id") == channel_id:
+            DATABASE.update_user_data({"standup": time_finish})
+    raise ValueError("Channel does not exist or cannot be found.")
+
+def end_standup(token, channel_id):
+    global DATABASE
+    global MESSAGE_STANDUP
+
+    time_current = datetime.now()
+    time_finish = time_current + timedelta(minutes=15)
+
+    while datetime.now() <= time_finish:
+        time.sleep(1)
+
+    message_send(token, channel_id, MESSAGE_STANDUP)
