@@ -1,7 +1,7 @@
-from channels_list import channels_list
+from .channels_list import channels_list
 from datetime import timedelta, datetime
-from access_error import AccessError
-from channels_listall import channels_listall
+from .access_error import AccessError
+from .channels_listall import channels_listall
 import jwt
 
 #   standup_send(token, channel_id, message);
@@ -28,30 +28,38 @@ def standup_send(token, channel_id, message):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    global DATABASE
+    # find the user ID associated with this token, else raise a ValueError
+    # decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
     try:
-        for x in database:
-            if x.get("u_id") == decoded_jwt.key():
+        for x in DATABASE:
+            if x.get("token") == token:
                 return x.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")
 
+
 def check_channel_exist(token, channel_id):
-    #if channel_id not in [x["channel_id"] for x in channel_list(token)]:
-        #raise ValueError("Channel does not exist or cannot be found.")
-    #else:
-        #return True
-    if channel_id == "channel":
-        return True
-    else:
-        raise ValueError("Channel does not exist or cannot be found.")
+    global DATABASE
+    # check if channel_id exists, else raise a ValueError
+
+    for x in DATABASE("channels"):
+        if x.get("channel_id") == channel_id:
+            return True
+    raise ValueError("Channel does not exist or cannot be found.")
 
 def check_channel_member(token, channel_id):
     # we need to find a way to know what members correspond to which channels, for now, pass
-    if token == "badtoken":
-        raise AccessError("You are not a member of this channel.")
-    else:
-        return True
+    global DATABASE
+
+    for x in DATABASE("channels"):
+        if x.get("channel_id") == channel_id:
+            channel_dictionary = x.get_channel_data()
+            member_list = channel_dictionary["members"]
+            for members in member_list:
+                if members.key() == u_id:
+                    return True
+    raise AccessError("You are not a member of this channel.")
 
 def check_message_length(message):
     if len(message) <= 1000:
@@ -59,12 +67,12 @@ def check_message_length(message):
     else:
         raise ValueError("Message is too long.")
 
-def check_valid_standup_time(channel_id):
+def check_valid_standup_time(channel_id): #TODO: a
     # for now I don't know about the channel class so I'm gonna pretend
     # if channel.standup_time < datetime.today
     # raise AccessError
     pass
 
-def send_message(token, channel_id, message):
+def send_message(token, channel_id, message): #TODO: a
     # send a message corresponding to token in the channel_id
     pass

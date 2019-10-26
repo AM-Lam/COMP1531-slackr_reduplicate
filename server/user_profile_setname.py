@@ -18,13 +18,16 @@ def user_profile_setname(token, name_first, name_last):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    global DATABASE
+    # find the user ID associated with this token, else raise a ValueError
+    # decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
     try:
-        for x in database:
-            if x.get("u_id") == decoded_jwt.key():
+        for x in DATABASE:
+            if x.get("token") == token:
                 return x.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")
+
     
 def first_name_check(name_first):
     # check if the first name is within length limits/if first name exists

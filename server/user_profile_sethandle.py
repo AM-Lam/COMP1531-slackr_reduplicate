@@ -1,5 +1,3 @@
-import jwt
-
 #   user_profile_sethandle(token, handle_str);
 #   return void
 #   Exception: ValueError when:
@@ -17,11 +15,11 @@ def user_profile_sethandle(token, handle_str):
     return
 
 def check_valid_token(token):
+    global DATABASE
     # find the user ID associated with this token, else raise a ValueError
-    decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
     try:
-        for x in database:
-            if x.get("u_id") == decoded_jwt.key():
+        for x in DATABASE:
+            if x.get("token") == token:
                 return x.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")
@@ -36,9 +34,7 @@ def handle_in_use_check(handle_str):
     # check if the handle is already being used/exists within the database
     global DATABASE
     for x in DATABASE["handle"]:
-        if x.get("handle") != handle_str:
-            pass
-        else:
+        if x.get("handle") == handle_str:
             raise ValueError("Handle is already in use.")
     return True
 

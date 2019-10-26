@@ -22,10 +22,11 @@ def admin_userpermission_change(token, u_id, permission_id):
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
     global DATABASE
-    decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    # find the user ID associated with this token, else raise a ValueError
+    # decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
     try:
         for x in DATABASE:
-            if x.get("u_id") == decoded_jwt.key():
+            if x.get("token") == token:
                 return x.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")

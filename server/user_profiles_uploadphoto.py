@@ -10,6 +10,7 @@ import jwt
 
 def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end):
     # find u_id associated with token (with non-existent database)
+    #TODO: (note: this is not requried to be completed until iteration 3)
     user_id = check_valid_token(token)
 
     check_imgurl(img_url)
@@ -22,13 +23,16 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    global DATABASE
+    # find the user ID associated with this token, else raise a ValueError
+    # decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
     try:
-        for x in database:
-            if x.get("u_id") == decoded_jwt.key():
+        for x in DATABASE:
+            if x.get("token") == token:
                 return x.get("u_id")
     except Exception as e:
         raise ValueError("token invalid")
+
         
 def check_imgurl(img_url):
     if urllib.request.urlopen(img_url).getcode() == 200:
