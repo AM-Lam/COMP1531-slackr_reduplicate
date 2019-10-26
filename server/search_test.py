@@ -7,7 +7,7 @@ clear_data()
 
 
 def test_search():
-    user = auth_register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
 
     # find all the matching messages (nothing)
     assert search(user["token"], "hewwo") == []

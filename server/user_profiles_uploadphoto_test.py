@@ -9,7 +9,7 @@ clear_data()
 
 
 def test_user_profiles_uploadphoto():
-    user = auth_register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
 
     # this test should pass with no issue
     assert user_profiles_uploadphoto(user["token"], "https://twitter.com/home", 0, 0, 200, 200) == None

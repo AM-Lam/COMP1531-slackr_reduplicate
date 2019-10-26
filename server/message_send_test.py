@@ -7,7 +7,7 @@ from .database import *
 clear_data()
 
 
-def test_message_send(token, channel_id, message):
+def test_message_send():
     #basic cases
     assert message_send('person1', 1, 'a') == None
     assert message_send('person1', 1, 'hello') == None

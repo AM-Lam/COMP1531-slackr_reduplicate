@@ -11,7 +11,7 @@ clear_data()
 
 
 def test_standup_start():
-    user = auth_register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
     #hannel = channels_create(user[token], "Channel 1", False)
     channel = "channel"
 
