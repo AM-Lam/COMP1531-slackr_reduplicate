@@ -2,17 +2,16 @@ import jwt
 import pytest
 from datetime import datetime, timedelta
 from .access_error import *
+from .database import *
 from .message_sendlater import message_sendlater
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .channel_messages import channel_messages
-from .database import *
-
-
-clear_data()
 
 
 def test_message_sendlater():
+    clear_data()
+    
     server_data = get_data()
     user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
     

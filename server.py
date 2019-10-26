@@ -75,6 +75,11 @@ def email_request():
     print(send_code(email, dumpstring))
     return dumps({})
 
+@APP.route('/auth/passwordreset/request', methods=['POST'])
+def email_request():
+    email = request.form.get('email')
+    dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
+    return dumps (dumpstring)
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
 def email_reset():
@@ -123,6 +128,127 @@ def run_channels_create():
 
     return dumps(return_value)
 
+@APP.route('/message/send', methods=["POST"])
+def run_message_send():
+    """ 
+        run the message_send function to send a message and
+        add it to the  server database
+    """
+    request_data = request.get_json()
+    return_value = message_send.message_send(request_data["token"],
+                                            request_data["channel_id"],
+                                            request_data["message"]
+                                            )
+
+    return dumps(return_value)
+
+@APP.route('/message/remove', methods=["DELETE"])
+def run_message_remove():
+    """ 
+        run the message_remove function to remove a message and
+        update the server database
+    """
+    request_data = request.get_json()
+    return_value = ""
+        return_value = message_remove.message_remove(request_data["token"],
+                                                    request_data["message_id"]
+                                                    )
+
+    return dumps(return_value)
+
+@APP.route('/message/edit', methods=["PUT"])
+def run_message_edit():
+    """ 
+        run the message_edit function to edit a message and
+        update the server database
+    """
+    request_data = request.get_json()
+    return_value = message_edit.message_edit(request_data["token"],
+                                            request_data["message_id"],
+                                            request_data["message"]
+                                            )
+
+    return dumps(return_value)
+
+@APP.route('/message/react', methods=["POST"])
+def run_message_react():
+    """ 
+        run the message_react function to react a message and
+        add it to the server database
+    """
+    request_data = request.get_json()
+    return_value = message_react.message_react(request_data["token"],
+                                                request_data["message_id"],
+                                                request_data["react_id"]
+                                                )
+
+    return dumps(return_value)
+
+@APP.route('/message/unreact', methods=["POST"])
+def run_message_unreact():
+    """ 
+        run the message_react function to react a message and
+        add it to the server database
+    """
+    request_data = request.get_json()
+    return_value = message_unreact.message_unreact(request_data["token"],
+                                                    request_data["message_id"],
+                                                    request_data["react_id"]
+                                                    )
+
+    return dumps(return_value)
+
+
+@APP.route('/message/pin', methods=["POST"])
+def run_message_pin():
+    """ 
+        run the message_react function to react a message and
+        add it to the server database
+    """
+    request_data = request.get_json()
+    return_value = message_pin.message_pin( request_data["token"],
+                                            request_data["message_id"]
+                                        )
+
+    
+    return dumps(return_value)
+
+@APP.route('/message/unpin', methods=["POST"])
+def run_message_unpin():
+    """ 
+        run the message_react function to react a message and
+        add it to the server database
+    """
+    request_data = request.get_json()
+
+    return_value = message_unpin.message_unpin( request_data["token"],
+                                                request_data["message_id"]
+                                                )
+
+    return dumps(return_value)
+
+@APP.route('/user/profile', methods=["GET"])
+def run_user_profile():
+    """ 
+        run the message_react function to react a message and
+        add it to the server database
+    """
+    request_data = request.get_json()
+    return_value = user_profile.user_profile(request_data["token"],
+                                            request_data["u_id"]
+                                            )
+
+    return dumps(return_value)
+
+@APP.route("/channel/leave", methods=["POST"])
+def run_channel_leave():
+    request_data = request.get_json()
+    return_value = channel_leave.channel_leave( request_data["token"],
+                                                request_data["channel_id"]
+                                            )
+
+    return dumps(return_value)
+
 
 @APP.route("/channel/leave", methods=["POST"])
 def run_channel_leave():
@@ -150,9 +276,7 @@ def run_channels_listall():
 @APP.route('/channels/list', methods=['POST'])
 def run_channels_list():
     request_data = request.get_json()
-    return_value = channels_list.channels_list(
-        request_data["token"]
-    )
+    return_value = channels_list.channels_list(request_data["token"])
 
     return dumps(return_value)
 

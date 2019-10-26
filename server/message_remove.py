@@ -1,29 +1,51 @@
+import jwt
+import threading
+from .database import *
 from .access_error import *
-from .channels_list import channels_list
 
 def message_remove(token, message_id):
-    # Message (based on ID) no longer exists
-    # or the message Id never exists
-    if message_id not in message_id_list:
-        raise ValueError(description="The message is not existing. Please try again")
+    server_data = get_data()
+
+    # now grab the u_id associated with the provided token
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
+
+    # if the token is not valid raise an AccessError
+    if not server_data["tokens"].get(token, True):
+        raise AccessError(description="This token is invalid")
 
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
-    if message_id_dic[message_id][0] != token:
-        raise AccessError(description="You have no permission to remove the message. Messages can only be deleted by sender or admin.")
-
-    token_of_message = message_id_dic[message_id][0]
-    id_of_channel = message_id_dic[message_id][1]
-    # if channel_slist succeed, it should list of channels that the user being
-    # check whether the user is a member in the channel or not
-    if id_of_channel not in channels_list(token_of_message):
-        if permission_id_dic[token_of_message][id_of_channel] == 3:  
-            #  Person who make the request is not an admin or owner in the channel so they don't have permission to remove the message
-            raise AccessError(description="You don't have access to remove the message. Only the sender or admin shall make this request.")
-    else: 
-        # Since it also fail the channel_details so something must be wrong with the token or channel
-        raise AccessError(description="You are not a member in this channel")
+    channel_ = None
+    # add the message to the server database
+    for channel in server_data["channels"]:
+        for message in channel._messages:
+            if message.get_m_id() == message_id:
+                channel_ = channel
+                break
     
-    #If the function is successfully executed
-    del message_id_dic[message_id]
-    message_id_list.remove(message_id)
+    if channel_ is None:
+        raise ValueError(description="Channel does not exist")
+
+    obj_request = None
+    for user in server_data["users"]:
+        if user.get_u_id() == u_id:
+            obj_request = user
+            break
+
+    user_id = obj_request.get_u_id()
+
+    # the message is not existed
+    if user_id is None:
+        raise AccessError(description="The message is not existed")
+
+    if u_id != user_id:
+        # if user is not the poster and admin
+        if not obj_request.is_global_admin():
+            raise AccessError(description="You don't have access to delete")
+    
+    # add the message to the server database
+    channel._messages.remove(message)
+            
+
+#200, 400,404,500
