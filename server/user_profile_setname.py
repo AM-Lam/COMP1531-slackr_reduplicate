@@ -1,4 +1,4 @@
-from .access_error import AccessError
+from .access_error import AccessError, ValueError
 import jwt
 
 #   user_profile_setname(token, name_first, name_last);
@@ -30,21 +30,21 @@ def check_valid_token(token):
             if user_id == token["u_id"]:
                 return user_id
     except Exception as e:
-        raise ValueError("token invalid")
+        raise ValueError(description="token invalid")
 
 def first_name_check(name_first):
     # check if the first name is within length limits/if first name exists
     if len(name_first) < 50 and len(name_first) > 0:
         return True
     else:
-        raise ValueError("First name must be between 1 and 50 characters.")
+        raise ValueError(description="First name must be between 1 and 50 characters.")
 
 def last_name_check(name_last):
     # check if the last name is within length limits
     if len(name_last) < 50:
         return True
     else:
-        raise ValueError("Last name cannot exceed 50 characters.")
+        raise ValueError(description="Last name cannot exceed 50 characters.")
 
 def change_names(u_id, name_first, name_last):
     # change first and last name in the database for the associated user
@@ -57,4 +57,4 @@ def change_names(u_id, name_first, name_last):
                 x.update_user_last_name(name_last)
                 return True
     except Exception as e:
-        raise ValueError("Error: Couldn't change name.")
+        raise ValueError(description="Error: Couldn't change name.")
