@@ -1,23 +1,23 @@
 import jwt
-from datetime import datetime 
-from .access_error import AccessError
-from .channels_list import channels_list
+import threading
+from .database import *
+from .access_error import *
 
 def message_react(token, message_id, react_id):
     server_data = get_data()
 
-    # Message (based on ID) no longer exists
-    # or the message Id never exists
-    if message_id not in server_data['channels']._messages:
-        raise ValueError #("The message is not existing. Please try again")
+    # if the token is not valid raise an AccessError
+    if not server_data["tokens"].get(token, True):
+        raise AccessError(description="This token is invalid")
 
     # now grab the u_id associated with the provided token
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
     u_id = token_payload["u_id"]
 
-    # not an authorised user
-    if token not in server_data['token']:
-        raise AccessError 
+    # Message (based on ID) no longer exists
+    # or the message Id never exists
+    if message_id not in server_data['channels']._messages:
+        raise ValueError #("The message is not existing. Please try again")
 
     for channel in server_data['channels']:
         for message in channel._messages:

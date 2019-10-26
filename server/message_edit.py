@@ -1,19 +1,30 @@
 import jwt
+import threading
 from .database import *
-from .access_error import AccessError
+from .access_error import *
 
 def message_edit(token, message_id, message):
     server_data = get_data()
 
+    # if the token is not valid raise an AccessError
+    if not server_data["tokens"].get(token, True):
+        raise AccessError(description="This token is invalid")
+
+    # now grab the u_id associated with the provided token
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
+    
+    # Message is more than 1000 characters
+    if len(message) > 1000:
+        raise ValueError(description="Messages must be less than 1000 characters")
+
+'''
     # basic case
     # if the message_id cannot be found
     if message_id not in server_data['channels']._messages:
         raise ValueError 
         
         # now grab the u_id associated with the provided token
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    u_id = token_payload["u_id"]
-
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
     for channel in server_data['channels']:
@@ -31,8 +42,8 @@ def message_edit(token, message_id, message):
                     #     1) is a message sent by the authorised user
                     # message doesn't have the right format or character limitation. 
                     # Even though it is sent by the right person the request is still denied
-                if len(message) > 1000:
-                    raise ValueError
+'''
+
                 # update the database with new message
                 # or use update data?
                 channel._messages.test = message

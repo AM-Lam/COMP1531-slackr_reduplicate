@@ -83,7 +83,6 @@ def test_invalid_user():
 
     channel_id = channels_create(user1["token"], "Channel 1", True)
 
-    db = get_data()
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
     
     # check that the channel exists
@@ -113,7 +112,6 @@ def test_admin_user():
 
     channel_id = channels_create(user1["token"], "Channel 1", True)
 
-    db = get_data()
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
     # check that the message exists
     assert message_1 is not None

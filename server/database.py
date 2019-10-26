@@ -230,6 +230,8 @@ class Messages:
     def get_u_id(self):
         return self._u_id
 
+    def is_pinned(self):
+        return self._pinned
 
 def get_data():
     global DATABASE

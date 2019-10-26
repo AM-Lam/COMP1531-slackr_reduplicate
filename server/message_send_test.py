@@ -7,13 +7,12 @@ from .channels_create import channels_create
 from .message_send import message_send
 
 def verify_message(message_obj, correct_data):
-    # print(message_obj)
     if message_obj == correct_data:
         return True
     return False
 
 def test_message_send():
-    # user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
+    # user1 = auth_register("valid@email.com", "144234", "Bob", "Jones")
 
     # just got the u_id by putting fake data into jwt.io
     secret = get_secret()

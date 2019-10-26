@@ -3,14 +3,6 @@ import threading
 from .database import *
 from .access_error import *
 
-def is_admin(u_id, obj_channel):
-    if u_id in obj_channel._members:
-        for person in obj_channel._members:
-            # and the request is sent by member of the channels
-            if person[u_id] == 'admin':
-                return True
-    return False
-
 def message_remove(token, message_id):
     server_data = get_data()
 
@@ -19,7 +11,7 @@ def message_remove(token, message_id):
     u_id = token_payload["u_id"]
 
     # not an authorised user
-    if token not in server_data['token']:
+    if token not in server_data["token"]:
         raise AccessError(description="This token is invalid")
 
     # Message with message_id was not sent by the authorised user making this request
