@@ -1,4 +1,5 @@
 from .access_error import AccessError, ValueError
+from .database import *
 import re
 import jwt
 
@@ -20,9 +21,8 @@ def user_profile_setemail(token, email):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    global DATABASE
-    global SECRET
-
+    DATABASE = get_data()
+    SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
     try:
@@ -32,6 +32,7 @@ def check_valid_token(token):
                 return user_id
     except Exception as e:
         raise ValueError(description="token invalid")
+
 
 def check_if_email_valid(email):
     # run the re module to identify if an email is valid
@@ -43,7 +44,8 @@ def check_if_email_valid(email):
 
 def check_email_database(email):
     # check if the email is already being used/is within the database
-    global DATABASE
+    DATABASE = get_data()
+
     for x in DATABASE["email"]:
         y = x.get_user_data()
         if y.get("email") == email:
@@ -52,7 +54,8 @@ def check_email_database(email):
 
 def change_email(u_id, email):
     # change email in the database for the specified user
-    global DATABASE
+    DATABASE = get_data()
+    
     try:
         for x in DATABASE["users"]:
             y = x.get_user_data()
