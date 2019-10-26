@@ -134,12 +134,6 @@ def get_data():
     return DATABASE
 
 
-def update_data(new_database):
-    global DATABASE
-    DATABASE = new_database
-    return DATABASE
-
-
 def get_secret():
     global SECRET
     return SECRET
@@ -152,12 +146,11 @@ def save_data():
 
 
 # initialise an empty database
-update_data({
+DATABASE = {
     "users" : [],
     "channels" : [],
     "tokens" : {},
-    "reset" : {} # <----- I am adding this field {'reset_code':'email'} <-to be able to store the reset
-                                     # code and to delete the code after the new password has been made
-})
+    "reset" : {}
+}
 
 print("Setup complete")
