@@ -6,13 +6,14 @@ SECRET = "AVENGERS_SOCKS"
 
 
 class User:
-    def __init__(self, u_id, first_name, last_name, password, email):
+    def __init__(self, u_id, first_name, last_name, password, email, global_admin=False):
         self._u_id = u_id 
         self._first_name = first_name
         self._last_name = last_name
         self._password = password
         self._email = email
         self._handle = first_name + last_name
+        self._global_admin = global_admin
     
     
     def get_user_data(self):
@@ -48,6 +49,10 @@ class User:
         
     def update_user_handle(self, new_handle):
         self._handle = new_handle
+    
+
+    def is_global_admin(self):
+        return self._global_admin
 
 
 class Channel:
