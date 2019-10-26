@@ -45,6 +45,7 @@ def test_message_sendlater():
 
     # ensure that the message has not yet appeared
     assert len(channelObj.get_messages()) == 0
+
     
     # wait until the time has passed then check if the message was sent
     # (wait a little longer just to ensure that we aren't checking for the
