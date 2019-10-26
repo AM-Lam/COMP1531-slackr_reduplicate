@@ -1,4 +1,5 @@
 from .access_error import AccessError
+from .database import *
 import urllib
 import jwt
 
@@ -24,9 +25,8 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    global DATABASE
-    global SECRET
-
+    DATABASE = get_data()
+    SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
     try:
@@ -35,7 +35,8 @@ def check_valid_token(token):
             if user_id == token["u_id"]:
                 return user_id
     except Exception as e:
-        raise ValueError("token invalid")
+        raise ValueError(description="token invalid")
+
         
 def check_imgurl(img_url):
     if urllib.request.urlopen(img_url).getcode() == 200:
