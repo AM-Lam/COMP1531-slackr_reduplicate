@@ -1,5 +1,7 @@
 import pytest
 from .database import *
+from .auth_register import auth_register
+from .channels_create import channels_create
 from .message_unreact import message_unreact
     
 def test_message_unreact():
