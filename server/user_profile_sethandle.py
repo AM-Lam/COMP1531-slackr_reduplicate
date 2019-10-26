@@ -1,4 +1,5 @@
 from .access_error import AccessError, ValueError
+from .database import *
 import jwt
 
 #   user_profile_sethandle(token, handle_str);
@@ -19,9 +20,8 @@ def user_profile_sethandle(token, handle_str):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    global DATABASE
-    global SECRET
-
+    DATABASE = get_data()
+    SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
     try:
@@ -31,6 +31,7 @@ def check_valid_token(token):
                 return user_id
     except Exception as e:
         raise ValueError(description="token invalid")
+
         
 def handle_check(handle_str):
     if len(handle_str) < 20 and len(handle_str) > 0:
@@ -40,7 +41,8 @@ def handle_check(handle_str):
 
 def handle_in_use_check(handle_str):
     # check if the handle is already being used/exists within the database
-    global DATABASE
+    DATABASE = get_data()
+
     for x in DATABASE["handle"]:
         y = x.get_user_data()
         if y.get("handle") == handle_str:
@@ -49,7 +51,8 @@ def handle_in_use_check(handle_str):
 
 def change_handle(u_id, handle_str):
     # change handle in the database for associated user
-    global DATABASE
+    DATABASE = get_data()
+    
     try:
         for x in DATABASE["users"]:
             y = x.get_user_data()
