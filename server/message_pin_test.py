@@ -9,67 +9,30 @@ from .message_remove import message_remove
 from .message_pin import message_pin
 
 def test_message_pin():
-    # user1 = auth_register("valid@email.com", "125\34", "Bob", "Jones")
+    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
 
-    # just got the u_id by putting fake data into jwt.io
-    secret = get_secret()
-    user1 = {
-        "token" : jwt.encode({"u_id" : "111"}, secret, algorithm="HS256").decode(),
-        "u_id" : "111"
-    }
-
-    user2 = {
-        "token" : jwt.encode({"u_id" : "22"}, secret, algorithm="HS256").decode(),
-        "u_id" : "22"
-    }
-
-    user3 = {
-        "token" : jwt.encode({"u_id" : "3"}, secret, algorithm="HS256").decode(),
-        "u_id" : "3"
-    }
-    
     channel_id = channels_create(user1["token"], "Channel 1", True)
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
 
-    # check that the channel exists
+    # check that the message exists
     assert message_1 is not None
     
-    assert message_pin(user1["token"], message_1) == {}
-
-    assert message_1._pinned == True
+    assert message_pin(user1["token"], message_1['message_id']) is None
 
 def test_no_message1():
-    # user1 = auth_register("valid@email.com", "144234", "Bob", "Jones")
+    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
 
-    # just got the u_id by putting fake data into jwt.io
-    secret = get_secret()
-    user1 = {
-        "token" : jwt.encode({"u_id" : "111"}, secret, algorithm="HS256").decode(),
-        "u_id" : "111"
-    }
-
-    user2 = {
-        "token" : jwt.encode({"u_id" : "22"}, secret, algorithm="HS256").decode(),
-        "u_id" : "22"
-    }
-
-    user3 = {
-        "token" : jwt.encode({"u_id" : "3"}, secret, algorithm="HS256").decode(),
-        "u_id" : "3"
-    }
-    
     channel_id = channels_create(user1["token"], "Channel 1", True)
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-    message_remove(user1["token"], message_1)
-
     # message is not existed anymore
-    assert message_1 is None
+    message_remove(user1["token"], message_1['message_id'])
+
     # the message is not existed
-    pytest.raises(ValueError, message_pin, user1["token"], message_1)
+    pytest.raises(ValueError, message_pin, user1["token"], message_1['message_id'])
 
     # # assert message_pin(token, message_id) == None
     # assert message_pin('admin1', 1) == None

@@ -14,30 +14,40 @@ def message_pin(token, message_id):
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
     u_id = token_payload["u_id"]
 
-    # Message (based on ID) no longer exists
-    # or the message Id never exists
-    if message_id not in server_data['channels']._messages:
-        raise ValueError #("The message is not existing. Please try again")
-
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
-    for channel in server_data['channels']:
+    channel_ = None
+    message_ = None
+    # add the message to the server database
+    for channel in server_data["channels"]:
         for message in channel._messages:
-            # the message is not existed
-            # or the channel is not existed
-            # double check
-            if message_id not in message._message_id:
-                raise AccessError 
-
-            if message._message_id == message_id:
-                # if the request is not send by the poster 
-                if message._u_id != u_id:
-                    if is_admin(u_id, channel) == False:
-                        raise AccessError 
-
-            #  Message with ID message_id is already pinned
-            if message._pinned == True:
-                raise ValueError
-            else: 
-                message._pinned == True
+            if message.get_m_id() == message_id:
+                channel_ = channel
+                message_ = message
+                break
     
+    if channel_ is None:
+        raise ValueError(description="Channel does not exist")
+
+    obj_request = None
+    for user in server_data["users"]:
+        if user.get_u_id() == u_id:
+            obj_request = user
+            break
+
+    user_id = obj_request.get_u_id()
+
+    # the message is not existed
+    if user_id is None:
+        raise AccessError(description="The message is not existed")
+
+    if u_id != user_id:
+        # if user is not the poster and admin
+        if not obj_request.is_global_admin():
+            raise AccessError(description="You don't have access to delete")
+
+    #  Message with ID message_id is already pinned
+    if message_._pinned == True:
+        raise ValueError(description="The message is pinned")
+    else: 
+        message_._pinned == True
