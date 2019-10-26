@@ -99,6 +99,10 @@ class Channel:
         
         self._public = public               # is the channel public, boolean 
                                             # val
+
+        self._standup = None                # when standup is active, gives time when
+                                            # standup finishes
+                                            # else it's None
     
 
     def get_channel_data(self):
@@ -109,8 +113,8 @@ class Channel:
             "members" : self._members,
             "owners" : self._owners,
             "public" : self._public,
+            "standup" : self._standup,
         }
-        
 
     def frontend_format(self):
         return {
@@ -163,6 +167,9 @@ class Channel:
 
     def set_public(self, public):
         self._public = public
+
+    def set_standup(self, standup):
+        self._standup = standup
 
  
 class Messages:
