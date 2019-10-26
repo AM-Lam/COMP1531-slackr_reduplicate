@@ -3,7 +3,7 @@ import sys
 import atexit
 from flask_cors import CORS
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
 from datetime import datetime
@@ -28,6 +28,10 @@ APP = Flask(__name__)
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
 CORS(APP)
+mail = Mail(APP)
+class ValueError(HTTPException):
+    code = 400
+    message = 'No message specified'
 
 
 APP.config.update(
@@ -46,7 +50,10 @@ def register():
     last_name = request.form.get('name_last')
     password = request.form.get('password')
     email = request.form.get('email')
-    dumpstring = auth_register.auth_register(email, password, first_name, last_name)
+    try:
+        dumpstring = auth_register.auth_register(email, password, first_name, last_name)
+    except ValueError as error:
+        defaultHandler(error)
     return dumps (dumpstring)
 
 
@@ -69,7 +76,8 @@ def user_logout():
 def email_request():
     email = request.form.get('email')
     dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
-    return dumps (dumpstring)
+    print(send_code(email, dumpstring))
+    return dumps({})
 
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
@@ -79,7 +87,29 @@ def email_reset():
     dumpstring = auth_passwordreset_reset.auth_passwordreset_reset(reset_code, new_password)
     return dumps (dumpstring)
 
+@APP.route('/channel/invite', methods=['POST'])
+def channel_invite_e():
+    token = request.form.get('token')
+    channel_id = request.form.get('channel_id')
+    u_id = request.form.get('u_id')
+    dumpstring = channel_invite.channel_invite(token,channel_id,u_id)
+    return (dumpstring)
 
+@APP.route('/channel/details', methods=['GET'])
+def channel_details_e():
+    token = request.form.get('token')
+    channel_id = request.form.get('channel_id')
+    dumpstring = channel_details.channel_details(token,channel_id)
+    return (dumpstring)
+
+@APP.route('/channel/messages', methods=['GET'])
+def channel_messages_e():
+    token = request.form.get('token')
+    channel_id = request.form.get('channel_id')
+    start = request.form.get('start')
+    dumpstring = channel_messages.channel_messages(token,channel_id, start)
+    return (dumpstring)
+    
 @APP.route('/echo/get', methods=['GET'])
 def echo1():
     """ Description of function """
@@ -152,6 +182,27 @@ def run_channel_join():
     )
 
     return dumps(return_value)
+
+def send_code(email, user_id):
+    try:
+        with APP.app_context():
+            msg = Message(subject = "Your slacky reset code",
+                sender="deadthundersquirrels@gmail.com",
+                recipients=[email],
+                body = 'hello')
+            random_num = user_id * (random.randint(1,10000))      # multiplying a random number to user id.
+            random_alph = random.choice(string.ascii_letters)     # getting a random alphabet
+            ramdom_str = str(random_num) + random_alph            # appending the two toghter
+            code = (hashlib.sha256(random_str.encode()).hexdigest())  # hashing the code
+            update_data["reset"][code] = email # adding the code email combo to the database for future refrence.
+            msg.body = "your reset code is " + code
+           
+            mail.send(msg)
+            return {}
+    except Exception as e:
+        return (str(e))
+
+
 
 
 @APP.route('/channel/addowner', methods=["POST"])
@@ -283,3 +334,4 @@ if __name__ == '__main__':
 
     # when the server exists dump the current database into a file
     atexit.register(database.save_data)
+
