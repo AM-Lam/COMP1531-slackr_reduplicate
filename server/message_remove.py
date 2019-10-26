@@ -10,8 +10,8 @@ def message_remove(token, message_id):
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
     u_id = token_payload["u_id"]
 
-    # not an authorised user
-    if token not in server_data["token"]:
+    # if the token is not valid raise an AccessError
+    if not server_data["tokens"].get(token, True):
         raise AccessError(description="This token is invalid")
 
     # Message with message_id was not sent by the authorised user making this request
@@ -19,33 +19,33 @@ def message_remove(token, message_id):
     channel_ = None
     # add the message to the server database
     for channel in server_data["channels"]:
-        if channel.get_id() == channel_id:
-            channel_ = channel
-            break
+        for message in channel._messages:
+            if message.get_m_id() == message_id:
+                channel_ = channel
+                break
     
     if channel_ is None:
         raise ValueError(description="Channel does not exist")
-    
-    # Message (based on ID) no longer exists
-    # or the message Id never exists
-    user_mid_ = None
-    for message in server_data['channels']._messages:
-        if message_id == message._m_id():
-            user_id_ = message.get_u_id
+
+    obj_request = None
+    for user in server_data["users"]:
+        if user.get_u_id() == u_id:
+            obj_request = user
+            break
+
+    user_id = obj_request.get_u_id()
 
     # the message is not existed
-    if user_mid == None:
+    if user_id is None:
         raise AccessError(description="The message is not existed")
- 
-    if u_id != user_mid:
+
+    if u_id != user_id:
         # if user is not the poster and admin
-        if not u_id.is_global_admin():
+        if not obj_request.is_global_admin():
             raise AccessError(description="You don't have access to delete")
     
     # add the message to the server database
     channel._messages.remove(message)
-            
-
             
 
 #200, 400,404,500
