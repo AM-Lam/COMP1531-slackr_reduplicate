@@ -165,6 +165,18 @@ def run_channel_addowner():
     return dumps(return_value)
 
 
+@APP.route('/channel/removeowner', methods=["POST"])
+def run_channel_removeowner():
+    request_data = request.get_json()
+    return_value = channel_addowner.channel_addowner(
+        request_data["token"],
+        request_data["channel_id"],
+        request_data["u_id"]
+    )
+
+    return dumps(return_value)
+
+
 if __name__ == '__main__':
     APP.run(port=(sys.argv[1] if len(sys.argv) > 1 else 5000))
 
