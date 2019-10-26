@@ -6,6 +6,7 @@ from json import dumps
 from flask import Flask, request
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
+from datetime import datetime
 from server import *
 
 
@@ -165,6 +166,7 @@ def run_channel_addowner():
     return dumps(return_value)
 
 
+
 @APP.route('/channel/removeowner', methods=["POST"])
 def run_channel_removeowner():
     request_data = request.get_json()
@@ -172,6 +174,19 @@ def run_channel_removeowner():
         request_data["token"],
         request_data["channel_id"],
         request_data["u_id"]
+    )
+
+    return dumps(return_value)
+
+
+@APP.route('/message/sendlater')
+def run_message_sendlater():
+    request_data = request.get_json()
+    return_value = channel_addowner.channel_addowner(
+        request_data["token"],
+        request_data["channel_id"],
+        request_data["message"],
+        datetime.utcfromtimestamp(request_data["time_sent"])
     )
 
     return dumps(return_value)
