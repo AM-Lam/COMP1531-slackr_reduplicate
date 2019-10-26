@@ -26,9 +26,9 @@ def check_valid_token(token):
 
     try:
         for x in DATABASE["users"]:
-            y = x.get_user_data()
-            if y.get("u_id") == token["u_id"]:
-                return y.get("u_id")
+            user_id = x.get_u_id()
+            if user_id == token["u_id"]:
+                return user_id
     except Exception as e:
         raise ValueError("token invalid")
         
