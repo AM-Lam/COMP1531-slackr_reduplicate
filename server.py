@@ -150,7 +150,7 @@ def run_channels_list():
     return dumps(return_value)
 
 
-@APP.route('channel/join', methods=['POST'])
+@APP.route('/channel/join', methods=['POST'])
 def run_channel_join():
     request_data = request.get_json()
     return_value = ""
