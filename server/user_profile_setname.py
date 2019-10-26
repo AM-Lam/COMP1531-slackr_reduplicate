@@ -1,4 +1,5 @@
 from .access_error import AccessError, ValueError
+from .database import *
 import jwt
 
 #   user_profile_setname(token, name_first, name_last);
@@ -19,9 +20,8 @@ def user_profile_setname(token, name_first, name_last):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    global DATABASE
-    global SECRET
-
+    DATABASE = get_data()
+    SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
     try:
@@ -31,6 +31,7 @@ def check_valid_token(token):
                 return user_id
     except Exception as e:
         raise ValueError(description="token invalid")
+
 
 def first_name_check(name_first):
     # check if the first name is within length limits/if first name exists
@@ -48,7 +49,8 @@ def last_name_check(name_last):
 
 def change_names(u_id, name_first, name_last):
     # change first and last name in the database for the associated user
-    global DATABASE
+    DATABASE = get_data()
+    
     try:
         for x in DATABASE["users"]:
             y = x.get_user_data()
