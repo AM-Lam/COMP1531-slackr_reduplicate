@@ -9,7 +9,7 @@ clear_data()
 
 
 def test_admin_userpermission_change():
-    user = auth_register("valid@email.com", "12345", "John", "Doe")
+    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
     
     # this test should pass with no issue
     assert admin_userpermission_change(user["token"], 12345, 1) == None
