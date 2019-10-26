@@ -54,7 +54,7 @@ def change_handle(u_id, handle_str):
         for x in DATABASE["users"]:
             y = x.get_user_data()
             if y.get("u_id") == u_id:
-                DATABASE.update_user_handle(handle)
-                break
+                x.update_user_handle(handle)
+                return True
     except Exception as e:
         raise ValueError("Error: Couldn't change handle.")
