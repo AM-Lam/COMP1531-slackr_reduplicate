@@ -1,14 +1,28 @@
+import jwt
 import pytest
 from datetime import datetime, timedelta
-from message_sendlater import message_sendlater
-from auth_register import auth_register
-from channels_create import channels_create
-from channel_messages import channel_messages
+from .access_error import *
+from .message_sendlater import message_sendlater
+from .auth_register import auth_register
+from .channels_create import channels_create
+from .channel_messages import channel_messages
+from .database import get_secret, get_data
 
 
 def test_message_sendlater():
-    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
+    server_data = get_data()
+    # user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
+
+    user1 = {
+        "token" : jwt.encode({"u_id" : "111"}, get_secret(), algorithm="HS256"),
+        "u_id" : "111"
+    }
+    
+    # create the channel we test with
     channel1 = channels_create(user1["token"], "Channel 1", True)
+
+    # get the channel object, we need this to check if messages were sent
+    channelObj = server_data["channels"][0]
     
     # first test some cases that should raise exceptions
     # message > 1000 characters
@@ -25,14 +39,18 @@ def test_message_sendlater():
                   404, "Message", datetime.now() + timedelta(minutes=1))
     
     # now try to send a valid message in the future
-    time_sent = datetime.now() + timedelta(minutes=1)
-    assert message_sendlate(user1["token"], channel1["channel_id"], "Message",
-                            time_sent) == {}
+    time_sent = datetime.utcnow() + timedelta(seconds=5)
+    assert message_sendlater(user1["token"], channel1["channel_id"], "Message",
+                            time_sent) == { "message_id" : 1 }
+
+    # ensure that the message has not yet appeared
+    assert len(channelObj.get_messages()) == 0
+
     
-    # to test that the message went through check the messages in the channel,
-    # to ensure that it isn't actually displayed until the time we specified we
-    # will likely have to rely upon observation to an extent
-    channel1_msgs = channel_messages(user1["token"], channel1["channel_id"], 0)
-    assert channel1_msgs["messages"][0]["message"] == "Message"
-    assert channel1_msgs["messages"][0]["time_created"] == time_sent     
+    # wait until the time has passed then check if the message was sent
+    # (wait a little longer just to ensure that we aren't checking for the
+    # message at the same time as it is sent)
+    while datetime.utcnow() < time_sent + timedelta(seconds=1):
+        continue
     
+    assert len(channelObj.get_messages()) == 1
