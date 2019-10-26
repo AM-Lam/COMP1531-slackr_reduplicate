@@ -7,7 +7,7 @@ from .database import *
 
 def send_message(channel, message, time_sent):
     # wait until we have passed beyond the desired time to send the message
-    while datetime.now() < time_sent:
+    while datetime.utcnow() < time_sent:
         continue
     
     # now just append the message we created earlier to the provided channel
@@ -30,7 +30,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     
     # next error, check the current date against time_sent and raise an
     # exception if time_sent is in the past
-    if datetime.now() > time_sent:
+    if datetime.utcnow() > time_sent:
         raise ValueError(description="Cannot send messages in the past")
         
     # ensure that the channel we are trying to send a message to actually exists
