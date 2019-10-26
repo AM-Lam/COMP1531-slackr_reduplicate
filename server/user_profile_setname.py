@@ -53,7 +53,8 @@ def change_names(u_id, name_first, name_last):
         for x in DATABASE["users"]:
             y = x.get_user_data()
             if y.get("u_id") == u_id:
-                DATABASE.update_user_data({"first_name": name_first, "last_name": name_last})
+                DATABASE.update_user_first_name(name_first)
+                DATABASE.update_user_last_name(name_last)
                 break
     except Exception as e:
         raise ValueError("Error: Couldn't change name.")
