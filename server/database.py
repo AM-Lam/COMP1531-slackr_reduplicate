@@ -99,12 +99,15 @@ class Channel:
         
         self._public = public               # is the channel public, boolean 
                                             # val
-        
+
+        self._standup = None                # when standup is active, gives time when
+                                            # standup finishes
+                                            # else it's None
+
         self._message_id_max = 1            # a value we need to use to keep
                                             # track of the current messages id
                                             # since message_sendlater is concurrent
                                             # we need to keep track of this explicitly
-    
 
     def get_channel_data(self):
         return {
@@ -114,8 +117,8 @@ class Channel:
             "members" : self._members,
             "owners" : self._owners,
             "public" : self._public,
+            "standup" : self._standup,
         }
-        
 
     def frontend_format(self):
         return {
@@ -176,6 +179,9 @@ class Channel:
 
     def increment_m_id(self):
         self._message_id_max += 1
+
+    def set_standup(self, standup):
+        self._standup = standup
 
  
 class Messages:
