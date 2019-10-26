@@ -6,13 +6,14 @@ SECRET = "AVENGERS_SOCKS"
 
 
 class User:
-    def __init__(self, u_id, first_name, last_name, password, email):
+    def __init__(self, u_id, first_name, last_name, password, email, global_admin=False):
         self._u_id = u_id 
         self._first_name = first_name
         self._last_name = last_name
         self._password = password
         self._email = email
         self._handle = first_name + last_name
+        self._global_admin = global_admin
     
     
     def get_user_data(self):
@@ -48,10 +49,38 @@ class User:
         
     def update_user_handle(self, new_handle):
         self._handle = new_handle
+    
+
+    def get_u_id(self):
+        return self._u_id
+
+
+    def get_first_name(self):
+        return self._first_name
+
+
+    def get_last_name(self):
+        return self._last_name
+
+
+    def get_password(self):
+        return self._password
+
+
+    def get_email(self):
+        return self._email
+
+        
+    def get_handle(self):
+        return self._handle
+    
+
+    def is_global_admin(self):
+        return self._global_admin
 
 
 class Channel:
-    def __init__(self, channel_id, channel_name, messages, members, public):
+    def __init__(self, channel_id, channel_name, messages, creator, public):
         self._channel_id = channel_id       # id of the channel, increases 
                                             # sequentially
         
@@ -60,8 +89,13 @@ class Channel:
         self._messages = messages           # messages in the channel, list
                                             # of Message objects
         
-        self._members = members             # members of the channel, dictionary
-                                            # with u_id as key and perm. as value
+        self._members = creator             # members of the channel, just a list
+                                            # of u_ids
+        
+        self._owners = creator.copy()       # owners of the channel, initially set to
+                                            # the creator of the channel, this must
+                                            # be a copy so that changing it doesn't
+                                            # change members and vice-versa
         
         self._public = public               # is the channel public, boolean 
                                             # val
@@ -73,16 +107,9 @@ class Channel:
             "channel_name" : self._channel_name,
             "messages" : self._messages,
             "members" : self._members,
+            "owners" : self._owners,
             "public" : self._public,
         }
-    
-
-    def update_channel_data(self, new_data):
-        self._channel_id = new_data["channel_id"]
-        self._first_name = new_data["first_name"]
-        self._last_name = new_data["last_name"]
-        self._password = new_data["password"]
-        self._email = new_data["email"]
         
 
     def frontend_format(self):
@@ -90,6 +117,52 @@ class Channel:
             "channel_id" : self._channel_id,
             "name" : self._channel_name
         }
+    
+
+    def get_id(self):
+        return self._channel_id
+    
+
+    def get_name(self):
+        return self._channel_name
+    
+
+    def get_messages(self):
+        return self._messages
+
+    def get_members(self):
+        return self._members
+    
+
+    def get_owners(self):
+        return self._owners
+    
+
+    def is_public(self):
+        return self._public
+    
+    
+    def set_id(self, id):
+        self._channel_id = id
+    
+
+    def sett_name(self, name):
+        self._channel_name = name
+    
+
+    def add_message(self, message):
+        self._messages.append(message)
+
+    def add_member(self, member):
+        self._members.append(member)
+    
+
+    def add_owner(self, owner):
+        self._owners.append(owner)
+    
+
+    def set_public(self, public):
+        self._public = public
 
  
 class Messages:
@@ -97,15 +170,18 @@ class Messages:
         self._message_id = message_id       # id of the message in a channel, increases 
                                             # sequentially
         self._u_id = u_id                   # poster's u_id
+       
         self._channel_id = channel_id       # id of the channel where the message is posted
+       
         self._text = text                   # the content of the messages
+       
         self._time_sent = time_sent         # time that the message is posted 
                                             # used for sendlater or standup
         self._reacts = reacts               # List of dictionaries
                                             # with u_id as key, and react_id, is_this_user_reacted as values
                                             # is_this_user_reacted:whether or not the authorised user has been one of the reacts to this post
         self._pinned = False                # bool of whether the message is pinned or not
-    
+
 
     def get_message_data(self):
         return {
