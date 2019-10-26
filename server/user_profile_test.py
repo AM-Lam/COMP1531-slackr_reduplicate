@@ -1,8 +1,7 @@
 import pytest
-from .access_error import AccessError
+from .access_error import *
 from .auth_register import auth_register
 from .user_profile import user_profile
-from .database import *
 
 def verify_info(user_obj, correct_data):
     # print(message_obj.__dict__)
@@ -11,17 +10,10 @@ def verify_info(user_obj, correct_data):
     return False
 
 def test_user_profile():
-    # user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
+    user1 = auth_register("valid@email.com", "1234567", "Bob", "Jones")
 
-    # just got the u_id by putting fake data into jwt.io
-    user1 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
-    }
-
-    db = get_data()
-    
     # try to create a valid message
-    profile = user_profile(user1["token"], 111)
+    profile = user_profile(user1["token"], 1)
 
     # check that the user exists
     assert profile is not None

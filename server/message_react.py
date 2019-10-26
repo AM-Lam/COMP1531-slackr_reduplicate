@@ -1,26 +1,47 @@
+import jwt
+from datetime import datetime 
+from .access_error import AccessError
 from .channels_list import channels_list
 
 def message_react(token, message_id, react_id):
-    # assume we can get the list of channels that the user's joining by getting u_id's dictionary
-    # message_id is not a valid message within a channel that the authorised user has joined
-    # message does not exist
-    if message_id not in message_id_list:
-        raise ValueError("The message no longer exists.")
+    server_data = get_data()
 
-    # user is not in the channel anymore
-    token_of_message = message_id_dic[message_id][0]
-    id_of_channel = message_id_dic[message_id][1]
-    if id_of_channel not in channels_list(token_of_message):
-        raise ValueError("You are not a member of the channel.")
+    # Message (based on ID) no longer exists
+    # or the message Id never exists
+    if message_id not in server_data['channels']._messages:
+        raise ValueError #("The message is not existing. Please try again")
 
-    #  react_id is not a valid React ID
-    if react_id not in react_id_type:
-        return ValueError("Please enter a valid react_id.")
-    #  Message with ID message_id already contains an active React with ID react_id
-    if react_id_dic[message_id][2] != None:
-        return ValueError("You reacted before. Please don't repeat.")
+    # now grab the u_id associated with the provided token
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
 
-    # if the function is working
-    # add the react_id into dictionary
-    react_id_dic[message_id] = {token, message_id, react_id}
-    
+    # not an authorised user
+    if token not in server_data['token']:
+        raise AccessError 
+
+    for channel in server_data['channels']:
+        for message in channel._messages:
+            # the message is not existed
+            # double check
+            if message_id not in message._message_id:
+                raise AccessError 
+            else:
+                if u_id in channels_list(token):
+                    # user can only react to same message once
+                    if u_id not in message.message_react:
+                        message.message_react.append(
+                            { 
+                                'react_id': react_id,
+                                'u_id': u_id,
+                                'is_this_user_reacted': True
+                            }
+                        )
+                    else:
+                        for this_u_id in message.message_react:
+                            if this_u_id == u_id:
+                                if this_u_id['is_this_user_reacted'] == True:
+                                    raise ValueError 
+                                else:
+                                    # update react
+                                    this_u_id['react_id'] = react_id
+                                    this_u_id['is_this_user_reacted'] = True

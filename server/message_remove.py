@@ -1,29 +1,52 @@
-from .access_error import AccessError
-from .channels_list import channels_list
+import pytest
+import jwt
+from .database import *
+from .auth_register import auth_register
+from .channels_create import channels_create
+from .message_send import message_send
+from .message_remove import message_remove
+
+def is_admin(u_id, obj_channel):
+    if u_id in obj_channel._members:
+        for person in obj_channel._members:
+            # and the request is sent by member of the channels
+            if person[u_id] == 'admin':
+                return True
+    return False
 
 def message_remove(token, message_id):
+
+    server_data = get_data()
     # Message (based on ID) no longer exists
     # or the message Id never exists
-    if message_id not in message_id_list:
-        raise ValueError("The message is not existing. Please try again")
+    if message_id not in server_data['channels']._messages:
+        raise ValueError #("The message is not existing. Please try again")
+
+    # now grab the u_id associated with the provided token
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
+
+    # not an authorised user
+    if token not in server_data['token']:
+        raise AccessError 
 
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
-    if message_id_dic[message_id][0] != token:
-        raise AccessError("You have no permission to remove the message. Messages can only be deleted by sender or admin.")
+    for channel in server_data['channels']:
+        for message in channel._messages:
+            # the message is not existed
+            # double check
+            if message_id not in message._message_id:
+                raise AccessError 
 
-    token_of_message = message_id_dic[message_id][0]
-    id_of_channel = message_id_dic[message_id][1]
-    # if channel_slist succeed, it should list of channels that the user being
-    # check whether the user is a member in the channel or not
-    if id_of_channel not in channels_list(token_of_message):
-        if permission_id_dic[token_of_message][id_of_channel] == 3:  
-            #  Person who make the request is not an admin or owner in the channel so they don't have permission to remove the message
-            raise AccessError("You don't have access to remove the message. Only the sender or admin shall make this request.")
-    else: 
-        # Since it also fail the channel_details so something must be wrong with the token or channel
-        raise AccessError("You are not a member in this channel")
-    
-    #If the function is successfully executed
-    del message_id_dic[message_id]
-    message_id_list.remove(message_id)
+            if message._message_id == message_id:
+                # if the request is not send by the poster 
+                if message._u_id != u_id:
+                        if is_admin(u_id, channel) == False:
+                            raise AccessError 
+                channel._messages.remove(message)
+            
+
+            
+
+#200, 400,404,500

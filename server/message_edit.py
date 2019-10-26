@@ -1,30 +1,38 @@
+import jwt
+from .database import *
 from .access_error import AccessError
-from .channels_list import channels_list
 
 def message_edit(token, message_id, message):
+    server_data = get_data()
+
     # basic case
     # if the message_id cannot be found
-    if message_id not in message_id_list:
-        raise ValueError("The message is not existing. Please try again.")
+    if message_id not in server_data['channels']._messages:
+        raise ValueError 
+        
+        # now grab the u_id associated with the provided token
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
 
-    #  Message with message_id edited by authorised user is not the poster of the message
-    token_of_message = message_id_dic[message_id][0]
-    id_of_channel = message_id_dic[message_id][1]
+    # Message with message_id was not sent by the authorised user making this request
+    # person who send this message is not the sender and not an admin or owner in the channel
+    for channel in server_data['channels']:
+        for message in channel._messages:
+            # the message is not existed
+            # double check
+            if message_id not in message._message_id:
+                raise AccessError 
 
-    if token_of_message != token:
-        raise ValueError("You don't have access to edit the message as you are not the poster of the message.")
-
-    #  Message with message_id is not a valid message
-    if permission_id_dic[token_of_message][id_of_channel] == 3:
-    #     1) is a message sent by the authorised user
-    # message doesn't have the right format or character limitation. E
-    # Even though it is sent by the right person the request is still denied
-        if (len(message) > 1000):
-            raise ValueError("The message is too long. Please keep it within 1000 characters.")   
-    #     2) If the authorised user is an admin, is a any message within a channel that the authorised user has joined
-    else:
-        raise ValueError("Admin don't have the permission to edit the message. ")   
-
-    # pseudo-code
-    # if the function is executed, i suppose this is the way to change the message's content
-    message_id_list[message_id] = message
+            if message._message_id == message_id:
+                # if the request is not send by the poster 
+                # only poster is able to edit
+                if message._u_id != u_id:
+                    raise AccessError 
+                    #     1) is a message sent by the authorised user
+                    # message doesn't have the right format or character limitation. 
+                    # Even though it is sent by the right person the request is still denied
+                if len(message) > 1000:
+                    raise ValueError
+                # update the database with new message
+                # or use update data?
+                channel._messages.test = message
