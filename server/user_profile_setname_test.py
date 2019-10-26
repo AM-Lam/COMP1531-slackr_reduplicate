@@ -5,10 +5,8 @@ from .access_error import *
 from .database import *
 
 
-clear_data()
-
-
 def test_user_profile_setname():
+    clear_data()
     user = auth_register("valid@email.com", "1234567890", "John", "Doe")
 
     # this test should pass with no issue

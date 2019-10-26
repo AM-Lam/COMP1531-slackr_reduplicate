@@ -233,6 +233,7 @@ class Messages:
     def is_pinned(self):
         return self._pinned
 
+
 def get_data():
     global DATABASE
     return DATABASE
