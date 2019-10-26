@@ -30,6 +30,7 @@ def register():
     dumpstring = auth_register.auth_register(email, password, first_name, last_name)
     return dumps (dumpstring)
 
+
 @APP.route('/auth/login', methods=['POST'])
 def login():
     email = request.form.get('email')
@@ -37,17 +38,20 @@ def login():
     dumpstring = auth_login.auth_login(email, password)
     return dumps (dumpstring)
 
+
 @APP.route('/auth/logout', methods=['POST'])
 def user_logout():
     token = request.form.get('token')
     dumpstring = auth_logout.auth_logout(token)
     return dumps (dumpstring)
 
+
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
     email = request.form.get('email')
     dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
     return dumps (dumpstring)
+
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
 def email_reset():
@@ -56,6 +60,7 @@ def email_reset():
     dumpstring = auth_passwordreset_reset.auth_passwordreset_reset(reset_code, new_password)
     return dumps (dumpstring)
     
+
 @APP.route('/echo/get', methods=['GET'])
 def echo1():
     """ Description of function """
@@ -121,6 +126,43 @@ def run_channels_listall():
     try:
         return_value = channels_listall.channels_listall(
             request_data["token"]
+        )
+    except Exception as e:
+        if e == access_error.AccessError:
+            return_value = "<h1>403 Access Forbidden</h1>"
+        else:
+            return_value = "<h1>404 Page Not Found</h1>"
+    
+    return dumps(return_value)
+
+
+@APP.route('/channels/list', methods=['POST'])
+def run_channels_list():
+    request_data = request.get_json()
+    return_value = ""
+
+    try:
+        return_value = channels_list.channels_list(
+            request_data["token"]
+        )
+    except Exception as e:
+        if e == access_error.AccessError:
+            return_value = "<h1>403 Access Forbidden</h1>"
+        else:
+            return_value = "<h1>404 Page Not Found</h1>"
+    
+    return dumps(return_value)
+
+
+@APP.route('channel/join', methods=['POST'])
+def run_channel_join():
+    request_data = request.get_json()
+    return_value = ""
+
+    try:
+        return_value = channel_join.channel_join(
+            request_data["token"],
+            request_data["channel_id"]
         )
     except Exception as e:
         if e == access_error.AccessError:
