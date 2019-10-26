@@ -1,8 +1,6 @@
-#from .database import *
 import jwt
-# from .access_error import AccessError
-import access_error
-
+from .database import *
+from .access_error import AccessError
 
 def message_edit(token, message_id, message):
     server_data = get_data()
@@ -23,13 +21,13 @@ def message_edit(token, message_id, message):
             # the message is not existed
             # double check
             if message_id not in message._message_id:
-                raise access_error.AccessError 
+                raise AccessError 
 
             if message._message_id == message_id:
                 # if the request is not send by the poster 
                 # only poster is able to edit
                 if message._u_id != u_id:
-                    raise access_error.AccessError 
+                    raise AccessError 
                     #     1) is a message sent by the authorised user
                     # message doesn't have the right format or character limitation. 
                     # Even though it is sent by the right person the request is still denied

@@ -27,13 +27,13 @@ def test_message_react():
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id, "Hello")
 
-    # check that the channel exists
+    # check that the message exists
     assert message_1 is not None
 
     react_id = 1
     message_react(user1["token"], message_1, react_id)
     # check that the database was correctly updated
-    assert verify_channel(db["message"][0], 
+    assert verify_message(db["message"][0], 
                         {
                         "message_id" : 1,
                         "u_id" : 111,
@@ -54,12 +54,14 @@ def test_no_message():
         "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
     }
 
+    react_id = 1
+
     # db = get_data()
 
     # message is not existed
     assert message_1 is None
     # the message is not existed
-    pytest.raises(ValueError, message_react, user1["token"], message_1)
+    pytest.raises(ValueError, message_react, user1["token"], message_1, react_id)
 
 # def test_message_react():
 #     #assert message_react(token, message_id, react_id) == None

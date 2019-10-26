@@ -1,7 +1,6 @@
-#from .database import *
 import jwt
-# from .access_error import AccessError
-import access_error
+from .database import *
+from .access_error import AccessError
 
 def user_profile(token, u_id):
     server_data = get_data()
@@ -12,7 +11,7 @@ def user_profile(token, u_id):
 
     # not an authorised user
     if token not in server_data['token']:
-        raise access_error.AccessError 
+        raise AccessError 
 
     # authorization problem
     if check_u_id != u_id:

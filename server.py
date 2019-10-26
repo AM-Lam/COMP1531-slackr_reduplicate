@@ -325,37 +325,33 @@ def run_channels_listall():
 @APP.route('/channels/list', methods=['POST'])
 def run_channels_list():
     request_data = request.get_json()
-    return_value = ""
-
-    try:
-        return_value = channels_list.channels_list(
-            request_data["token"]
-        )
-    except Exception as e:
-        if e == access_error.AccessError:
-            return_value = "<h1>403 Access Forbidden</h1>"
-        else:
-            return_value = "<h1>404 Page Not Found</h1>"
+    return_value = channels_list.channels_list(
+        request_data["token"]
+    )
     
     return dumps(return_value)
 
 
-@APP.route('channel/join', methods=['POST'])
+@APP.route('/channel/join', methods=['POST'])
 def run_channel_join():
     request_data = request.get_json()
-    return_value = ""
-
-    try:
-        return_value = channel_join.channel_join(
-            request_data["token"],
-            request_data["channel_id"]
-        )
-    except Exception as e:
-        if e == access_error.AccessError:
-            return_value = "<h1>403 Access Forbidden</h1>"
-        else:
-            return_value = "<h1>404 Page Not Found</h1>"
+    return_value = return_value = channel_join.channel_join(
+        request_data["token"], 
+        request_data["channel_id"]
+    )
     
+    return dumps(return_value)
+
+
+@APP.route('/channel/addowner', methods=["POST"])
+def run_channel_addowner():
+    request_data = request.get_json()
+    return_value = channel_addowner.channel_addowner(
+        request_data["token"],
+        request_data["channel_id"],
+        request_data["u_id"]
+    )
+
     return dumps(return_value)
 
 

@@ -63,8 +63,10 @@ class Channel:
         self._members = creator             # members of the channel, just a list
                                             # of u_ids
         
-        self._owners = creator              # owners of the channel, initially set to
-                                            # the creator of the channel
+        self._owners = creator.copy()       # owners of the channel, initially set to
+                                            # the creator of the channel, this must
+                                            # be a copy so that changing it doesn't
+                                            # change members and vice-versa
         
         self._public = public               # is the channel public, boolean 
                                             # val
@@ -77,6 +79,7 @@ class Channel:
             "messages" : self._messages,
             "owners" : self._owners,
             "members" : self._members,
+            "owners" : self._owners,
             "public" : self._public,
         }
         

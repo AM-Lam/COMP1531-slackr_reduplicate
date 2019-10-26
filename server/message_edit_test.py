@@ -26,10 +26,10 @@ def test_message_edit():
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id, "Hello")
-    # check that the channel exists
+    # check that the message exists
     assert message_1 is not None
     message_edit(user1["token"], message_1, "Hi")
-    assert verify_channel(db["message"][0], 
+    assert verify_message(db["message"][0], 
                         {
                         "message_id" : 1,
                         "u_id" : 111,

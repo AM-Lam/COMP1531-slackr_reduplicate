@@ -21,7 +21,7 @@ def test_message_remove():
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id, "Hello")
 
-    # check that the channel exists
+    # check that the message exists
     assert message_1 is not None
 
     message_remove(user1["token"], message_1)
@@ -110,7 +110,7 @@ def test_admin_user():
 
     # try to create a valid message
     message_1 = message_send(user2["token"], channel_id, "Hello")
-    # check that the channel exists
+    # check that the message exists
     assert message_1 is not None
     message_remove(user1["token"], message_1)
 

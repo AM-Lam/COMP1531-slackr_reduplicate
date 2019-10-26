@@ -1,7 +1,6 @@
-# from .database import *
 import jwt
-# from .access_error import AccessError
-import access_error
+from .database import *
+from .access_error import AccessError
 
 def is_admin(u_id, obj_channel):
     if u_id in obj_channel._members:
@@ -25,7 +24,7 @@ def message_pin(token, message_id):
 
     # not an authorised user
     if token not in server_data['token']:
-        raise access_error.AccessError 
+        raise AccessError 
 
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
@@ -35,13 +34,13 @@ def message_pin(token, message_id):
             # or the channel is not existed
             # double check
             if message_id not in message._message_id:
-                raise access_error.AccessError 
+                raise AccessError 
 
             if message._message_id == message_id:
                 # if the request is not send by the poster 
                 if message._u_id != u_id:
                     if is_admin(u_id, channel) == False:
-                        raise access_error.AccessError 
+                        raise AccessError 
 
             #  Message with ID message_id is already pinned
             if message._pinned == True:
