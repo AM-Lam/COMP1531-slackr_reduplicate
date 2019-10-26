@@ -38,7 +38,7 @@ def test_message_sendlater():
                   404, "Message", datetime.now() + timedelta(minutes=1))
     
     # now try to send a valid message in the future
-    time_sent = datetime.now() + timedelta(seconds=5)
+    time_sent = datetime.utcnow() + timedelta(seconds=5)
     assert message_sendlater(user1["token"], channel1["channel_id"], "Message",
                             time_sent) == {}
 
@@ -48,7 +48,7 @@ def test_message_sendlater():
     # wait until the time has passed then check if the message was sent
     # (wait a little longer just to ensure that we aren't checking for the
     # message at the same time as it is sent)
-    while datetime.now() < time_sent + timedelta(seconds=1):
+    while datetime.utcnow() < time_sent + timedelta(seconds=1):
         continue
     
     assert len(channelObj._messages) == 1
