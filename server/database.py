@@ -60,8 +60,8 @@ class Channel:
         self._messages = messages           # messages in the channel, list
                                             # of Message objects
         
-        self._members = members             # members of the channel, dictionary
-                                            # with u_id as key and perm. as value
+        self._members = members             # members of the channel, list
+
         
         self._public = public               # is the channel public, boolean 
                                             # val
@@ -116,12 +116,6 @@ def get_data():
     return DATABASE
 
 
-def update_data(new_database):
-    global DATABASE
-    DATABASE = new_database
-    return DATABASE
-
-
 def get_secret():
     global SECRET
     return SECRET
@@ -134,12 +128,12 @@ def save_data():
 
 
 # initialise an empty database
-update_data({
+DATABASE = {
     "users" : [],
     "channels" : [],
     "tokens" : {},
     "reset" : {} # <----- I am adding this field {'reset_code':'email'} <-to be able to store the reset
                                      # code and to delete the code after the new password has been made
-})
+}
 
 print("Setup complete")
