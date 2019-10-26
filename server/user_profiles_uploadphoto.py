@@ -1,4 +1,7 @@
+from .access_error import AccessError
+from .database import *
 import urllib
+import jwt
 
 #   user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end);
 #   return void
@@ -9,7 +12,8 @@ import urllib
 
 def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end):
     # find u_id associated with token (with non-existent database)
-    u_id = 12345
+    #TODO: (note: this is not required to be completed until iteration 3)
+    user_id = check_valid_token(token)
 
     check_imgurl(img_url)
     check_start_coords(x_start, y_start)
@@ -19,6 +23,21 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
     change_photo(img_url, x_start, y_start, x_end, y_end)
     return
 
+def check_valid_token(token):
+    # find the user ID associated with this token, else raise a ValueError
+    DATABASE = get_data()
+    SECRET = get_secret()
+    token = jwt.decode(token, SECRET, algorithms=['HS256'])
+
+    try:
+        for x in DATABASE["users"]:
+            user_id = x.get_u_id()
+            if user_id == token["u_id"]:
+                return user_id
+    except Exception as e:
+        raise ValueError(description="token invalid")
+
+        
 def check_imgurl(img_url):
     if urllib.request.urlopen(img_url).getcode() == 200:
         return True
@@ -28,7 +47,7 @@ def check_imgurl(img_url):
 def check_start_coords(x_start, y_start):
     # we don't know how to get image dimensions yet, so we will assume the max image size is 200x200
     IMG_LIMIT = 200;
-    if x_start >= 0 and y_start >= 0 and x_start <= 200 and y_start <= 200:
+    if x_start >= 0 and y_start >= 0 and x_start <= IMG_LIMIT and y_start <= IMG_LIMIT:
         return True
     else:
         raise ValueError("Co-ordinates out of bounds.")

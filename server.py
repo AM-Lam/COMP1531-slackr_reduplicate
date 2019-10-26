@@ -6,18 +6,24 @@ from json import dumps
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
+from datetime import datetime
 from server import *
 
 
 def defaultHandler(err):
     response = err.get_response()
+
+    
     response.data = dumps({
         "code": err.code,
         "name": "System Error",
         "message": err.description,
     })
+    
     response.content_type = 'application/json'
+    
     return response
+
 
 APP = Flask(__name__)
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -29,15 +35,14 @@ class ValueError(HTTPException):
     message = 'No message specified'
 
 
-APP.config.update({
-    'MAIL_SERVER' : 'smtp.gmail.com',
-    'MAIL_PORT': '465',
-    'MAIL_USE_SSL' : True,
-    'MAIL_USE_TLS' : False,
-    'MAIL_USERNAME' : 'deadthundersquirrels@gmail.com',
-    'MAIL_PASSWORD' : "passnew%1"
-})
-print(APP.config['TESTING'])
+APP.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=465,
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME = 'deadthundersquirrels@gmail.com',
+    MAIL_PASSWORD = "passnew%1"
+)
+
 
 
 @APP.route('/auth/register', methods=['POST'])
@@ -52,6 +57,7 @@ def register():
         defaultHandler(error)
     return dumps (dumpstring)
 
+
 @APP.route('/auth/login', methods=['POST'])
 def login():
     email = request.form.get('email')
@@ -59,11 +65,13 @@ def login():
     dumpstring = auth_login.auth_login(email, password)
     return dumps (dumpstring)
 
+
 @APP.route('/auth/logout', methods=['POST'])
 def user_logout():
     token = request.form.get('token')
     dumpstring = auth_logout.auth_logout(token)
     return dumps (dumpstring)
+
 
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
@@ -71,6 +79,7 @@ def email_request():
     dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
     print(send_code(email, dumpstring))
     return dumps({})
+
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
 def email_reset():
@@ -125,15 +134,9 @@ def run_channels_create():
         add it to the  server database
     """
     request_data = request.get_json()
-    return_value = ""
-    try:
-        return_value = channels_create.channels_create(
-            request_data["token"],
-            request_data["name"],
-            bool(request_data["is_public"])
-        )
-    except:
-        return_value = "<h1>403 Request Forbidden</h1>"
+    return_value = channels_create.channels_create(request_data["token"],
+                                                   request_data["name"],
+                                                   bool(request_data["is_public"]))
     
     return dumps(return_value)
 
@@ -141,14 +144,8 @@ def run_channels_create():
 @APP.route("/channel/leave", methods=["POST"])
 def run_channel_leave():
     request_data = request.get_json()
-    return_value = ""
-    try:
-        return_value = channel_leave.channel_leave(
-            request_data["token"],
-            request_data["channel_id"]
-        )
-    except:
-        return_value = "<h1>403 Request Forbidden</h1>"
+    return_value = channel_leave.channel_leave(request_data["token"],
+                                               request_data["channel_id"])
     
     return dumps(return_value)
 
@@ -162,17 +159,28 @@ def run_channels_listall():
     with the stakeholders.
     """
     request_data = request.get_json()
-    return_value = ""
+    return_value = channels_listall.channels_listall(request_data["token"])
+    
+    return dumps(return_value)
 
-    try:
-        return_value = channels_listall.channels_listall(
-            request_data["token"]
-        )
-    except Exception as e:
-        if e == access_error.AccessError:
-            return_value = "<h1>403 Access Forbidden</h1>"
-        else:
-            return_value = "<h1>404 Page Not Found</h1>"
+
+@APP.route('/channels/list', methods=['POST'])
+def run_channels_list():
+    request_data = request.get_json()
+    return_value = channels_list.channels_list(
+        request_data["token"]
+    )
+    
+    return dumps(return_value)
+
+
+@APP.route('/channel/join', methods=['POST'])
+def run_channel_join():
+    request_data = request.get_json()
+    return_value = return_value = channel_join.channel_join(
+        request_data["token"], 
+        request_data["channel_id"]
+    )
     
     return dumps(return_value)
 
@@ -196,6 +204,44 @@ def send_code(email, user_id):
         return (str(e))
 
 
+
+
+@APP.route('/channel/addowner', methods=["POST"])
+def run_channel_addowner():
+    request_data = request.get_json()
+    return_value = channel_addowner.channel_addowner(
+        request_data["token"],
+        request_data["channel_id"],
+        request_data["u_id"]
+    )
+
+    return dumps(return_value)
+
+
+
+@APP.route('/channel/removeowner', methods=["POST"])
+def run_channel_removeowner():
+    request_data = request.get_json()
+    return_value = channel_addowner.channel_addowner(
+        request_data["token"],
+        request_data["channel_id"],
+        request_data["u_id"]
+    )
+
+    return dumps(return_value)
+
+
+@APP.route('/message/sendlater')
+def run_message_sendlater():
+    request_data = request.get_json()
+    return_value = channel_addowner.channel_addowner(
+        request_data["token"],
+        request_data["channel_id"],
+        request_data["message"],
+        datetime.utcfromtimestamp(request_data["time_sent"])
+    )
+
+    return dumps(return_value)
 
 
 if __name__ == '__main__':
