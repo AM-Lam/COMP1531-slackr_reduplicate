@@ -99,6 +99,11 @@ class Channel:
         
         self._public = public               # is the channel public, boolean 
                                             # val
+        
+        self._message_id_max = 1            # a value we need to use to keep
+                                            # track of the current messages id
+                                            # since message_sendlater is concurrent
+                                            # we need to keep track of this explicitly
     
 
     def get_channel_data(self):
@@ -142,6 +147,10 @@ class Channel:
         return self._public
     
     
+    def get_m_id(self):
+        return self._message_id_max
+    
+    
     def set_id(self, id):
         self._channel_id = id
     
@@ -163,6 +172,10 @@ class Channel:
 
     def set_public(self, public):
         self._public = public
+    
+
+    def increment_m_id(self):
+        self._message_id_max += 1
 
  
 class Messages:

@@ -1,36 +1,63 @@
-from .channels_listall import channels_listall
+import jwt
+import threading
 from datetime import datetime
+from .access_error import *
+from .database import *
+
+
+def send_message(channel, message, time_sent):
+    # wait until we have passed beyond the desired time to send the message
+    while datetime.utcnow() < time_sent:
+        continue
+    
+    # now just append the message we created earlier to the provided channel
+    channel.add_message(message)
 
 
 def message_sendlater(token, channel_id, message, time_sent):
+    server_data = get_data()
+
+    # if the token is not valid raise an AccessError
+    if not server_data["tokens"].get(token, True):
+        raise AccessError(description="This token is invalid")
+
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
+
     # first deal with an easy to catch error, is the message too large to send
     if len(message) > 1000:
-        raise ValueError("Messages must be below 1000 characters")
+        raise ValueError(description="Messages must be below 1000 characters")
     
     # next error, check the current date against time_sent and raise an
     # exception if time_sent is in the past
-    if datetime.now() > time_sent:
-        raise ValueError("Cannot send messages in the past")
+    if datetime.utcnow() > time_sent:
+        raise ValueError(description="Cannot send messages in the past")
         
     # ensure that the channel we are trying to send a message to actually exists
     # and that we are an authorised user in it (which I take here to mean a
     # member of the channel)
-    channel_exists = False
-    for channel in channels_listall(token):
-        if channel_id == channel["channel_id"]:
-            # check whether or not the user is authorised to send messages in
-            # this channel, I presume we will need to access a database to do
-            # this
-            channel_exists = True
+    channel_ = None
+    for channel in server_data["channels"]:
+        if channel_id == channel.get_id():
+            channel_ = channel
             break
     
-    if not channel_exists:
-        raise ValueError("Channel does not exist")
+    if channel_ is None:
+        raise ValueError(description="Channel does not exist")
     
-    # now send the message with the time_created being time_sent to the server
-    # this will require access to the database and server so we can't really
-    # do anything with it right now, see assumptions.md for why I'm doing it
-    # this way rather than using threading or something similar
+    if u_id not in channel_.get_members():
+        raise AccessError(description="You cannot send messages in this channel")
     
-    return {}
+    # now create the message we will be sending
+    m_id = channel_.get_m_id()
+    to_send = Messages(m_id, u_id, message, channel_id,
+                       time_sent, [])
+    
+    # increment the channel's max message id
+    channel_.increment_m_id()
+    
+    # start a thread that will call send_message
+    threading.Thread(target=send_message, args=(channel_, message, time_sent)).start()
+    
+    return { "message_id" : m_id}
 
