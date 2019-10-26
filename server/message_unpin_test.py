@@ -1,6 +1,7 @@
 import pytest
 import jwt
 from .database import *
+from .access_error import *
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .message_send import message_send
@@ -9,52 +10,35 @@ from .message_pin import message_pin
 from .message_unpin import message_unpin
 
 def test_message_unpin():
-    # user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
+    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
 
-    # just got the u_id by putting fake data into jwt.io
-    user1 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
-    }
-    user2 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMjIifQ.V8RNVCtIW66E7gxk54-FYE_XRp67TsndcrCmZMfJ0RI"
-    }
-    user3 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMyJ9.QaiuthhOZ3vU8iRd7QDtbs89nDHpNo6lKgo_JPwpSj4"
-    }
-
-    # channel_id = channels_create("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI", "channel1", True)
-    channel1 = channels_create(user1["token"], "Channel 1", True)
-    db = get_data()
+    channel_id = channels_create(user1["token"], "Channel 1", True)
 
     # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id, "Hello")
+    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
 
     # check that the message exists
     assert message_1 is not None
-    message_pin(user1["token"], message_1)
-    assert db['message'][0]._pinned == True
-    message_unpin(user1["token"], message_1)
-    assert db['message'][0]._pinned == False
+    
+    message_pin(user1["token"], message_1['message_id']) 
 
-def test_no_message1():
-    # user1 = auth_register("valid@email.com", "1234", "Bob", "Jones")
+    assert message_unpin(user1["token"], message_1['message_id']) is None
 
-    # just got the u_id by putting fake data into jwt.io
-    user1 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.dyT88tdeqRfTRsfjQRenygNT_ywC-wTAFWlvMUHfhxI"
-    }
+def test_no_message():
+    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
 
-    db = get_data()
-    channel1 = channels_create(user1["token"], "Channel 1", True)
+    channel_id = channels_create(user1["token"], "Channel 1", True)
 
-    message_1 = message_send(user1["token"], channel_id, "Hello")
-    message_remove(user1["token"], message_1)
+    # try to create a valid message
+    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
 
+    # check that the message exists
+    assert message_1 is not None
+    
+    assert message_pin(user1["token"], message_1['message_id']) is None
 
-    # message is not existed
-    assert message_1 is None
     # the message is not existed
-    pytest.raises(ValueError, message_unpin, user1["token"], message_1)
+    pytest.raises(ValueError, message_unpin, user1["token"], message_1['message_id'])
 
 # def test_message_unpin():
 #     #assert message_unpin(token, message_id) == None
