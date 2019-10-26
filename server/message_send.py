@@ -38,7 +38,7 @@ def message_send(token, channel_id, message):
                        datetime.utcnow(), [])
     
     # increment the channel's max message id
-    channel_.increment_message_id()
+    channel_.increment_m_id()
     
     # start a thread that will call send_message
     channel_.add_message(to_send)

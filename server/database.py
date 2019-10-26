@@ -224,6 +224,12 @@ class Messages:
             'is_pinned': self._pinned,
     }
 
+    def get_m_id(self):
+        return self._message_id
+
+    def get_u_id(self):
+        return self._u_id
+
 
 def get_data():
     global DATABASE
