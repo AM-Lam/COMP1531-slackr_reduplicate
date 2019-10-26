@@ -1,4 +1,4 @@
-from .access_error import AccessError
+from .access_error import AccessError, ValueError
 import jwt
 
 #   user_profile_sethandle(token, handle_str);
@@ -30,13 +30,13 @@ def check_valid_token(token):
             if user_id == token["u_id"]:
                 return user_id
     except Exception as e:
-        raise ValueError("token invalid")
+        raise ValueError(description="token invalid")
         
 def handle_check(handle_str):
     if len(handle_str) < 20 and len(handle_str) > 0:
         return True
     else:
-        raise ValueError("Handle must be between 1 and 20 characters")
+        raise ValueError(description="Handle must be between 1 and 20 characters")
 
 def handle_in_use_check(handle_str):
     # check if the handle is already being used/exists within the database
@@ -44,7 +44,7 @@ def handle_in_use_check(handle_str):
     for x in DATABASE["handle"]:
         y = x.get_user_data()
         if y.get("handle") == handle_str:
-            raise ValueError("Handle is already in use.")
+            raise ValueError(description="Handle is already in use.")
     return True
 
 def change_handle(u_id, handle_str):
@@ -57,4 +57,4 @@ def change_handle(u_id, handle_str):
                 x.update_user_handle(handle)
                 return True
     except Exception as e:
-        raise ValueError("Error: Couldn't change handle.")
+        raise ValueError(description="Error: Couldn't change handle.")
