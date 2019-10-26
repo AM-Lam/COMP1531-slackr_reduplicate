@@ -11,7 +11,7 @@ def send_message(channel, message, time_sent):
         continue
     
     # now just append the message we created earlier to the provided channel
-    channel._messages.append(message)
+    channel.add_message(message)
 
 
 def message_sendlater(token, channel_id, message, time_sent):
@@ -38,22 +38,26 @@ def message_sendlater(token, channel_id, message, time_sent):
     # member of the channel)
     channel_ = None
     for channel in server_data["channels"]:
-        if channel_id == channel._channel_id:
+        if channel_id == channel.get_id():
             channel_ = channel
             break
     
     if channel_ is None:
         raise ValueError(description="Channel does not exist")
     
-    if u_id not in channel_._members:
+    if u_id not in channel_.get_members():
         raise AccessError(description="You cannot send messages in this channel")
     
     # now create the message we will be sending
-    to_send = Messages(len(channel_._messages) + 1, u_id, message, channel_id,
+    m_id = channel_.get_m_id()
+    to_send = Messages(m_id, u_id, message, channel_id,
                        time_sent, [])
+    
+    # increment the channel's max message id
+    channel_.increment_m_id()
     
     # start a thread that will call send_message
     threading.Thread(target=send_message, args=(channel_, message, time_sent)).start()
     
-    return {}
+    return { "message_id" : m_id}
 

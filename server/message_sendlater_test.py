@@ -18,6 +18,7 @@ def test_message_sendlater():
         "u_id" : "111"
     }
     
+    # create the channel we test with
     channel1 = channels_create(user1["token"], "Channel 1", True)
 
     # get the channel object, we need this to check if messages were sent
@@ -40,10 +41,10 @@ def test_message_sendlater():
     # now try to send a valid message in the future
     time_sent = datetime.utcnow() + timedelta(seconds=5)
     assert message_sendlater(user1["token"], channel1["channel_id"], "Message",
-                            time_sent) == {}
+                            time_sent) == { "message_id" : 1 }
 
     # ensure that the message has not yet appeared
-    assert len(channelObj._messages) == 0
+    assert len(channelObj.get_messages()) == 0
     
     # wait until the time has passed then check if the message was sent
     # (wait a little longer just to ensure that we aren't checking for the
@@ -51,4 +52,4 @@ def test_message_sendlater():
     while datetime.utcnow() < time_sent + timedelta(seconds=1):
         continue
     
-    assert len(channelObj._messages) == 1
+    assert len(channelObj.get_messages()) == 1
