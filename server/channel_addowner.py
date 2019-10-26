@@ -38,9 +38,7 @@ def channel_addowner(token, channel_id, u_id):
     if owner_u_id not in channel._owners:
        raise AccessError(description="Lack permissions to add owner to this channel")
 
-    # finally set the u_id to be an owner of the channel requested, we will need
-    # to interact with a database to handle this
-
+    # finally set the u_id to be an owner of the channel requested
     channel._owners.append(u_id)
     if u_id not in channel._members:
         channel._members.append(u_id)
