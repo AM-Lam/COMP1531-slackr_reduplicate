@@ -1,13 +1,13 @@
 import pytest
 import jwt
-from .access_error import *
-from .database import *
+from .database import get_data, clear_data
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .channel_join import channel_join
 from .message_send import message_send
 from .message_remove import message_remove
 from .message_edit import message_edit
+from .access_error import *
 
 
 def verify_message(message_obj, correct_data):

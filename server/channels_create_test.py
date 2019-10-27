@@ -1,8 +1,8 @@
 import pytest
-from .access_error import *
 from .channels_create import channels_create
 from .auth_register import auth_register
-from .database import *
+from .database import clear_data, get_data
+from .access_error import *
 
 
 def verify_channel(channel_obj, correct_data):

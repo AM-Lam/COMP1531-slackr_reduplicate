@@ -1,12 +1,12 @@
 import pytest
 import jwt
-from .access_error import *
-from .database import *
+from .database import clear_data, get_data
 from .message_remove import message_remove
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .channel_join import channel_join
 from .message_send import message_send
+from .access_error import *
 
 
 def test_message_remove():

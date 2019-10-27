@@ -1,8 +1,8 @@
 import pytest
 import re
-from .database import *
-from .auth_login import *
-from .auth_register import *
+from .database import clear_data
+from .auth_login import auth_login, check_emailtype, validate_email, validate_password
+from .auth_register import auth_register
 from .access_error import *
 
 
@@ -12,6 +12,10 @@ def test_login():
     user_1 = auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
     user_2 = auth_register('user2@domain.com' , 'vscod231343' , 'ussr' , 'b')
     user_3 = auth_register('user3@domain.com.au' , 'vsdco23111' , 'person' , 'c')
+
+    assert user_1 is not None
+    assert user_2 is not None
+    assert user_3 is not None
     
     token = auth_login('user1@domain.com' ,'passew@321')
     

@@ -1,10 +1,10 @@
 import pytest
 from .access_error import *
-from .channel_details import *
-from .auth_register import *
-from .channels_create import *
-from .channel_join import *
-from .database import *
+from .channel_details import channel_details, verify_user_status, check_channel_existence
+from .auth_register import auth_register
+from .channels_create import channels_create
+from .channel_join import channel_join
+from .database import clear_data
 
 
 def test_run_all():
@@ -17,11 +17,7 @@ def test_run_all():
     
     token1 = user1['token']
     token2 = user2['token']
-    token3 = user3['token']
     
-    uid1 = user1['u_id']
-    uid2 = user2['u_id']
-    uid3 = user3['u_id']
     
     # user1 will be the channel owner
     unswchannel = channels_create(token1, 'unswchannel', True)
@@ -43,15 +39,15 @@ def test_run_all():
     
     # search details
     detaildict = channel_details(token2, unswchannelid)
-    assert(detaildict['name'] == "unswchannel")
-    assert(detaildict['owner_members'] == [1])
-    assert(detaildict['all_members'] == [1 , 2])
+    assert detaildict['name'] == "unswchannel"
+    assert detaildict['owner_members'] == [1]
+    assert detaildict['all_members'] == [1 , 2]
     
     # add user 3
     channel_join(user3["token"], unswchannelid)
     
     # search details
     detaildict2 = channel_details(token2, unswchannelid)
-    assert(detaildict2['name'] == "unswchannel")
-    assert(detaildict2['owner_members'] == [1])
-    assert(detaildict2['all_members'] == [1,2,3])
+    assert detaildict2['name'] == "unswchannel"
+    assert detaildict2['owner_members'] == [1]
+    assert detaildict2['all_members'] == [1,2,3]

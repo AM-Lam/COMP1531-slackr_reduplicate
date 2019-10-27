@@ -1,5 +1,5 @@
 import pytest
-from .database import *
+from .database import clear_data
 from .access_error import *
 from .admin_userpermission_change import admin_userpermission_change
 from .auth_register import auth_register

@@ -1,16 +1,23 @@
-import jwt
-from .access_error import *
-from .database import *
+"""
+ search(token, query_str);
+  return {messages}
+  Exception: N/A
+  Description: Given a query string, return a collection of messages  that match the query
+"""
 
-#   search(token, query_str);
-#   return {messages}
-#   Exception: N/A
-#   Description: Given a query string, return a collection of messages  that match the query
+
+import jwt
+from .database import get_data, get_secret
+from .access_error import *
+
 
 def search(token, query_str):
     # find u_id associated with token (with non-existent database)
     DATABASE = get_data()
     admin_user_id = check_valid_token(token)
+
+    # suppress pylint error
+    assert admin_user_id is not None
 
     # pull messages from a list/dictionary of all messages
     message_match = []
@@ -22,6 +29,7 @@ def search(token, query_str):
                 message_match.append(message)
 
     return message_match
+
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError

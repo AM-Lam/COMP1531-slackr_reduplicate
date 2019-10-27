@@ -1,7 +1,7 @@
 import jwt
-from .access_error import *
-from .database import *
+from .database import get_data, get_secret
 from .channels_list import channels_list
+from .access_error import *
 
 
 def channel_removeowner(token, channel_id, u_id):

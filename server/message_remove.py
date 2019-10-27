@@ -1,6 +1,5 @@
 import jwt
-import threading
-from .database import *
+from .database import get_data, get_secret
 from .access_error import *
 
 def message_remove(token, message_id):
