@@ -248,9 +248,18 @@ class Messages:
 
     def get_u_id(self):
         return self._u_id
+    
+    
+    def get_text(self):
+        return self._text
+
 
     def is_pinned(self):
         return self._pinned
+    
+    
+    def edit_text(self, new):
+        self._text = new
 
 
 def get_data():
