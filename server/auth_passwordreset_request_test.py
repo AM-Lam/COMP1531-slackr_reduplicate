@@ -1,11 +1,14 @@
-from .auth_passwordreset_request import *
 import pytest
+from .database import *
+from .auth_passwordreset_request import *
 from .auth_register import *
 from .database import *
 
 
+def test_dummy_func():
+    clear_data()
+    auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
 
-auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
 
 ###########################################################################################################################################
 def test_Validate_email():

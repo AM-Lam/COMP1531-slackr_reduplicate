@@ -2,7 +2,11 @@ from .auth_register import *
 from .channels_create import *
 from .channel_join import *
 from .channel_invite import *
+from .database import *
 import pytest
+
+
+clear_data()
 
 
 # first we create two users:

@@ -1,6 +1,6 @@
-from .access_error import AccessError, ValueError
-from .database import *
 import jwt
+from .access_error import *
+from .database import *
 
 #   admin_userpermission_change(token, u_id, permission_id);
 #   return void
@@ -61,9 +61,9 @@ def check_owner_or_admin(admin_user_id):
     try:
         for x in DATABASE["users"]:
             if admin_user_id == x.get_u_id():
-                if x.is_global_admin == True
+                if x.is_global_admin == True:
                     return True
-                elif x.is_global_admin == False
+                elif x.is_global_admin == False:
                     raise AccessError("User is not an administrator.")
         raise AccessError("User does not have prerequisite permissions.")
     except Exception as e:

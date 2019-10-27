@@ -33,7 +33,9 @@ def verify_user_status(token, channel_id):
         if channel._channel_id == channel_id:
             for people in channel._members:                
                 if people == user_id:
-                    flag = 1                    # flag is one if the user is a member of the channel.    
+                    # flag is one if the user is a member of the channel.
+                    flag = 1    
+
     if flag == 1:
         for channeli in update_data['channels']:
             if channeli._channel_id == channel_id:

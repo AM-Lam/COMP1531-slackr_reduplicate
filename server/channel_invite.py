@@ -1,5 +1,5 @@
-from .access_error import AccessError
 from .channel_join import channel_join
+from .access_error import *
 from .database import *
 import jwt
 import time
@@ -17,7 +17,7 @@ def channel_invite(token, channel_id, u_id):
         channel_join(encoded, channel_id)      # now that all the detals have been verified we join the user to the channel.
         return {}
     else:
-        raise ValueError("the given token does not exist")
+        raise ValueError(description="the given token does not exist")
       
 
 def verify_token_not_member(token, channel_id, u_id):
@@ -33,7 +33,7 @@ def verify_token_not_member(token, channel_id, u_id):
                 if user_id == userss:        # setting flag to 1 if user id was found in the channel.
                     flag_2 = 1
     if flag_2 == 0:
-        raise AccessError("user trying to add another member is not a part of the channel")
+        raise AccessError(description="user trying to add another member is not a part of the channel")
     # making sure the u_id trying to be added is not in the channel
     flag = 0                                
     for i in update_data['channels']:        # going through the channels list.
@@ -42,7 +42,8 @@ def verify_token_not_member(token, channel_id, u_id):
                 if u_id == users:            # setting flag to 1 if user id was found in the channel.
                     flag = 1
     if flag == 1:
-        raise ValueError("user already exists in the channel") 
+        raise ValueError(description="user already exists in the channel") 
+
 
 def verify_user_validity(u_id):
     update_data = get_data()
@@ -51,7 +52,8 @@ def verify_user_validity(u_id):
         if users._u_id == u_id:
             flag = 1
     if flag == 0:
-        raise ValueError("user id does not exist on the server")
+        raise ValueError(description="user id does not exist on the server")
+
 
 def verify_channel_exists(channel_id):
     update_data = get_data()
@@ -60,4 +62,4 @@ def verify_channel_exists(channel_id):
         if channel_id == i._channel_id:
             flag = 1
     if flag == 0:
-        raise ValueError('channel does not exist')
+        raise ValueError(description='channel does not exist')

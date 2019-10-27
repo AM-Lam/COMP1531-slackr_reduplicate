@@ -1,14 +1,16 @@
 import pytest
+import re
 import jwt
 from .database import *
 from .access_error import *
+from .message_react import message_react
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .message_send import message_send
 from .message_remove import message_remove
-from .message_react import message_react
 
 def test_message_react():
+    clear_data()
     user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
 
     channel_id = channels_create(user1["token"], "Channel 1", True)
@@ -21,6 +23,7 @@ def test_message_react():
                         
 
 def test_no_message():
+    clear_data()
     user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
 
     channel_id = channels_create(user1["token"], "Channel 1", True)

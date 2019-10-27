@@ -1,5 +1,5 @@
 import jwt
-import threading
+from .channels_list import channels_list
 from .database import *
 from .access_error import *
 
