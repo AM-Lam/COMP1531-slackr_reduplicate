@@ -1,4 +1,5 @@
-from .access_error import AccessError
+from .access_error import AccessError, ValueError
+from .database import *
 import jwt
 
 #   admin_userpermission_change(token, u_id, permission_id);
@@ -22,9 +23,8 @@ def admin_userpermission_change(token, u_id, permission_id):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    global DATABASE
-    global SECRET
-
+    DATABASE = get_data()
+    SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
     try:
@@ -33,52 +33,51 @@ def check_valid_token(token):
             if user_id == token["u_id"]:
                 return user_id
     except Exception as e:
-        raise ValueError("token invalid")
+        raise ValueError(description="token invalid")
 
 def check_valid_user(u_id):
-    global DATABASE
     # check if the u_id given currently exists within the global database
+    DATABASE = get_data()
+
     try:
         for x in DATABASE["users"]:
             y = x.get_user_data()
             if y.get("u_id") == u_id:
                 return True
     except Exception as e:
-        raise ValueError("This user does not exist.")
+        raise ValueError(description="This user does not exist.")
 
 def check_valid_permission(permission_id):
     # assuming that 0 = user, 1 = admin, 2 = owner
     if permission_id < 0 or permission_id > 2:
-        raise ValueError("Permission does not exist.")
+        raise ValueError(description="Permission does not exist.")
     else:
         return True
 
-def check_owner_or_admin(token):
+def check_owner_or_admin(admin_user_id):
     # check if the permission_id associated with the user is an admin or owner
-    global DATABASE
-    try:
-        for x in DATABASE["channels"]:
-            channel_dictionary = x.get_channel_data()
-            member_dict = channel_dictionary["members"]
-            if token in member_list:
-                check_perm = member_dict.get(token)
-                break
-    except Exception as e:
-        raise ValueError("Could not access user permissions.")
+    DATABASE = get_data()
 
-    if check_perm == 1:
-        raise AccessError("User cannot undertake this action.")
-    else:
-        return True
+    try:
+        for x in DATABASE["users"]:
+            if admin_user_id == x.get_u_id():
+                if x.is_global_admin == True
+                    return True
+                elif x.is_global_admin == False
+                    raise AccessError("User is not an administrator.")
+        raise AccessError("User does not have prerequisite permissions.")
+    except Exception as e:
+        raise ValueError(description="Could not access user permissions.")
 
 def change_permission(u_id, permission_id):
     # change global permissions for user in the global database
-    global DATABASE
+    DATABASE = get_data()
+    
     try:
         for x in DATABASE["channels"]:
             y = x.get_channel_data()
             if y.get("u_id") == u_id:
-                DATABASE.update_permissions({"permissions": permission_id})
+                x.add_owner(u_id)
     except Exception as e:
-        raise ValueError("Error: Couldn't change permissions.")
+        raise ValueError(description="Error: Couldn't change permissions.")
 

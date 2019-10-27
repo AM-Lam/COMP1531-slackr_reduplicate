@@ -1,4 +1,5 @@
-from .access_error import AccessError
+from .access_error import AccessError, ValueError
+from .database import *
 import re
 import jwt
 
@@ -20,9 +21,8 @@ def user_profile_setemail(token, email):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    global DATABASE
-    global SECRET
-
+    DATABASE = get_data()
+    SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
     try:
@@ -31,7 +31,8 @@ def check_valid_token(token):
             if user_id == token["u_id"]:
                 return user_id
     except Exception as e:
-        raise ValueError("token invalid")
+        raise ValueError(description="token invalid")
+
 
 def check_if_email_valid(email):
     # run the re module to identify if an email is valid
@@ -39,25 +40,27 @@ def check_if_email_valid(email):
     if(re.search(regex, email)):
         return True
     else:
-        raise ValueError("Email is invalid.")
+        raise ValueError(description="Email is invalid.")
 
 def check_email_database(email):
     # check if the email is already being used/is within the database
-    global DATABASE
+    DATABASE = get_data()
+
     for x in DATABASE["email"]:
         y = x.get_user_data()
         if y.get("email") == email:
-            raise ValueError("Email is already in use.")
+            raise ValueError(description="Email is already in use.")
     return True
 
 def change_email(u_id, email):
     # change email in the database for the specified user
-    global DATABASE
+    DATABASE = get_data()
+    
     try:
         for x in DATABASE["users"]:
             y = x.get_user_data()
             if y.get("u_id") == u_id:
-                DATABASE.update_user_data({"email": handle})
-                break
+                x.update_user_email(email)
+                return True
     except Exception as e:
-        raise ValueError("Error: Couldn't change email.")
+        raise ValueError(description="Error: Couldn't change email.")

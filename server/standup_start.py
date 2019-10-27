@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
-from .access_error import AccessError
+from .access_error import AccessError, ValueError
 from .message_send import message_send
+from .database import *
 import jwt
 import time
 
@@ -31,9 +32,8 @@ def standup_start(token, channel_id):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    global DATABASE
-    global SECRET
-
+    DATABASE = get_data()
+    SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
     try:
@@ -42,20 +42,20 @@ def check_valid_token(token):
             if user_id == token["u_id"]:
                 return user_id
     except Exception as e:
-        raise ValueError("token invalid")
+        raise ValueError(description="token invalid")
 
 def check_channel_exist(channel_id):
-    global DATABASE
     # check if channel_id exists, else raise a ValueError
+    DATABASE = get_data()
 
     for x in DATABASE("channels"):
         if x.get("channel_id") == channel_id:
             return True
-    raise ValueError("Channel does not exist or cannot be found.")
+    raise ValueError(description="Channel does not exist or cannot be found.")
 
 def check_channel_member(u_id, channel_id):
     # we need to find a way to know what members correspond to which channels, for now, pass
-    global DATABASE
+    DATABASE = get_data()
 
     for x in DATABASE("channels"):
         if x.get("channel_id") == channel_id:
@@ -65,22 +65,22 @@ def check_channel_member(u_id, channel_id):
                 return True
             else:
                 raise AccessError("You are not a member of this channel.")
-    raise ValueError("Channel does not exist or cannot be found.")
+    raise ValueError(description="Channel does not exist or cannot be found.")
 
 def start_standup(channel_id):
     # give a timedate object to the database
-    global DATABASE
+    DATABASE = get_data()
     
     time_current = datetime.now()
     time_finish = time_current + timedelta(minutes=15)
 
     for x in DATABASE("channels"):
         if x.get("channel_id") == channel_id:
-            DATABASE.update_user_data({"standup": time_finish})
-    raise ValueError("Channel does not exist or cannot be found.")
+            DATABASE.set_standup(time_finish)
+    raise ValueError(description="Channel does not exist or cannot be found.")
 
 def end_standup(token, channel_id):
-    global DATABASE
+    DATABASE = get_data()
     global MESSAGE_STANDUP
 
     time_current = datetime.now()

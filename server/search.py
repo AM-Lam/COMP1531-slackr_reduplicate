@@ -1,4 +1,5 @@
 from .access_error import AccessError
+from .database import *
 
 #   search(token, query_str);
 #   return {messages}
@@ -6,8 +7,8 @@ from .access_error import AccessError
 #   Description: Given a query string, return a collection of messages  that match the query
 
 def search(token, query_str):
-    global DATABASE
     # find u_id associated with token (with non-existent database)
+    DATABASE = get_data()
     admin_user_id = check_valid_token(token)
 
     # pull messages from a list/dictionary of all messages
@@ -25,9 +26,8 @@ def search(token, query_str):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    global DATABASE
-    global SECRET
-
+    DATABASE = get_data()
+    SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
     try:
@@ -36,4 +36,4 @@ def check_valid_token(token):
             if user_id == token["u_id"]:
                 return user_id
     except Exception as e:
-        raise ValueError("token invalid")
+        raise ValueError(description="token invalid")

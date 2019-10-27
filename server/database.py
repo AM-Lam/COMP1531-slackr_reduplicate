@@ -113,6 +113,7 @@ class Channel:
             "members" : self._members,
             "owners" : self._owners,
             "public" : self._public,
+            "standup" : self._standup,
         }
 
     def frontend_format(self):
@@ -166,6 +167,9 @@ class Channel:
 
     def set_public(self, public):
         self._public = public
+
+    def set_standup(self, standup):
+        self._standup = standup
 
  
 class Messages:

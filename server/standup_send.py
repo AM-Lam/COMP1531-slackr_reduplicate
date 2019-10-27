@@ -1,5 +1,6 @@
 from datetime import timedelta, datetime
-from .access_error import AccessError
+from .access_error import AccessError, ValueError
+from .database import *
 import jwt
 
 #   standup_send(token, channel_id, message);
@@ -26,9 +27,8 @@ def standup_send(token, channel_id, message):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    global DATABASE
-    global SECRET
-
+    DATABASE = get_data()
+    SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
     try:
@@ -37,7 +37,8 @@ def check_valid_token(token):
             if user_id == token["u_id"]:
                 return user_id
     except Exception as e:
-        raise ValueError("token invalid")
+        raise ValueError(description="token invalid")
+
 
 def check_channel_exist(token, channel_id):
     global DATABASE
@@ -46,7 +47,7 @@ def check_channel_exist(token, channel_id):
     for x in DATABASE("channels"):
         if x.get("channel_id") == channel_id:
             return True
-    raise ValueError("Channel does not exist or cannot be found.")
+    raise ValueError(description="Channel does not exist or cannot be found.")
 
 def check_channel_member(token, channel_id):
     # we need to find a way to know what members correspond to which channels, for now, pass
@@ -60,13 +61,13 @@ def check_channel_member(token, channel_id):
                 return True
             else:
                 raise AccessError("You are not a member of this channel.")
-    raise ValueError("Channel does not exist or cannot be found.")
+    raise ValueError(description="Channel does not exist or cannot be found.")
 
 def check_message_length(message):
     if len(message) <= 1000:
         return True
     else:
-        raise ValueError("Message is too long.")
+        raise ValueError(description="Message is too long.")
 
 def check_valid_standup_time(channel_id):
     # for now I don't know about the channel class so I'm gonna pretend
@@ -79,7 +80,7 @@ def check_valid_standup_time(channel_id):
             y = x.get_channel_data()
             if datetime.now() > y["standup"]:
                 raise AccessError ("The standup time has finished.")
-    raise ValueError("Channel does not exist or cannot be found.")
+    raise ValueError(description="Channel does not exist or cannot be found.")
 
 def send_message(u_id, message):
     # send a message corresponding to token in the channel_id
