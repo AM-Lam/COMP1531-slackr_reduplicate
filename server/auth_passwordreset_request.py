@@ -1,8 +1,9 @@
 import hashlib
 import random
 import string
-from .database import *
 from flask_mail import Mail, Message
+from .database import *
+from .access_error import *
 
 
 def auth_passwordreset_request(email):
@@ -26,7 +27,7 @@ def validate_email_existence(email):
             flag = 1
             userid = clients._u_id
     if flag == 0:
-        raise ValueError("email does not exist")
+        raise ValueError(description="email does not exist")
     else:
         return userid
 '''

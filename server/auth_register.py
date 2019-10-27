@@ -5,24 +5,49 @@ import jwt
 from flask import Flask, request
 from json import dumps
 from .database import * 
+from .access_error import *
 
 
 def auth_register(email, password, first_name, last_name):
     update_data = get_data()
-    check_first(first_name)     # checking first name.
-    check_last(last_name)       # checking last name.
-    hashed = check_password_strength(password)   # checking if password is strong and getting a hash.
-    check_regEmailtype(email)   # checking if the email has a valid structure.
-    validate_regEmail(email)    # checking if the email already exists.
-    SECRET = get_secret()       # getting the secret from the database.    
-    listlen = len(update_data['users'])          # getting the number of currently registered users.
-    u_id = listlen + 1          # new user id is the number of current users plus one.
+    
+    
+    check_first(first_name)
+    check_last(last_name)
+    
+    # checking if password is strong and getting a hash.
+    hashed = check_password_strength(password)
+    
+    # checking if the email has a valid structure.
+    check_regEmailtype(email)
+    
+    # checking if the email already exists.
+    validate_regEmail(email)
+
+    # getting the number of currently registered users.
+    listlen = len(update_data['users'])
+    
+    # new user id is the number of current users plus one.
+    u_id = listlen + 1
+    
     # now we encode a unique token with the help of u_id and the current time.
-    token = jwt.encode({'u_id': u_id , 'time': time.time()}, SECRET, algorithm='HS256').decode()
-    update_data["tokens"][token] = True   # adding the token to the list of tokens to be killed later.
-    person = User(u_id,first_name,last_name,hashed,email)   # creating a user class instance.
-    update_data['users'].append(person)   # adding the person to the user list.
-    return {"u_id": u_id, "token": token}
+    token = jwt.encode({'u_id': u_id , 'time': time.time()}, get_secret(), algorithm='HS256').decode()
+    
+    # adding the token to the list of tokens to be killed later.
+    update_data["tokens"][token] = True   
+    
+    # creating a user class instance.
+    person = User(u_id,first_name,last_name,hashed,email)
+
+    # if this is the first user to register make them a slackr owner
+    if u_id == 1:
+        person.set_global_admin(True)
+        person._slackr_owner = True
+    
+    # adding the person to the user list.
+    update_data['users'].append(person)
+    
+    return { "u_id": u_id, "token": token }
 
 
 def check_regEmailtype(email):
@@ -31,7 +56,7 @@ def check_regEmailtype(email):
     if(re.search(regex,email)):  
         return True
     else:  
-        raise ValueError("this is not a valid email format!")
+        raise ValueError(description="this is not a valid email format!")
 
 
 def validate_regEmail(email):
