@@ -26,7 +26,7 @@ def check_reset_code(reset_code):
 
 def chec_password_strength(password):
     # to check if the password is at least 5 digits 
-    if len(password) >= 5:
+    if len(password) >= 6:
         return True
     else:
         raise ValueError("Password is too short!")
