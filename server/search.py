@@ -1,4 +1,4 @@
-from .access_error import AccessError
+from .access_error import *
 from .database import *
 
 #   search(token, query_str);
@@ -20,7 +20,7 @@ def search(token, query_str):
         messages_list = channel_dictionary["messages"]
         for message in messages_list:
             if query_str in message:
-                message_match.append(message);
+                message_match.append(message)
 
     return message_match
 

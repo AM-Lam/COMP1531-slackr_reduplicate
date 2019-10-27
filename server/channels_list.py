@@ -12,7 +12,7 @@ def channels_list(token):
     # apparently we want everyone to be able to access
     # all the channels)
     if not database["tokens"].get(token, True):
-        raise AccessError
+        raise AccessError(description="Token is invalid")
 
     # get the user's u_id
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])

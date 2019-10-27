@@ -1,11 +1,12 @@
 from .database import *
+from .access_error import *
 import jwt
 
 
 def channels_create(token, name, is_public):
     # first check for a valid name
     if len(name) > 20:
-        raise ValueError
+        raise ValueError(description="Channel name is too short")
     
     # now grab the u_id associated with the provided token
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
