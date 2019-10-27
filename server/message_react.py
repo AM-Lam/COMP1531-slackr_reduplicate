@@ -1,26 +1,61 @@
-from .channels_list import channels_list
+import jwt
+import threading
+from .database import *
+from .access_error import *
 
 def message_react(token, message_id, react_id):
-    # assume we can get the list of channels that the user's joining by getting u_id's dictionary
-    # message_id is not a valid message within a channel that the authorised user has joined
-    # message does not exist
-    if message_id not in message_id_list:
-        raise ValueError("The message no longer exists.")
+    server_data = get_data()
 
-    # user is not in the channel anymore
-    token_of_message = message_id_dic[message_id][0]
-    id_of_channel = message_id_dic[message_id][1]
-    if id_of_channel not in channels_list(token_of_message):
-        raise ValueError("You are not a member of the channel.")
+    # now grab the u_id associated with the provided token
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
 
-    #  react_id is not a valid React ID
-    if react_id not in react_id_type:
-        return ValueError("Please enter a valid react_id.")
-    #  Message with ID message_id already contains an active React with ID react_id
-    if react_id_dic[message_id][2] != None:
-        return ValueError("You reacted before. Please don't repeat.")
+    # if the token is not valid raise an AccessError
+    if not server_data["tokens"].get(token, True):
+        raise AccessError(description="This token is invalid")
 
-    # if the function is working
-    # add the react_id into dictionary
-    react_id_dic[message_id] = {token, message_id, react_id}
+    # Message with message_id was not sent by the authorised user making this request
+    # person who send this message is not the sender and not an admin or owner in the channel
+    channel_ = None
+    # add the message to the server database
+    for channel in server_data["channels"]:
+        for message in channel._messages:
+            if message.get_m_id() == message_id:
+                channel_ = channel
+                break
     
+    if channel_ is None:
+        raise ValueError(description="Channel does not exist")
+
+    obj_request = None
+    for user in server_data["users"]:
+        if user.get_u_id() == u_id:
+            obj_request = user
+            break
+
+    user_id = obj_request.get_u_id()
+
+    # the message is not existed
+    if user_id is None:
+        raise AccessError(description="The message is not existed")
+
+    # if user is not the poster
+    if u_id != user_id:
+        raise AccessError(description="You don't have access to delete")
+        
+    react_id = 1
+    if u_id in obj_request._reacts['u_id']:
+        if obj_request._reacts['is_this_user_reacted'] == True:
+            raise ValueError(description="You reacted to the post already")
+        # update react
+        else:
+            obj_request._reacts['react_id'] = react_id
+            obj_request._reacts['is_this_user_reacted'] = True
+    else:            
+        obj_request._reacts.append(
+                                    { 
+                                        'react_id': react_id,
+                                        'u_id': u_id,
+                                        'is_this_user_reacted': True
+                                    }
+                                )

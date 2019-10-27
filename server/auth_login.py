@@ -1,12 +1,14 @@
 import re
 import hashlib
 import jwt
+import time
 from flask import Flask, request
 from json import dumps
 from .database import *
 
     
 def auth_login(email, password):
+    update_data = get_data()
     SECRET = get_secret()       # getting the secret from the database.
     check_emailtype(email)      # checking if the email has a valid structure.
     validate_email(email)       # checking if the email actually exists.
@@ -29,16 +31,20 @@ def check_emailtype(email):
 def validate_email(email):
     # checking if thr email even exists already.
     flag = 0
+    update_data = get_data()
     for clients in update_data['users']:
         if clients._email == email:
             flag = 1
     if flag == 0:
-        raise ValueError("email already exists on the server")
+        raise ValueError("email does not exist on the server")
+    if flag == 1:
+        return True
 
 
 def validate_password(email, password):
     # This will check if the password to the corresponding email is correct and returns user id if correct.
     flag = 0
+    update_data = get_data()
     hash_pass = (hashlib.sha256(password.encode()).hexdigest())
     for user in update_data['users']:
         if user._email == email and user._password == hash_pass:

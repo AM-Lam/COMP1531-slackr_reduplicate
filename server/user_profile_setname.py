@@ -1,4 +1,6 @@
 import jwt
+from .access_error import *
+from .database import *
 
 #   user_profile_setname(token, name_first, name_last);
 #   return void
@@ -9,7 +11,8 @@ import jwt
 
 def user_profile_setname(token, name_first, name_last):
     # find u_id associated with token (with non-existent database)
-    admin_user_id = check_valid_token(token)
+    u_id = check_valid_token(token)
+
     first_name_check(name_first)
     last_name_check(name_last)
     change_names(u_id, name_first, name_last)
@@ -18,26 +21,42 @@ def user_profile_setname(token, name_first, name_last):
 
 def check_valid_token(token):
     # find the user ID associated with this token, else raise a ValueError
-    decoded_jwt = jwt.decode(token, 'sempai', algorithms=['HS256'])
+    DATABASE = get_data()
+    SECRET = get_secret()
+    token = jwt.decode(token, SECRET, algorithms=['HS256'])
+
     try:
-        for x in database:
-            if x.get("u_id") == decoded_jwt.key():
-                return x.get("u_id")
+        for x in DATABASE["users"]:
+            user_id = x.get_u_id()
+            if user_id == token["u_id"]:
+                return user_id
     except Exception as e:
-        raise ValueError("token invalid")
-    
+        raise ValueError(description="token invalid")
+
 def first_name_check(name_first):
+    # check if the first name is within length limits/if first name exists
     if len(name_first) < 50 and len(name_first) > 0:
         return True
     else:
-        raise ValueError("First name must be between 1 and 50 characters.")
+        raise ValueError(description="First name must be between 1 and 50 characters.")
 
 def last_name_check(name_last):
+    # check if the last name is within length limits
     if len(name_last) < 50:
         return True
     else:
-        raise ValueError("Last name cannot exceed 50 characters.")
+        raise ValueError(description="Last name cannot exceed 50 characters.")
 
 def change_names(u_id, name_first, name_last):
-    # change first and last name in the database (which doesn't exist yet)
-    pass
+    # change first and last name in the database for the associated user
+    DATABASE = get_data()
+    
+    try:
+        for x in DATABASE["users"]:
+            y = x.get_user_data()
+            if y.get("u_id") == u_id:
+                x.update_user_first_name(name_first)
+                x.update_user_last_name(name_last)
+                return True
+    except Exception as e:
+        raise ValueError(description="Error: Couldn't change name.")
