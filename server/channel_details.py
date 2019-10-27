@@ -1,5 +1,5 @@
 from .database import *
-from .access_error import AccessError
+from .access_error import *
 import jwt
 
 
@@ -10,7 +10,7 @@ def channel_details(token, channel_id):
         details = verify_user_status(token, channel_id)    # this will check if the user is in the channel and will get channel details.
         return details
     else:
-        raise ValueError("the given token does not exist")
+        raise ValueError(description="the given token does not exist")
 
 def check_channel_existence(channel_id):
     # this function will have to check and verify if the channel is valid
@@ -20,7 +20,7 @@ def check_channel_existence(channel_id):
         if channels._channel_id == channel_id:  # set flag as one if channel exists.
             flag = 1
     if flag == 0:
-        raise ValueError("channel given does not exist!")
+        raise ValueError(description="channel given does not exist!")
 
 def verify_user_status(token, channel_id):
     # this will check if the user is a part of the channel
@@ -44,4 +44,4 @@ def verify_user_status(token, channel_id):
                 c_amembers = channeli._members
                 return {"name" : c_name, "owner_members" : c_omembers, "all_members" : c_amembers} 
     else:
-        raise AccessError('user is not a part of the channel... does not have correct permissions.')
+        raise AccessError(description='You do not have permission to do this')
