@@ -11,7 +11,7 @@ def user_profile(token, u_id):
     check_u_id = token_payload["u_id"]
 
     # not an authorised user
-    if not server_data["tokens"].get(token, True):
+    if not server_data["tokens"].get(token, False):
         raise AccessError 
 
     # authorization problem

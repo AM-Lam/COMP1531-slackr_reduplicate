@@ -9,6 +9,7 @@ from .channels_create import channels_create
 from .message_send import message_send
 from .message_remove import message_remove
 
+
 def test_message_react():
     clear_data()
     user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
@@ -19,7 +20,7 @@ def test_message_react():
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
 
     react_id = 1
-    assert message_react(user1["token"], message_1['message_id'], react_id) is None
+    assert message_react(user1["token"], message_1['message_id'], react_id) == {}
                         
 
 def test_no_message():

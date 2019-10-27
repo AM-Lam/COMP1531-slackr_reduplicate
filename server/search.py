@@ -16,10 +16,8 @@ def search(token, query_str):
     message_match = []
 
     # TODO: write check for if user has access to channel
-    for channels in DATABASE["channels"]:
-        channel_dictionary = channels.get_channel_data()
-        messages_list = channel_dictionary["messages"]
-        for message in messages_list:
+    for channel in DATABASE["channels"]:
+        for message in channel.get_messages():
             if query_str in message:
                 message_match.append(message)
 
@@ -31,10 +29,8 @@ def check_valid_token(token):
     SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
-    try:
-        for x in DATABASE["users"]:
-            user_id = x.get_u_id()
-            if user_id == token["u_id"]:
-                return user_id
-    except Exception as e:
-        raise ValueError(description="token invalid")
+    for x in DATABASE["users"]:
+        user_id = x.get_u_id()
+        if user_id == token["u_id"]:
+            return user_id
+    raise ValueError(description="token invalid")

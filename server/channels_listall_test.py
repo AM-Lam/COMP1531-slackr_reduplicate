@@ -5,14 +5,13 @@ from .channels_listall import channels_listall
 from .database import *
 
 
-clear_data()
-
-
 def test_channels_listall():
+    clear_data()
+    
     # create some users and channels for testing, commented for now
     # until auth_register works
-    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
-    user2 = auth_register("good@email.com", "987654321", "Jone", "Bobs")
+    user1 = auth_register("valid@email.com", "0123456789", "Bob", "Jones")
+    user2 = auth_register("good@email.com", "9876543210", "Jone", "Bobs")
     
     # ensure that if there are no channels that none are shown
     assert channels_listall(user1["token"]) == {"channels" : []}

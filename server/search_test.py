@@ -3,10 +3,9 @@ from .auth_register import auth_register
 from .database import *
 
 
-clear_data()
-
-
 def test_search():
+    clear_data()
+    
     user = auth_register("valid@email.com", "1234567890", "John", "Doe")
 
     # find all the matching messages (nothing)

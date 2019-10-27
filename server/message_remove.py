@@ -11,41 +11,36 @@ def message_remove(token, message_id):
     u_id = token_payload["u_id"]
 
     # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, True):
+    if not server_data["tokens"].get(token, False):
         raise AccessError(description="This token is invalid")
 
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
-    channel_ = None
-    # add the message to the server database
+    message_ = None
+    
+    # check if this channel
     for channel in server_data["channels"]:
         for message in channel._messages:
             if message.get_m_id() == message_id:
-                channel_ = channel
+                message_ = message
                 break
     
-    if channel_ is None:
-        raise ValueError(description="Channel does not exist")
+    if message_ is None:
+        raise ValueError(description="Message does not exist")
 
-    obj_request = None
+    user_ = None
     for user in server_data["users"]:
         if user.get_u_id() == u_id:
-            obj_request = user
+            if user.get_u_id() != message_.get_u_id() and not user.is_global_admin():
+                break
+            user_ = user
             break
 
-    user_id = obj_request.get_u_id()
-
-    # the message is not existed
-    if user_id is None:
-        raise AccessError(description="The message is not existed")
-
-    if u_id != user_id:
-        # if user is not the poster and admin
-        if not obj_request.is_global_admin():
-            raise AccessError(description="You don't have access to delete")
+    if user_ == None:
+        # if user is not the poster or an admin
+        raise AccessError(description="You don't have access to delete")
     
-    # add the message to the server database
+    # remove the message to the server database
     channel._messages.remove(message)
-            
 
-#200, 400,404,500
+    return {}

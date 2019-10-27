@@ -36,10 +36,8 @@ def test_no_message():
     message_remove(user1["token"], message_1['message_id'])
 
     react_id = 1
-    
-    # message is not existed
-    assert message_1 is None
-    # the message is not existed
+
+    # the message does not exist
     pytest.raises(ValueError, message_unreact, user1["token"], message_1['message_id'], react_id)
 
 

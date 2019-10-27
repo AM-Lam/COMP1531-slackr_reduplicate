@@ -51,6 +51,10 @@ class User:
         self._handle = new_handle
     
 
+    def set_global_admin(self, admin):
+        self._global_admin = admin
+    
+
     def get_u_id(self):
         return self._u_id
 
@@ -91,6 +95,8 @@ class Channel:
         
         self._members = creator             # members of the channel, just a list
                                             # of u_ids
+        
+        self._pinned_messages = []
         
         self._owners = creator.copy()       # owners of the channel, initially set to
                                             # the creator of the channel, this must
@@ -156,6 +162,10 @@ class Channel:
     
     def get_m_id(self):
         return self._message_id_max
+
+    
+    def get_pins(self):
+        return self._pinned_messages
     
     
     def set_id(self, id):
@@ -188,6 +198,10 @@ class Channel:
 
     def set_standup(self, standup):
         self._standup = standup
+    
+
+    def add_pin(self, message_id):
+        self._pinned_messages.append(message_id)
 
  
 class Messages:
@@ -234,9 +248,18 @@ class Messages:
 
     def get_u_id(self):
         return self._u_id
+    
+    
+    def get_text(self):
+        return self._text
+
 
     def is_pinned(self):
         return self._pinned
+    
+    
+    def edit_text(self, new):
+        self._text = new
 
 
 def get_data():

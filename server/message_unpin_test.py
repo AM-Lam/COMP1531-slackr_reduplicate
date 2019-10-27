@@ -22,10 +22,10 @@ def test_message_unpin():
 
     # check that the message exists
     assert message_1 is not None
-    
     message_pin(user1["token"], message_1['message_id']) 
 
-    assert message_unpin(user1["token"], message_1['message_id']) is None
+    assert message_unpin(user1["token"], message_1['message_id']) == {}
+
 
 def test_no_message():
     clear_data()
@@ -33,16 +33,8 @@ def test_no_message():
 
     channel_id = channels_create(user1["token"], "Channel 1", True)
 
-    # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-
-    # check that the message exists
-    assert message_1 is not None
-    
-    assert message_pin(user1["token"], message_1['message_id']) is None
-
-    # the message is not existed
-    pytest.raises(ValueError, message_unpin, user1["token"], message_1['message_id'])
+    # try to remove a non-existent message
+    pytest.raises(ValueError, message_unpin, user1["token"], 123)
 
 # def test_message_unpin():
 #     #assert message_unpin(token, message_id) == None

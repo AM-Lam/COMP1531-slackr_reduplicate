@@ -13,24 +13,10 @@ def verify_message(message_obj, correct_data):
 
 def test_message_send():
     clear_data()
-    # user1 = auth_register("valid@email.com", "144234", "Bob", "Jones")
-
-    # just got the u_id by putting fake data into jwt.io
-    secret = get_secret()
-    user1 = {
-        "token" : jwt.encode({"u_id" : "111"}, secret, algorithm="HS256").decode(),
-        "u_id" : "111"
-    }
-
-    user2 = {
-        "token" : jwt.encode({"u_id" : "22"}, secret, algorithm="HS256").decode(),
-        "u_id" : "22"
-    }
-
-    user3 = {
-        "token" : jwt.encode({"u_id" : "3"}, secret, algorithm="HS256").decode(),
-        "u_id" : "3"
-    }
+    
+    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
+    user2 = auth_register("valid2@email.com", "0123456789", "John", "Bobs")
+    user3 = auth_register("valid3@email.com", "0987654321", "Bob", "Zones")
     
     channel_id = channels_create(user1["token"], "Channel 1", True)
 
@@ -41,9 +27,7 @@ def test_message_send():
     assert message_1 is not None
 
     # check that the database was correctly updated
-    assert verify_message(message_1, 
-                        {"message_id" : 1}
-                        ) 
+    assert verify_message(message_1, {"message_id" : 1}) 
     
     # the user is not a member in the group
     pytest.raises(AccessError, message_send, user3["token"], channel_id["channel_id"], "Hello")
@@ -52,7 +36,7 @@ def test_message_send():
     message_1 = None
     # the message is over 1000 characters
     pytest.raises(ValueError, message_send, user1["token"], channel_id["channel_id"],
-                "bfiDw25miCyBvrwSfYWVRTSdunVfTxzWRfkYrvOztvF3BrtCHbXWoIKPbpBhYdQsWf7TTWQ5Z0cKmBBygwVRAyS9Yt6YBtitWYQDVVVembsy7izJMjuVk611l7NmxPWXw8w8pk7EtKHq1464icy6z5qcnG6cSALJUT86hU2tXG3redpcINHEG9BaNTqgngUSGNENIVkD9mzYRFeChjq7CBwZVP7G0yCYxn3M3VSgUIyFbQElRGkKtX7KWvg9FxlFXnld8ScXaTE27i8zT4FqZMf8j45wVYZOJLRpOnX1JaDvfvpMfG5ybCleIQYe9GADEzcP7RxBcs7EaIqSRmpXOZl3kyJDdYubEttcR9rrulQo3dJMzPa3WnaosCByZCEeO3rqHqryXcpwlB8Z5ztYGJ8fiRDMgwloBjjAZyHPU6CTd76zFRXPyywnjzQhmsBVHQ6qjyNQODV9j2mLejkCVjFXgVYbOfQnSQZALo7PDkB4BEQDJWY4GVtG7FfhhGM9YsolHDWzQnGkFjvPfLgI1rXNsacFr2jbb5qv7C8nCnE63BDroyI0UjR0iQqFuNIuJI2pxuibdxZcsifRFjhf3j86Ya03mSBBxoULl8o9mOZx60nYalsQcBGd56qavrrLIqxWB6KOhLoFhSwOyZCc4bU3s4UX8oN0s9BXaeAM7S6dyLbI8qA6OKJFHmpUielq6dlaaSXHOZMmOgG5K6lmpUvaxc9vz0AUmgWTo8ENHv1iHFoqEDgWsjbziBkRaxxCCnyoE6qg00OvNxerVNLQgEYYVj9TBeEPbXlDCQSvx50RAEbE8PxRsf9Fp0ZvdqXcyOr3ZtZ6X20afRnkZx8bcll7UF7LKBJl3BFrRGcpKoT5rUpAEifG3tMNB1jANgrJSbdkh4fwkCRfX1n52VyO9xnXTqijFmr1zMg01SpuSRTcqu901OA4kOQZzh0iQk1baCQDEOrFtDSuSLtXTYXl6nS5upAK0v8AnRxtlsdflhyge")
+                 "X" * 1001)
 
 
 # def test_message_send(token, channel_id, message):
