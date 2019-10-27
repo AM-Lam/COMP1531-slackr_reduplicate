@@ -22,30 +22,32 @@ def channel_invite(token, channel_id, u_id):
 
 def verify_token_not_member(token, channel_id, u_id):
     update_data = get_data()
-    SECRET = get_secret()               # getting the secret from thd database.
+    SECRET = get_secret()                    # getting the secret from thd database.
     decode = (jwt.decode(token, SECRET, algorithm = 'HS256'))    # extracting u_id from token.
     user_id = decode['u_id']            
     # checking if token is in the channel
     flag_2 = 0
-    for k in update_data['channels']:    # going through the channels list.
-        for userss in k._members:        # going through the members of the channel list.
-            if user_id == userss:  # setting flag to 1 if user id was found in the channel.
-                flag_2 = 1
+    for k in update_data['channels']:        # going through the channels list.
+        if k._channel_id == channel_id:
+            for userss in k._members:        # going through the members of the channel list.
+                if user_id == userss:        # setting flag to 1 if user id was found in the channel.
+                    flag_2 = 1
     if flag_2 == 0:
         raise AccessError("user trying to add another member is not a part of the channel")
     # making sure the u_id trying to be added is not in the channel
     flag = 0                                
-    for i in update_data['channels']:   # going through the channels list.
-        for users in i._members:        # going through the members of the channel list.
-            if u_id == users:     # setting flag to 1 if user id was found in the channel.
-                flag = 1
+    for i in update_data['channels']:        # going through the channels list.
+        if i._channel_id == channel_id:
+            for users in i._members:         # going through the members of the channel list.
+                if u_id == users:            # setting flag to 1 if user id was found in the channel.
+                    flag = 1
     if flag == 1:
         raise ValueError("user already exists in the channel") 
 
 def verify_user_validity(u_id):
     update_data = get_data()
-    flag = 0                              # If flag is zero then the user deos not exist!
-    for users in update_data['users']:    # looking through the users list.
+    flag = 0                                 # If flag is zero then the user deos not exist!
+    for users in update_data['users']:       # looking through the users list.
         if users._u_id == u_id:
             flag = 1
     if flag == 0:

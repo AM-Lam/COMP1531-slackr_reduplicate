@@ -1,6 +1,7 @@
 from .auth_passwordreset_request import *
 import pytest
 from .auth_register import *
+from .database import *
 
 
 
@@ -22,6 +23,8 @@ def test_Validate_email4():
 ###########################################################################################################################################
 
 def test_send_code():
-    ## this should be testing if connection to server was succesful and email was sent successfully! 
     ## cant test this since send email code has been moved to server.py i.e. flask
-    pass
+    update_data = get_data()
+    reset_code = auth_passwordreset_request('user1@domain.com')
+    assert(update_data["reset"][reset_code]) == 'user1@domain.com'
+    

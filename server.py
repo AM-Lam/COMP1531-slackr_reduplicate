@@ -77,7 +77,7 @@ def user_logout():
 def email_request():
     email = request.form.get('email')
     dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
-    print(send_code(email, dumpstring))
+    print(send_code(email, dumpstring)) # remove later
     return dumps({})
 
 
@@ -184,20 +184,14 @@ def run_channel_join():
     
     return dumps(return_value)
 
-def send_code(email, user_id):
+def send_code(email, code):
     try:
         with APP.app_context():
             msg = Message(subject = "Your slacky reset code",
                 sender="deadthundersquirrels@gmail.com",
                 recipients=[email],
                 body = 'hello')
-            random_num = user_id * (random.randint(1,10000))      # multiplying a random number to user id.
-            random_alph = random.choice(string.ascii_letters)     # getting a random alphabet
-            ramdom_str = str(random_num) + random_alph            # appending the two toghter
-            code = (hashlib.sha256(random_str.encode()).hexdigest())  # hashing the code
-            update_data["reset"][code] = email # adding the code email combo to the database for future refrence.
             msg.body = "your reset code is " + code
-           
             mail.send(msg)
             return {}
     except Exception as e:

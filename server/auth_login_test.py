@@ -192,7 +192,7 @@ def test_validate_password2():
 
 def test_validate_password3():
     # what if the password exists on the server but is not correctly matched to the provided email -->
-    pytest.raises(ValueError, validate_password, 'user1@domain.com' , 'vscod231343')
+    pytest.raises(ValueError, validate_password, 'user3@domain.com' , 'sfdsdfsdfsdfsffsf')
 
 def test_validate_password4():
     # what if the email and password combo is valid? -->
