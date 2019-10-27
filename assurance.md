@@ -8,20 +8,35 @@
 
 
 _TABLE OF CONTENTS
-Section                                                                                                                                         Page
+
+Section                        
+Page
 SECTION 1.  SOFTWARE DESCRIPTION------------------------------------------------------------2
+
 1.1      Scope
+
 1.2      Frontend
+
 1.3      Uses
+
 SECTION 2.  ROLES AND RESPONSIBILITIES-----------------------------------------------------2
+
 2.1      Organization
+
 2.2      Work division
+
 2.2.1       Checklists
+
 SECTION 3.  SQA REQUIREMENTS-------------------------------------------------------------------3
+
 3.1      Task:  Requirements phase
+
 3.2      Task:  Design phase
+
 3.3      Task:  Implementation phase
+
 3.4      Task:  Testing phase
+
 SECTION 4.  ER Diagrams---------------------------------------------------------------------------------4_
 
 
