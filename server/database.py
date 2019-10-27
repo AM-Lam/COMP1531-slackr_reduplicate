@@ -109,6 +109,7 @@ class Channel:
                                             # since message_sendlater is concurrent
                                             # we need to keep track of this explicitly
 
+
     def get_channel_data(self):
         return {
             "channel_id" : self._channel_id,
@@ -120,6 +121,7 @@ class Channel:
             "public" : self._public,
             "standup" : self._standup,
         }
+
 
     def frontend_format(self):
         return {
@@ -138,6 +140,7 @@ class Channel:
 
     def get_messages(self):
         return self._messages
+
 
     def get_members(self):
         return self._members
@@ -159,12 +162,13 @@ class Channel:
         self._channel_id = id
     
 
-    def sett_name(self, name):
+    def set_name(self, name):
         self._channel_name = name
     
 
     def add_message(self, message):
         self._messages.append(message)
+
 
     def add_member(self, member):
         self._members.append(member)
@@ -180,6 +184,7 @@ class Channel:
 
     def increment_m_id(self):
         self._message_id_max += 1
+
 
     def set_standup(self, standup):
         self._standup = standup

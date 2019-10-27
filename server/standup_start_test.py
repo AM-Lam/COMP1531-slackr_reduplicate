@@ -7,19 +7,20 @@ from .database import *
 from datetime import timedelta, datetime
 
 
-clear_data()
-
-
 def test_standup_start():
+    clear_data()
+    
     user = auth_register("valid@email.com", "1234567890", "John", "Doe")
-    #hannel = channels_create(user[token], "Channel 1", False)
-    channel = "channel"
+    user2 = auth_register("valid2@email.com", "1234567890", "John", "Boe")
+    channel = channels_create(user["token"], "Channel 1", False)
 
-    # this test should pass with no issue
-    assert standup_start(user["token"], channel) == timedelta(minutes=15)
+    # this test should pass with no issue, to assert just check that the time
+    # it returns is within some small range
+    predicted_finish_time = datetime.now() + timedelta(seconds=5)
+    assert (predicted_finish_time - standup_start(user["token"], channel["channel_id"]) <= timedelta(6))
 
     # returns a ValueError if the channel doesn't exist
     pytest.raises(ValueError, standup_start, user["token"], "not_a_real_channel")
 
     # returns an AccessError if the user does not have perms
-    pytest.raises(AccessError, standup_start, "badtoken", channel)
+    pytest.raises(AccessError, standup_start, user2["token"], channel["channel_id"])
