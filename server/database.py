@@ -14,6 +14,7 @@ class User:
         self._email = email
         self._handle = first_name + last_name
         self._global_admin = global_admin
+        self._slackr_owner = False
     
     
     def get_user_data(self):
@@ -81,6 +82,10 @@ class User:
 
     def is_global_admin(self):
         return self._global_admin
+    
+
+    def is_slackr_owner(self):
+        return self._slackr_owner
 
 
 class Channel:

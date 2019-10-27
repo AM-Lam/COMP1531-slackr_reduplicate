@@ -7,33 +7,29 @@ from .message_send import *
 from .database import *
 
 
-clear_data()
+def test_run_all():
+    clear_data()
+
+    # initialisation
+    user1 = auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
+    user2 = auth_register('user2@domain.com' , 'vscod231343' , 'ussr' , 'b')
+    user3 = auth_register('user3@domain.com' , 'lollollmao' , 'the' , 'rabbit')
+    
+    token1 = user1['token']
+    token2 = user2['token']
+    token3 = user3['token']
+    
+    uid1 = user1['u_id']
+    uid2 = user2['u_id']
+    uid3 = user3['u_id']
 
 
-#############################################################################################################################################
+    # channel does not exist
+    def test_channel_exists_or_not():
+        with pytest.raises(ValueError, match=r"*"):
+            does_channel_exist(9999999999999999)
 
-# initialisation
-user1 = auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
-user2 = auth_register('user2@domain.com' , 'vscod231343' , 'ussr' , 'b')
-user3 = auth_register('user3@domain.com' , 'lollollmao' , 'the' , 'rabbit')
-token1 = user1['token']
-token2 = user2['token']
-token3 = user3['token']
-uid1 = user1['u_id']
-uid2 = user2['u_id']
-uid3 = user3['u_id']
-
-########################################################################################################################
-
-# channel does not exist
-def test_channel_exists_or_not():
-    with pytest.raises(ValueError, match=r"*"):
-        does_channel_exist(9999999999999999)
-        
-
-############################################################################################################################################
-# start greater than the total number of messages
-def test_is_start_too_big():
+    # start greater than the total number of messages
     # user1 will be the channel owner
     unswchannel = channels_create(token1, 'unswchannel', True)
     unswchannelid = unswchannel['channel_id']
@@ -49,9 +45,7 @@ def test_is_start_too_big():
     with pytest.raises(ValueError, match=r"*"):
         channel_messages(token1, unswchannelid, 93)
 
-############################################################################################################################################
-# INVALID USER
-def test_not_a_member():
+    # INVALID USER
     # user1 will be the channel owner
     usydchannel = channels_create(token1, 'usydchannel', True)
     usydchannelid = usydchannel['channel_id']
@@ -64,11 +58,9 @@ def test_not_a_member():
         message_send(token1, usydchannelid, messageloop)
     # now lets call channel messages...
     with pytest.raises(AccessError, match=r"*"):
-        channel_messages(token3, usydchannelid, 2) # TOKEN 3 IS NOT A PART OF THE CHANNEL
+        channel_messages(token3, usydchannelid, 2)
 
-###########################################################################################################################################
-# END SHOULD BE -1 AS THE LEAST RECENT MESSAGE WAS SENT OUT.....
-def test_is_end_negative():
+    # END SHOULD BE -1 AS THE LEAST RECENT MESSAGE WAS SENT OUT
     # user1 will be the channel owner
     yeetchannel = channels_create(token1, 'yeetchannel', True)
     yeetchannelid = yeetchannel['channel_id']
@@ -85,9 +77,7 @@ def test_is_end_negative():
     assert mesdict['start'] == 40
     assert mesdict['end'] == -1
 
-###########################################################################################################################################
-# SOME IN BETWEEN INTERVAL TESTING:::::::::::::::::::::::::::::::::
-def test_intervals():
+    # SOME IN BETWEEN INTERVAL TESTING
     # user1 will be the channel owner
     unichannel = channels_create(token1, 'unichannel', True)
     unichannelid = unichannel['channel_id']
@@ -103,4 +93,3 @@ def test_intervals():
     mesdict1 = channel_messages(token1, unichannelid, 10)
     assert mesdict1['start'] == 10
     assert mesdict1['end'] == 60
-

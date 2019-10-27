@@ -2,13 +2,13 @@ import pytest
 from .channel_leave import channel_leave
 from .auth_register import auth_register
 from .channels_create import channels_create
+from .access_error import *
 from .database import *
 
 
-clear_data()
-
-
 def test_channel_leave():
+    clear_data()
+
     # boilerplate user and channel creation stuff, comment out until
     # auth_register is working
     user1 = auth_register("valid@email.com", "verystrong", "John", "Doe")

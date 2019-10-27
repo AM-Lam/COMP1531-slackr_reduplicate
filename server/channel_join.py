@@ -1,6 +1,6 @@
 import jwt
 from .database import *
-from .access_error import AccessError
+from .access_error import *
 from .channels_listall import channels_listall
 
 
@@ -12,7 +12,7 @@ def channel_join(token, channel_id):
     # if the token is invalid throw an access error, since auth_register is not
     # complete just assume all tokens are valid
     if not server_data["tokens"].get(token, False):
-        raise AccessError
+        raise AccessError(description="This token is invalid")
 
 
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])

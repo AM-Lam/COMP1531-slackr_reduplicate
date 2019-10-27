@@ -1,20 +1,21 @@
+import pytest
 from .auth_register import *
 from .channels_create import *
 from .channel_join import *
 from .channel_invite import *
 from .database import *
-import pytest
-
-
 
 
 def test_run_first():
     clear_data()
+    
     # first we create two users:
-    user1 = auth_register('user1@domain.com' , 'passew@321', 'user' , 'a')
-    user2 = auth_register('user2@domain.com' , 'vscod231343', 'ussr' , 'b')
+    user1 = auth_register('user1@domain.com' , '1234567890', 'user' , 'a')
+    user2 = auth_register('user2@domain.com' , '0987654321', 'ussr' , 'b')
+    
     token1 = user1['token']
     token2 = user2['token']
+    
     uid1 = user1['u_id']
     uid2 = user2['u_id']
 

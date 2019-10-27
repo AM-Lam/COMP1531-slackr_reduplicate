@@ -1,24 +1,43 @@
+import pytest
 from .database import *
+from .access_error import *
 from .admin_userpermission_change import admin_userpermission_change
 from .auth_register import auth_register
-from .access_error import AccessError
-import pytest
 
 
 def test_admin_userpermission_change():
     clear_data()
-    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
     
-    # this test should pass with no issue
-    assert admin_userpermission_change(user["token"], 12345, 1) == None
+    user1 = auth_register("valid@email.com", "1234567890", "John", "Doe")
+    user2 = auth_register("valid2@email.com", "1234567890", "Bob", "Doe")
+    user3 = auth_register("valid3@email.com", "1234567890", "Jane", "Doe")
+    user4 = auth_register("valid4@email.com", "1234567890", "Jen", "Doe")
 
-    # if the user is invalid
-    pytest.raises(ValueError, admin_userpermission_change, user["token"], 54321, 1)
+    # as a slackr owner attempt to make a member an admin
+    assert admin_userpermission_change(user1["token"], user2["u_id"], 2) == {}
 
-    # if the permission is invalid
-    pytest.raises(ValueError, admin_userpermission_change, user["token"], 12345, -1)
+    # as an admin attempt to make a member an admin
+    assert admin_userpermission_change(user2["token"], user3["u_id"], 2) == {}
 
-    pytest.raises(ValueError, admin_userpermission_change, user["token"], 12345, 3)
+    # as an admin try to make a slackr owner a member, this should fail
+    pytest.raises(AccessError, admin_userpermission_change, user2["token"], user1["u_id"], 3)
 
-    # if the user is not an admin/owner
-    pytest.raises(AccessError, admin_userpermission_change, "badtoken", 12345, -1)
+    # as an admin try to make an admin a slackr owner, this should fail
+    pytest.raises(AccessError, admin_userpermission_change, user2["token"], user3["u_id"], 1)
+
+    # as a regular member try to change somebody's perms, this should fail
+    pytest.raises(AccessError, admin_userpermission_change, user4["token"], user3["u_id"], 3)
+
+    # try to run with an invalid token
+    pytest.raises(AccessError, admin_userpermission_change, 000, user3["u_id"], 1)
+
+    # try to run with a user that does not exist
+    pytest.raises(ValueError, admin_userpermission_change, user2["token"], 666, 3)
+
+    # try to change to a permision_id that is invalid (too low), this should
+    # fail
+    pytest.raises(ValueError, admin_userpermission_change, user2["token"], user4["u_id"], 0)
+
+    # try to change to a permision_id that is invalid (too high), this should
+    # fail
+    pytest.raises(ValueError, admin_userpermission_change, user2["token"], user4["u_id"], 4)
