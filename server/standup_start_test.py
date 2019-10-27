@@ -16,7 +16,8 @@ def test_standup_start():
 
     # this test should pass with no issue, to assert just check that the time
     # it returns is within some small range
-    predicted_finish_time = datetime.now() + timedelta(seconds=5)
+    dev_time = 5
+    predicted_finish_time = datetime.now() + timedelta(seconds=dev_time)
     assert (predicted_finish_time - standup_start(user["token"], channel["channel_id"]) <= timedelta(6))
 
     # returns a ValueError if the channel doesn't exist
