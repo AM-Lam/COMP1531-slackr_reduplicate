@@ -96,6 +96,8 @@ class Channel:
         self._members = creator             # members of the channel, just a list
                                             # of u_ids
         
+        self._pinned_messages = []
+        
         self._owners = creator.copy()       # owners of the channel, initially set to
                                             # the creator of the channel, this must
                                             # be a copy so that changing it doesn't
@@ -160,6 +162,10 @@ class Channel:
     
     def get_m_id(self):
         return self._message_id_max
+
+    
+    def get_pins(self):
+        return self._pinned_messages
     
     
     def set_id(self, id):
@@ -192,6 +198,10 @@ class Channel:
 
     def set_standup(self, standup):
         self._standup = standup
+    
+
+    def add_pin(self, message_id):
+        self._pinned_messages.append(message_id)
 
  
 class Messages:

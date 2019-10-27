@@ -11,7 +11,7 @@ def message_edit(token, message_id, message):
     u_id = token_payload["u_id"]
     
     # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, True):
+    if not server_data["tokens"].get(token, False):
         raise AccessError(description="This token is invalid")
 
     # Message is more than 1000 characters

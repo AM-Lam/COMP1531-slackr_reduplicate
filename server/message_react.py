@@ -10,7 +10,7 @@ def message_react(token, message_id, react_id):
     u_id = token_payload["u_id"]
 
     # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, True):
+    if not server_data["tokens"].get(token, False):
         raise AccessError(description="This token is invalid")
 
     # Message with message_id was not sent by the authorised user making this request

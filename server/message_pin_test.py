@@ -21,7 +21,7 @@ def test_message_pin():
     # check that the message exists
     assert message_1 is not None
     
-    assert message_pin(user1["token"], message_1['message_id']) is None
+    assert message_pin(user1["token"], message_1['message_id']) == {}
 
 def test_no_message1():
     clear_data()

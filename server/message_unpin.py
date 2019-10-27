@@ -7,7 +7,7 @@ def message_unpin(token, message_id):
     server_data = get_data()
 
     # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, True):
+    if not server_data["tokens"].get(token, False):
         raise AccessError(description="This token is invalid")
 
     # now grab the u_id associated with the provided token

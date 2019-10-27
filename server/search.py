@@ -29,10 +29,8 @@ def check_valid_token(token):
     SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
 
-    try:
-        for x in DATABASE["users"]:
-            user_id = x.get_u_id()
-            if user_id == token["u_id"]:
-                return user_id
-    except Exception as e:
-        raise ValueError(description="token invalid")
+    for x in DATABASE["users"]:
+        user_id = x.get_u_id()
+        if user_id == token["u_id"]:
+            return user_id
+    raise ValueError(description="token invalid")
