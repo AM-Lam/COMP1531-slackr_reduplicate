@@ -1,3 +1,4 @@
+import jwt
 from .access_error import *
 from .database import *
 
@@ -15,10 +16,8 @@ def search(token, query_str):
     message_match = []
     
     # TODO: write check for if user has access to channel
-    for channels in DATABASE["channels"]:
-        channel_dictionary = channels.get_channel_data()
-        messages_list = channel_dictionary["messages"]
-        for message in messages_list:
+    for channel in DATABASE["channels"]:
+        for message in channel.get_messages():
             if query_str in message:
                 message_match.append(message)
 
