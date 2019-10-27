@@ -21,6 +21,11 @@ unswchannel = channels_create(token1, "unswchannel", True)
 unswchannelid = unswchannel['channel_id']
 # user1 is now a part of unswchannel
 
+# test if the user is valid.
+def test_validite():
+    with pytest.raises(ValueError , match=r"*"):
+        channel_invite('3131313133', unswchannelid, uid2)
+
 # test if user does not exist on application database
 def test_verify_user_validity():
     with pytest.raises(ValueError , match=r"*"):

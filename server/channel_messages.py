@@ -1,5 +1,6 @@
 from .access_error import AccessError 
 from .database import *
+import jwt
 
 
 def channel_messages(token, channel_id, start):
@@ -55,20 +56,23 @@ def retrive_message_list(channel_id, start, end):
     for channel in update_data['channels']:     # looping through the channels list(high-level). 
         if channel._channel_id == channel_id:   # if we find the correct channel then go into the channel.
             length = len(channel._messages)     # retriving the number of messages in that channel.
-            if end == -1:                       # if end is -1 then we want to return all remaining messages.
-                idx = 1 + start                 # idx is the index for the message list. starts at 1 because if start is zero then we want the index for the first message to be 1.
-                # looping through the message list reversed, because we want the most recent message first 
-                # and using splicing to specify message range.
-                for i in reversed(channel._messages)[start:length]:  
-                    diction = {'message_id':idx , 'u_id':i._u_id , 'message':i._text , 'time_created':i._time_sent , 'reacts':i._reacts , 'is_pinned':i._pinned}
-                    messages.append(diction)
-                    idx += 1
+            if start <= length:
+                if end == -1:                       # if end is -1 then we want to return all remaining messages.
+                    idx = 1 + start                 # idx is the index for the message list. starts at 1 because if start is zero then we want the index for the first message to be 1.
+                    # looping through the message list reversed, because we want the most recent message first 
+                    # and using splicing to specify message range.
+                    for i in reversed(channel._messages)[start:length]:  
+                        diction = {'message_id':idx , 'u_id':i._u_id , 'message':i._text , 'time_created':i._time_sent , 'reacts':i._reacts , 'is_pinned':i._pinned}
+                        messages.append(diction)
+                        idx += 1
+                else:
+                    idx = 1 + start
+                    # looping through the message list reversed, because we want the most recent message first 
+                    # and using splicing to specify message range.
+                    for i in reversed(channel._messages)[start:end]:
+                        diction = {'message_id':idx , 'u_id':i._u_id , 'message':i._text , 'time_created':i._time_sent , 'reacts':i._reacts , 'is_pinned':i._pinned}
+                        messages.append(diction)
+                        idx += 1
             else:
-                idx = 1 + start
-                # looping through the message list reversed, because we want the most recent message first 
-                # and using splicing to specify message range.
-                for i in reversed(channel._messages)[start:end]:
-                    diction = {'message_id':idx , 'u_id':i._u_id , 'message':i._text , 'time_created':i._time_sent , 'reacts':i._reacts , 'is_pinned':i._pinned}
-                    messages.append(diction)
-                    idx += 1
+                raise ValueError('start is greater then the total number of messages!')
     return messages

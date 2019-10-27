@@ -7,12 +7,6 @@ from .message_send import *
 
 
 #############################################################################################################################################
-# channel does not exist
-def test_channel_exists_or_not():
-    with pytest.raises(ValueError, match=r"*"):
-        does_channel_exist(9999999999999999)
-
-########################################################################################################################
 
 # initialisation
 user1 = auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
@@ -24,6 +18,14 @@ token3 = user3['token']
 uid1 = user1['u_id']
 uid2 = user2['u_id']
 uid3 = user3['u_id']
+
+########################################################################################################################
+
+# channel does not exist
+def test_channel_exists_or_not():
+    with pytest.raises(ValueError, match=r"*"):
+        does_channel_exist(9999999999999999)
+        
 
 ############################################################################################################################################
 # start greater than the total number of messages
