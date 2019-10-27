@@ -67,14 +67,6 @@ def user_logout():
     dumpstring = auth_logout.auth_logout(token)
     return dumps (dumpstring)
 
-
-@APP.route('/auth/passwordreset/request', methods=['POST'])
-def email_request():
-    email = request.form.get('email')
-    dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
-    print(send_code(email, dumpstring))
-    return dumps({})
-
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
     email = request.form.get('email')
@@ -126,8 +118,6 @@ def run_channels_create():
                                                    request_data["name"],
                                                    bool(request_data["is_public"]))
 
-<<<<<<< HEAD
-=======
     return dumps(return_value)
 
 @APP.route('/message/send', methods=["POST"])
@@ -152,7 +142,7 @@ def run_message_remove():
     """
     request_data = request.get_json()
     return_value = ""
-        return_value = message_remove.message_remove(request_data["token"],
+    return_value = message_remove.message_remove(request_data["token"],
                                                     request_data["message_id"]
                                                     )
 
@@ -212,8 +202,6 @@ def run_message_pin():
                                             request_data["message_id"]
                                         )
 
-    
->>>>>>> master
     return dumps(return_value)
 
 @APP.route('/message/unpin', methods=["POST"])
@@ -246,16 +234,6 @@ def run_user_profile():
 @APP.route("/channel/leave", methods=["POST"])
 def run_channel_leave():
     request_data = request.get_json()
-    return_value = channel_leave.channel_leave( request_data["token"],
-                                                request_data["channel_id"]
-                                            )
-
-    return dumps(return_value)
-
-
-@APP.route("/channel/leave", methods=["POST"])
-def run_channel_leave():
-    request_data = request.get_json()
     return_value = channel_leave.channel_leave(request_data["token"],
                                                request_data["channel_id"])
 
@@ -279,13 +257,7 @@ def run_channels_listall():
 @APP.route('/channels/list', methods=['POST'])
 def run_channels_list():
     request_data = request.get_json()
-<<<<<<< HEAD
-    return_value = channels_list.channels_list(
-        request_data["token"]
-    )
-=======
     return_value = channels_list.channels_list(request_data["token"])
->>>>>>> master
 
     return dumps(return_value)
 
@@ -332,11 +304,6 @@ def run_channel_addowner():
 
     return dumps(return_value)
 
-
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 @APP.route('/channel/removeowner', methods=["POST"])
 def run_channel_removeowner():
     request_data = request.get_json()
@@ -361,10 +328,6 @@ def run_message_sendlater():
 
     return dumps(return_value)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 @APP.route('/user/profile/setname', methods=["PUT"])
 def run_profile_setname():
     request_data = request.get_json()
@@ -376,10 +339,6 @@ def run_profile_setname():
 
     return dumps(return_value)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 @APP.route('/user/profile/setemail', methods=["PUT"])
 def run_profile_setemail():
     request_data = request.get_json()
@@ -390,10 +349,6 @@ def run_profile_setemail():
 
     return dumps(return_value)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 @APP.route('/user/profile/sethandle', methods=["PUT"])
 def run_profile_sethandle():
     request_data = request.get_json()
@@ -404,10 +359,6 @@ def run_profile_sethandle():
 
     return dumps(return_value)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 @APP.route('/user/profile/uploadphoto', methods=["POST"])
 def run_profile_uploadphoto():
     request_data = request.get_json()
@@ -422,10 +373,6 @@ def run_profile_uploadphoto():
 
     return dumps(return_value)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 @APP.route('/standup/start', methods=["POST"])
 def run_standup_start():
     request_data = request.get_json()
@@ -436,10 +383,6 @@ def run_standup_start():
 
     return dumps(return_value)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 @APP.route('/standup/send', methods=["POST"])
 def run_standup_send():
     request_data = request.get_json()
@@ -451,10 +394,6 @@ def run_standup_send():
 
     return dumps(return_value)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 @APP.route('/search', methods=["GET"])
 def run_search():
     request_data = request.get_json()
@@ -465,10 +404,6 @@ def run_search():
 
     return dumps(return_value)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 @APP.route('/admin/userpermission/change', methods=["POST"])
 def run_admin_userpermission_change():
     request_data = request.get_json()
@@ -480,10 +415,6 @@ def run_admin_userpermission_change():
 
     return dumps(return_value)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 if __name__ == '__main__':
     APP.run(port=(sys.argv[1] if len(sys.argv) > 1 else 5000))
 
