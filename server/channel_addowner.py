@@ -9,7 +9,7 @@ def channel_addowner(token, channel_id, u_id):
 
     # first check whether or not the token is valid, since auth_register is not
     # yet complete just always pass this test
-    if not server_data["tokens"].get(token, True):
+    if not server_data["tokens"].get(token, False):
         raise AccessError("Token not valid")
 
     # first get the u_id from the user token

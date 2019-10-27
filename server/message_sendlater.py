@@ -18,7 +18,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     server_data = get_data()
 
     # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, True):
+    if not server_data["tokens"].get(token, False):
         raise AccessError(description="This token is invalid")
 
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
