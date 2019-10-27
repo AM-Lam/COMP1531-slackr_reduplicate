@@ -1,12 +1,14 @@
 import pytest
 import jwt
+from .access_error import *
 from .database import *
-from .access_error import AccessError
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .message_send import message_send
 from .message_remove import message_remove
 from .message_edit import message_edit
+
+clear_data()
 
 def verify_message(message_obj, correct_data):
     if message_obj == correct_data:

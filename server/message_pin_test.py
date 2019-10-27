@@ -1,14 +1,16 @@
 import pytest
 import jwt
-from .database import *
 from .access_error import *
+from .database import *
+from .message_pin import message_pin
+from .channel_leave import channel_leave
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .message_send import message_send
 from .message_remove import message_remove
-from .message_pin import message_pin
 
 def test_message_pin():
+    clear_data()
     user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
 
     channel_id = channels_create(user1["token"], "Channel 1", True)
@@ -22,6 +24,7 @@ def test_message_pin():
     assert message_pin(user1["token"], message_1['message_id']) is None
 
 def test_no_message1():
+    clear_data()
     user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
 
     channel_id = channels_create(user1["token"], "Channel 1", True)

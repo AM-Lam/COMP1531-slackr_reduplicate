@@ -2,17 +2,16 @@ import pytest
 from .channel_leave import channel_leave
 from .auth_register import auth_register
 from .channels_create import channels_create
+from .database import *
 
+
+clear_data()
 
 
 def test_channel_leave():
     # boilerplate user and channel creation stuff, comment out until
     # auth_register is working
-    # user1 = auth_register("valid@email.com", "verystrong", "John", "Doe")
-    
-    user1 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.QPTH6fx8Z7D3E7GwZ9PybLC8I5Sfzna4pOM73yen1MM"
-    }
+    user1 = auth_register("valid@email.com", "verystrong", "John", "Doe")
     
     channel1 = channels_create(user1["token"], "New Channel", True)
     channel2 = channels_create(user1["token"], "A New Channel", False)

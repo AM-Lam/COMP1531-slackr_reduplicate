@@ -12,6 +12,7 @@ def verify_message(message_obj, correct_data):
     return False
 
 def test_message_send():
+    clear_data()
     # user1 = auth_register("valid@email.com", "144234", "Bob", "Jones")
 
     # just got the u_id by putting fake data into jwt.io

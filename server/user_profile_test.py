@@ -2,14 +2,17 @@ import pytest
 from .access_error import *
 from .auth_register import auth_register
 from .user_profile import user_profile
+from .database import *
 
 def verify_info(user_obj, correct_data):
+    clear_data()
     # print(message_obj.__dict__)
     if user_obj.__dict__ == correct_data:
         return True
     return False
 
 def test_user_profile():
+    clear_data()
     user1 = auth_register("valid@email.com", "1234567", "Bob", "Jones")
 
     # try to create a valid message

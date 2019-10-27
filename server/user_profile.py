@@ -2,6 +2,7 @@ import jwt
 from .database import *
 from .access_error import *
 
+
 def user_profile(token, u_id):
     server_data = get_data()
 

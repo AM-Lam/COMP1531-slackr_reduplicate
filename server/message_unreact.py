@@ -1,8 +1,8 @@
 import jwt
-import threading
 from .database import *
 from .access_error import *
-    
+
+
 def message_unreact(token, message_id, react_id):
     server_data = get_data()
 
@@ -48,13 +48,12 @@ def message_unreact(token, message_id, react_id):
         raise AccessError("Invalid unreact")
 
     if obj_request._reacts['is_this_user_reacted'] == False:
-                raise ValueError(description="Invalid unreact")
-            # update react
+        raise ValueError(description="Invalid unreact")
+    else:
+        for item in obj_request._reacts:
+            if item['u_id'] == u_id:
+                item['is_this_user_reacted'] = False
+                del item
             else:
-                for item in obj_request._reacts:
-                    if item['u_id'] == u_id:
-                        item['is_this_user_reacted'] = False
-                        del item
-                    else:
-                        raise AccessError(description="Invalid unreact")
+                raise AccessError(description="Invalid unreact")
 

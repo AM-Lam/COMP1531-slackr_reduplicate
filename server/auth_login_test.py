@@ -4,12 +4,16 @@ from .database import *
 from .auth_login import *
 from .auth_register import *
 
-user_1 = auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
-user_2 = auth_register('user2@domain.com' , 'vscod231343' , 'ussr' , 'b')
-user_3 = auth_register('user3@domain.com.au' , 'vsdco23111' , 'person' , 'c')
 
 def test_successfulLogin():
+    clear_data()
+
+    user_1 = auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
+    user_2 = auth_register('user2@domain.com' , 'vscod231343' , 'ussr' , 'b')
+    user_3 = auth_register('user3@domain.com.au' , 'vsdco23111' , 'person' , 'c')
+    
     token = auth_login('user1@domain.com' ,'passew@321')
+    
     assert token['token'] is not None
     assert token['u_id'] is not None
 
@@ -192,7 +196,7 @@ def test_validate_password2():
 
 def test_validate_password3():
     # what if the password exists on the server but is not correctly matched to the provided email -->
-    pytest.raises(ValueError, validate_password, 'user1@domain.com' , 'vscod231343')
+    pytest.raises(ValueError, validate_password, 'user3@domain.com' , 'sfdsdfsdfsdfsffsf')
 
 def test_validate_password4():
     # what if the email and password combo is valid? -->

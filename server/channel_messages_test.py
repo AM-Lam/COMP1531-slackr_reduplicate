@@ -1,18 +1,16 @@
+import pytest
 from .channel_messages import *
 from .channels_create import *
-import pytest
 from .auth_register import *
 from .channel_invite import *
 from .message_send import *
+from .database import *
+
+
+clear_data()
 
 
 #############################################################################################################################################
-# channel does not exist
-def test_channel_exists_or_not():
-    with pytest.raises(ValueError, match=r"*"):
-        does_channel_exist(9999999999999999)
-
-########################################################################################################################
 
 # initialisation
 user1 = auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
@@ -24,16 +22,24 @@ token3 = user3['token']
 uid1 = user1['u_id']
 uid2 = user2['u_id']
 uid3 = user3['u_id']
-# user1 will be the channel owner
-unswchannel = channels_create(token1, 'unswchannel', True)
-unswchannelid = unswchannel['channel_id']
+
+########################################################################################################################
+
+# channel does not exist
+def test_channel_exists_or_not():
+    with pytest.raises(ValueError, match=r"*"):
+        does_channel_exist(9999999999999999)
+        
 
 ############################################################################################################################################
 # start greater than the total number of messages
 def test_is_start_too_big():
+    # user1 will be the channel owner
+    unswchannel = channels_create(token1, 'unswchannel', True)
+    unswchannelid = unswchannel['channel_id']
     # adding user 2 and 3 to the channel
-    channel_invite(token2, unswchannelid, uid2)
-    channel_invite(token3, unswchannelid, uid3)
+    channel_invite(token1, unswchannelid, uid2)
+    channel_invite(token1, unswchannelid, uid3)
     # lets send 70 messages.......
     initmessage = 'lots of'
     for i in range(0, 70):
@@ -50,7 +56,7 @@ def test_not_a_member():
     usydchannel = channels_create(token1, 'usydchannel', True)
     usydchannelid = usydchannel['channel_id']
     # adding  ONLY user 2 to the channel
-    channel_invite(token2, usydchannelid, uid2)
+    channel_invite(token1, usydchannelid, uid2)
     # lets send 70 messages.......
     initmessage = 'lots of'
     for i in range(0, 70):
@@ -67,8 +73,8 @@ def test_is_end_negative():
     yeetchannel = channels_create(token1, 'yeetchannel', True)
     yeetchannelid = yeetchannel['channel_id']
     # adding user 2 and 3 to the channel
-    channel_invite(token2, yeetchannelid, uid2)
-    channel_invite(token3, yeetchannelid, uid3)
+    channel_invite(token1, yeetchannelid, uid2)
+    channel_invite(token1, yeetchannelid, uid3)
     # lets send 70 messages.......
     initmessage = 'lots of'
     for i in range(0, 70):
@@ -86,8 +92,8 @@ def test_intervals():
     unichannel = channels_create(token1, 'unichannel', True)
     unichannelid = unichannel['channel_id']
     # adding user 2 and 3 to the channel
-    channel_invite(token2, unichannelid, uid2)
-    channel_invite(token3, unichannelid, uid3)
+    channel_invite(token1, unichannelid, uid2)
+    channel_invite(token1, unichannelid, uid3)
     # lets send 70 messages.......
     initmessage = 'lots of'
     for i in range(0, 70):

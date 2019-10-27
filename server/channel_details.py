@@ -1,12 +1,13 @@
 from .database import *
 from .access_error import AccessError
+import jwt
 
 
 def channel_details(token, channel_id):
     update_data = get_data()
     if token in update_data['tokens'].keys():  # here check if token is a valid token.
         check_channel_existence(channel_id)    # this will check if the chanel exists. 
-        details = verify_user_status(token)    # this will check if the user is in the channel and will get channel details.
+        details = verify_user_status(token, channel_id)    # this will check if the user is in the channel and will get channel details.
         return details
     else:
         raise ValueError("the given token does not exist")
@@ -31,12 +32,16 @@ def verify_user_status(token, channel_id):
     for channel in update_data['channels']:
         if channel._channel_id == channel_id:
             for people in channel._members:                
-                if people == user_id
-                    flag = 1                    # flag is one if the user is a member of the channel.    
+                if people == user_id:
+                    # flag is one if the user is a member of the channel.
+                    flag = 1    
+
     if flag == 1:
-        c_name = channels._channel_name
-        c_omembers = channels._owners
-        c_amembers = channels._members
-        return {"name" : c_name, "owner_members" : c_omembers, "all_members" : c_amembers} 
+        for channeli in update_data['channels']:
+            if channeli._channel_id == channel_id:
+                c_name = channeli._channel_name
+                c_omembers = channeli._owners
+                c_amembers = channeli._members
+                return {"name" : c_name, "owner_members" : c_omembers, "all_members" : c_amembers} 
     else:
         raise AccessError('user is not a part of the channel... does not have correct permissions.')
