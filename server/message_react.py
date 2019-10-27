@@ -1,5 +1,5 @@
 import jwt
-from .database import *
+from .database import get_data, get_secret
 from .access_error import *
 
 def message_react(token, message_id, react_id):

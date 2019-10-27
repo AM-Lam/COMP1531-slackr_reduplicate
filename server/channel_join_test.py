@@ -2,8 +2,8 @@ import pytest
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .channel_join import channel_join
+from .database import clear_data
 from .access_error import *
-from .database import *
 
 
 def test_channel_join():

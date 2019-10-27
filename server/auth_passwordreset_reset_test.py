@@ -1,9 +1,9 @@
 import pytest
 import hashlib
-from .auth_register import *
-from .auth_passwordreset_request import *
-from .auth_passwordreset_reset import *
-from .database import *
+from .auth_register import auth_register
+from .auth_passwordreset_request import auth_passwordreset_request
+from .auth_passwordreset_reset import auth_passwordreset_reset, chec_password_strength
+from .database import clear_data, get_data
 from .access_error import *
 
 
@@ -17,7 +17,7 @@ def test_reset_test():
 
     pytest.raises(ValueError, auth_passwordreset_reset, "123@!@" , 'abcdefgh')
 
-    assert(chec_password_strength("sdfadffsfsfeasdadew"))
+    assert chec_password_strength("sdfadffsfsfeasdadew")
 
     pytest.raises(ValueError, chec_password_strength, 'pew')
 

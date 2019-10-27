@@ -1,6 +1,6 @@
 import jwt
 from .channels_list import channels_list
-from .database import *
+from .database import get_data, get_secret
 from .access_error import *
 
 
@@ -25,10 +25,12 @@ def message_pin(token, message_id):
     if user_ == None:
         raise ValueError("u_id does not belong to a real user")
     
-    # Message with message_id was not sent by the authorised user making this request
-    # person who send this message is not the sender and not an admin or owner in the channel
+    # Message with message_id was not sent by the authorised user making this
+    # request person who send this message is not the sender and not an admin
+    # or owner in the channel
     channel_ = None
     message_ = None
+    
     # add the message to the server database
     for channel in server_data["channels"]:
         for message in channel._messages:

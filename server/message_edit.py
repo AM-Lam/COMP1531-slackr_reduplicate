@@ -1,6 +1,6 @@
 import jwt
 import threading
-from .database import *
+from .database import get_data, get_secret
 from .access_error import *
 
 def message_edit(token, message_id, message):
@@ -24,7 +24,7 @@ def message_edit(token, message_id, message):
     channel_ = None
     # add the message to the server database
     for channel in server_data["channels"]:
-        for m in channel._messages:
+        for m in channel.get_messages():
             if m.get_m_id() == message_id:
                 channel_ = channel
                 message_ = m
@@ -36,7 +36,8 @@ def message_edit(token, message_id, message):
     user_ = None
     for user in server_data["users"]:
         if user.get_u_id() == u_id:
-            if message_.get_u_id() != u_id and not user.is_global_admin() and not u_id in channel_.get_owners():
+            if (message_.get_u_id() != u_id and not user.is_global_admin()
+                and not u_id in channel_.get_owners()):
                 break
             user_ = user
             break
