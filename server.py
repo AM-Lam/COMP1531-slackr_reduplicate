@@ -47,7 +47,7 @@ def register():
     password = request.form.get('password')
     email = request.form.get('email')
     dumpstring = auth_register.auth_register(email, password, first_name, last_name)
-    return dumps (dumpstring)
+    return dumps(dumpstring)
 
 
 @APP.route('/auth/login', methods=['POST'])
@@ -55,14 +55,14 @@ def login():
     email = request.form.get('email')
     password = request.form.get('password')
     dumpstring = auth_login.auth_login(email, password)
-    return dumps (dumpstring)
+    return dumps(dumpstring)
 
 
 @APP.route('/auth/logout', methods=['POST'])
 def user_logout():
     token = request.form.get('token')
     dumpstring = auth_logout.auth_logout(token)
-    return dumps (dumpstring)
+    return dumps(dumpstring)
 
 
 @APP.route('/auth/passwordreset/request', methods=['POST'])
@@ -78,7 +78,7 @@ def email_reset():
     reset_code = request.form.get('reset_code')
     new_password = request.form.get('new_password')
     dumpstring = auth_passwordreset_reset.auth_passwordreset_reset(reset_code, new_password)
-    return dumps (dumpstring)
+    return dumps(dumpstring)
 
 
 @APP.route('/channel/invite', methods=['POST'])
@@ -87,24 +87,24 @@ def channel_invite_e():
     channel_id = request.form.get('channel_id')
     u_id = request.form.get('u_id')
     dumpstring = channel_invite.channel_invite(token,channel_id,u_id)
-    return (dumpstring)
+    return dumps(dumpstring)
 
 
 @APP.route('/channel/details', methods=['GET'])
 def channel_details_e():
-    token = request.form.get('token')
-    channel_id = request.form.get('channel_id')
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
     dumpstring = channel_details.channel_details(token,channel_id)
-    return (dumpstring)
+    return dumps(dumpstring)
 
 
 @APP.route('/channel/messages', methods=['GET'])
 def channel_messages_e():
-    token = request.form.get('token')
-    channel_id = request.form.get('channel_id')
-    start = request.form.get('start')
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
     dumpstring = channel_messages.channel_messages(token,channel_id, start)
-    return (dumpstring)
+    return dumps(dumpstring)
 
 
 @APP.route('/channels/create', methods=["POST"])
@@ -134,6 +134,7 @@ def run_message_send():
 
     return dumps(return_value)
 
+
 @APP.route('/message/remove', methods=["DELETE"])
 def run_message_remove():
     """ 
@@ -145,6 +146,7 @@ def run_message_remove():
                                                  request_data["message_id"])
 
     return dumps(return_value)
+
 
 @APP.route('/message/edit', methods=["PUT"])
 def run_message_edit():
@@ -226,7 +228,7 @@ def run_user_profile():
         run the message_react function to react a message and
         add it to the server database
     """
-    request_data = request.form
+    request_data = request.args
     return_value = user_profile.user_profile(request_data["token"],
                                              request_data["u_id"])
 
@@ -242,7 +244,7 @@ def run_channel_leave():
     return dumps(return_value)
 
 
-@APP.route('/channels/listall', methods=["POST"])
+@APP.route('/channels/listall', methods=["GET"])
 def run_channels_listall():
     """
     Retrieve a list of all the channels that have been created and return
@@ -250,15 +252,15 @@ def run_channels_listall():
     can do this, regardless of what their token is but I will follow this up
     with the stakeholders.
     """
-    request_data = request.form
+    request_data = request.args
     return_value = channels_listall.channels_listall(request_data["token"])
 
     return dumps(return_value)
 
 
-@APP.route('/channels/list', methods=['POST'])
+@APP.route('/channels/list', methods=['GET'])
 def run_channels_list():
-    request_data = request.form
+    request_data = request.args
     return_value = channels_list.channels_list(request_data["token"])
 
     return dumps(return_value)
@@ -273,6 +275,7 @@ def run_channel_join():
     )
 
     return dumps(return_value)
+
 
 def send_code(email, code):
     try:
@@ -312,7 +315,7 @@ def run_channel_removeowner():
     return dumps(return_value)
 
 
-@APP.route('/message/sendlater')
+@APP.route('/message/sendlater', methods=["POST"])
 def run_message_sendlater():
     request_data = request.form
     return_value = channel_addowner.channel_addowner(
@@ -399,7 +402,7 @@ def run_standup_send():
 
 @APP.route('/search', methods=["GET"])
 def run_search():
-    request_data = request.form
+    request_data = request.args
     return_value = search.search(
         request_data["token"],
         request_data["query_str"],
@@ -421,6 +424,8 @@ def run_admin_userpermission_change():
 
 
 if __name__ == '__main__':
+    database.clear_data()
+
     APP.run(port=(sys.argv[1] if len(sys.argv) > 1 else 5000))
 
     # when the server exists dump the current database into a file
