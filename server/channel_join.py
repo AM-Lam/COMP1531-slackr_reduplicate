@@ -1,6 +1,6 @@
 import jwt
 from .database import *
-from .access_error import AccessError
+from .access_error import *
 from .channels_listall import channels_listall
 
 
