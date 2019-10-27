@@ -1,24 +1,33 @@
-from .channel_join import channel_join
-from .access_error import *
-from .database import *
 import jwt
 import time
+from .access_error import *
+from .database import *
 
 
 def channel_invite(token, channel_id, u_id):
     update_data = get_data()
-    if token in update_data['tokens'].keys():  # here check if token is a valid token.
-        SECRET = get_secret()                  # getting the secret from the database. 
-        verify_channel_exists(channel_id)      # making sure that the channel exists.
-        verify_user_validity(u_id)             # verifing that the user actually exists in the database.
-        verify_token_not_member(token, channel_id, u_id)    # verifiy that the uid is not a part of the channel.   
-        encoded = jwt.encode({'u_id': u_id , 'time': time.time()}, SECRET, algorithm='HS256').decode()
-        # we are not adding this new token to the active tokes list bc this is not a login function.
-        channel_join(encoded, channel_id)      # now that all the detals have been verified we join the user to the channel.
+
+    # here check if token is a valid token.
+    if token in update_data['tokens']:
+        # making sure that the channel exists.
+        verify_channel_exists(channel_id)
+
+        # verifing that the user actually exists in the database.
+        verify_user_validity(u_id)
+
+        # verifiy that the uid is not a part of the channel.
+        verify_token_not_member(token, channel_id, u_id)   
+
+        # now that all the detals have been verified we join the user to the channel.
+        
+        for c in update_data["channels"]:
+            if c.get_id() == channel_id:
+                c.add_member(u_id)
+
         return {}
     else:
         raise ValueError(description="the given token does not exist")
-      
+
 
 def verify_token_not_member(token, channel_id, u_id):
     update_data = get_data()
