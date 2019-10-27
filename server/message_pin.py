@@ -22,7 +22,9 @@ def message_pin(token, message_id):
             user_ = user
             break
     
-
+    if user_ == None:
+        raise ValueError("u_id does not belong to a real user")
+    
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
     channel_ = None
@@ -40,13 +42,13 @@ def message_pin(token, message_id):
     
     if user_.is_global_admin() == False and u_id not in channel_.get_owners():
         raise ValueError(description="Only admins and owners can pin messages!")
-
     #  Message with ID message_id is already pinned
     if message_._pinned == True:
-        raise ValueError(description="The message is pinned")
+        raise ValueError(description="The message is already pinned")
     else:
         # pin the message and add it to the channels list of pins
-        message_._pinned == True
+        message_._pinned = True
+        print(message_._pinned)
         channel_.add_pin(message_.get_m_id())
-    
+
     return {}
