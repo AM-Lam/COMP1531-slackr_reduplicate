@@ -51,6 +51,10 @@ class User:
         self._handle = new_handle
     
 
+    def set_global_admin(self, admin):
+        self._global_admin = admin
+    
+
     def get_u_id(self):
         return self._u_id
 
