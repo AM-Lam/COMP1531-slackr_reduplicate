@@ -1,20 +1,27 @@
+import pytest
 from .standup_start import standup_start
 from .channels_create import channels_create
-from .access_error import AccessError
-from datetime import timedelta, datetime
+from .access_error import *
 from .auth_register import auth_register
-import pytest
+from .database import *
+from datetime import timedelta, datetime
+
 
 def test_standup_start():
-    user = auth_register("valid@email.com", "123456", "John", "Doe")
-    #hannel = channels_create(user[token], "Channel 1", False)
-    channel = "channel"
+    clear_data()
+    
+    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
+    user2 = auth_register("valid2@email.com", "1234567890", "John", "Boe")
+    channel = channels_create(user["token"], "Channel 1", False)
 
-    # this test should pass with no issue
-    assert standup_start(user["token"], channel) == timedelta(minutes=15)
+    # this test should pass with no issue, to assert just check that the time
+    # it returns is within some small range
+    dev_time = 5
+    predicted_finish_time = datetime.now() + timedelta(seconds=dev_time)
+    assert (predicted_finish_time - standup_start(user["token"], channel["channel_id"]) <= timedelta(6))
 
     # returns a ValueError if the channel doesn't exist
     pytest.raises(ValueError, standup_start, user["token"], "not_a_real_channel")
 
     # returns an AccessError if the user does not have perms
-    pytest.raises(AccessError, standup_start, "badtoken", channel)
+    pytest.raises(AccessError, standup_start, user2["token"], channel["channel_id"])

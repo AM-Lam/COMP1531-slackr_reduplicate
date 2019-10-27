@@ -2,6 +2,8 @@ from .access_error import AccessError, ValueError
 from .database import *
 import re
 import jwt
+from .access_error import *
+from .database import *
 
 #   user_profile_setemail(token, email);
 #   return void
@@ -33,7 +35,6 @@ def check_valid_token(token):
     except Exception as e:
         raise ValueError(description="token invalid")
 
-
 def check_if_email_valid(email):
     # run the re module to identify if an email is valid
     regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
@@ -46,21 +47,17 @@ def check_email_database(email):
     # check if the email is already being used/is within the database
     DATABASE = get_data()
 
-    for x in DATABASE["email"]:
-        y = x.get_user_data()
-        if y.get("email") == email:
+    for x in DATABASE["users"]:
+        if x.get_email() == email:
             raise ValueError(description="Email is already in use.")
     return True
 
 def change_email(u_id, email):
     # change email in the database for the specified user
     DATABASE = get_data()
-    
-    try:
-        for x in DATABASE["users"]:
-            y = x.get_user_data()
-            if y.get("u_id") == u_id:
-                x.update_user_email(email)
-                return True
-    except Exception as e:
-        raise ValueError(description="Error: Couldn't change email.")
+
+    for x in DATABASE["users"]:
+        if x.get_u_id() == u_id:
+            x.update_user_email(email)
+            return True
+    raise ValueError(description="Error: Couldn't change email.")

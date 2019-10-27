@@ -7,11 +7,12 @@ from flask_mail import Mail, Message
 
 def auth_passwordreset_request(email):
     userid = validate_email_existence(email)    # this checks if the givin email even exists and retrives id.
-    send_code(email, userid)                    # this function sends the code through the SMTP setup.
-    return {}
+    # send_code(email, userid, APP)                    # this function sends the code through the SMTP setup.
+    return userid
 
 def validate_email_existence(email):
     # flag is zero if email does not exist and one if it does.
+    update_data = get_data()
     flag = 0
     userid = None
     for clients in update_data['users']:
@@ -22,8 +23,8 @@ def validate_email_existence(email):
         raise ValueError("email does not exist")
     else:
         return userid
-
-def send_code(email, user_id):
+'''
+def send_code(email, user_id, APP):
     mail = Mail(APP)
     try:
         msg = Message("Your slacky reset code",
@@ -39,4 +40,4 @@ def send_code(email, user_id):
         return 'Mail sent!'
     except Exception as e:
         return (str(e))
-
+'''

@@ -1,22 +1,18 @@
 import pytest
-from .access_error import AccessError
+from .access_error import *
 from .auth_register import auth_register
 from .channels_create import channels_create
 from .channel_join import channel_join
+from .database import *
+
+
+clear_data()
 
 
 def test_channel_join():
     # commented until auth_register working
-    # user1 = auth_register("valid@email.com", "strong-password", "John", "Doe")
-    # user2 = auth_register("good@email.com", "another-password", "Jack", "Doe")
-
-    user1 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTExIn0.QPTH6fx8Z7D3E7GwZ9PybLC8I5Sfzna4pOM73yen1MM"
-    }
-
-    user2 = {
-        "token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1X2lkIjoiMTEyIn0.z3zejfdHH-2ErKgGCoRlIAZnhV56T-F71k5JLRDBeXQ"
-    }
+    user1 = auth_register("valid@email.com", "strong-password", "John", "Doe")
+    user2 = auth_register("good@email.com", "another-password", "Jack", "Doe")
     
     channel1 = channels_create(user1['token'], "Channel 1", True)
     channel2 = channels_create(user1['token'], "Channel 2", False)

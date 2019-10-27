@@ -1,10 +1,14 @@
+from .database import *
 from .admin_userpermission_change import admin_userpermission_change
 from .auth_register import auth_register
 from .access_error import AccessError
 import pytest
 
+
 def test_admin_userpermission_change():
-    user = auth_register("valid@email.com", "123456", "John", "Doe")
+
+    clear_data()
+    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
     
     # this test should pass with no issue
     assert admin_userpermission_change(user["token"], 12345, 1) == None

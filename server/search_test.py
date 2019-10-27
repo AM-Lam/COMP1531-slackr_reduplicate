@@ -5,25 +5,11 @@ from .database import *
 import jwt
 import pytest
 
+clear_data()
+
+
 def test_search():
-    secret = get_secret()
-    user1 = {
-        "token" : jwt.encode({"u_id" : "111"}, secret, algorithm="HS256"),
-        "u_id" : "111"
-    }
-
-    user2 = {
-        "token" : jwt.encode({"u_id" : "112"}, secret, algorithm="HS256"),
-        "u_id" : "112"
-    }
-
-    user3 = {
-        "token" : jwt.encode({"u_id" : "113"}, secret, algorithm="HS256"),
-        "u_id" : "113"
-    }
-
-    channel1 = channels_create(user1["token"], "Channel 1", True)
-    channel2 = channels_create(user1["token"], "Channel 2", True)
+    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
 
     # find all the matching messages (nothing)
     assert search(user1["token"], "hewwo") == []

@@ -8,6 +8,7 @@ from .database import *
 
 
 def auth_register(email, password, first_name, last_name):
+    update_data = get_data()
     check_first(first_name)     # checking first name.
     check_last(last_name)       # checking last name.
     hashed = check_password_strength(password)   # checking if password is strong and getting a hash.
@@ -36,11 +37,14 @@ def check_regEmailtype(email):
 def validate_regEmail(email):
     # checking if thr email even exists already.
     flag = 0
+    update_data = get_data()
     for clients in update_data['users']:
         if clients._email == email:
             flag = 1
     if flag == 1:
         raise ValueError("email already exists on the server")
+    else:
+        return True
 
 
 def check_password_strength(password):

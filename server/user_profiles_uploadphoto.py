@@ -2,6 +2,8 @@ from .access_error import AccessError
 from .database import *
 import urllib
 import jwt
+from .access_error import *
+from .database import *
 
 #   user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end);
 #   return void
@@ -13,6 +15,7 @@ import jwt
 def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end):
     # find u_id associated with token (with non-existent database)
     #TODO: (note: this is not required to be completed until iteration 3)
+
     user_id = check_valid_token(token)
 
     check_imgurl(img_url)
@@ -37,35 +40,34 @@ def check_valid_token(token):
     except Exception as e:
         raise ValueError(description="token invalid")
 
-        
 def check_imgurl(img_url):
     if urllib.request.urlopen(img_url).getcode() == 200:
         return True
     else:
-        raise ValueError("The URL is not working at the moment!")
+        raise ValueError(description="The URL is not working at the moment!")
 
 def check_start_coords(x_start, y_start):
     # we don't know how to get image dimensions yet, so we will assume the max image size is 200x200
-    IMG_LIMIT = 200;
+    IMG_LIMIT = 200
     if x_start >= 0 and y_start >= 0 and x_start <= IMG_LIMIT and y_start <= IMG_LIMIT:
         return True
     else:
-        raise ValueError("Co-ordinates out of bounds.")
+        raise ValueError(description="Co-ordinates out of bounds.")
 
 def check_end_coords(x_end, y_end):
     # we don't know how to get image dimensions yet, so we will assume the max image size is 200x200
-    IMG_LIMIT = 200;
+    IMG_LIMIT = 200
     if x_end >= 0 and y_end >= 0 and x_end <= IMG_LIMIT and y_end <= IMG_LIMIT:
         return True
     else:
-        raise ValueError("Co-ordinates out of bounds.")
+        raise ValueError(description="Co-ordinates out of bounds.")
 
 def check_sequential(x_start, y_start, x_end, y_end):
     # check if start is before end
     if x_start >= x_end or x_end <= x_start:
-        raise ValueError("Co-ordinates are not sequential.")
+        raise ValueError(description="Co-ordinates are not sequential.")
     if y_start >= y_end or y_end <- y_start:
-        raise ValueError("Co-ordinates are not sequential.")
+        raise ValueError(description="Co-ordinates are not sequential.")
     else:
         return True
 
@@ -75,7 +77,7 @@ def check_square(x_start, y_start, x_end, y_end):
     side2 = y_end - y_start
 
     if side1 != side2:
-        raise ValueError("Co-ordinate selection is not a square.")
+        raise ValueError(description="Co-ordinate selection is not a square.")
     else:
         return True
     

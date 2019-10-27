@@ -3,6 +3,7 @@ from .database import *
 
 
 def auth_passwordreset_reset(reset_code, new_password):
+    update_data = get_data()
     email = check_reset_code(reset_code)    # check if the reset code is valid and retrive the email
     if chec_password_strength(new_password) == True:    # is the password strong enough?
         for users in update_data['users']:  # finding the user in the list of users
@@ -16,6 +17,7 @@ def auth_passwordreset_reset(reset_code, new_password):
 
 def check_reset_code(reset_code):
     # this will check if the reset code sent by the auth_passwordreset_request function is correct
+    update_data = get_data()
     if reset_code in update_data['reset'].keys():
         email = update_data['reset'][reset_code]
         return email

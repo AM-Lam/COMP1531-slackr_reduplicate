@@ -1,6 +1,8 @@
 from .access_error import AccessError, ValueError
 from .database import *
 import jwt
+from .access_error import *
+from .database import *
 
 #   user_profile_setname(token, name_first, name_last);
 #   return void
@@ -12,6 +14,7 @@ import jwt
 def user_profile_setname(token, name_first, name_last):
     # find u_id associated with token (with non-existent database)
     u_id = check_valid_token(token)
+
     first_name_check(name_first)
     last_name_check(name_last)
     change_names(u_id, name_first, name_last)
@@ -31,7 +34,6 @@ def check_valid_token(token):
                 return user_id
     except Exception as e:
         raise ValueError(description="token invalid")
-
 
 def first_name_check(name_first):
     # check if the first name is within length limits/if first name exists

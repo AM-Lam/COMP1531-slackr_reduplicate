@@ -103,13 +103,19 @@ class Channel:
         self._standup = None                # when standup is active, gives time when
                                             # standup finishes
                                             # else it's None
-    
+
+        self._message_id_max = 1            # a value we need to use to keep
+                                            # track of the current messages id
+                                            # since message_sendlater is concurrent
+                                            # we need to keep track of this explicitly
+
 
     def get_channel_data(self):
         return {
             "channel_id" : self._channel_id,
             "channel_name" : self._channel_name,
             "messages" : self._messages,
+            "owners" : self._owners,
             "members" : self._members,
             "owners" : self._owners,
             "public" : self._public,
@@ -134,6 +140,7 @@ class Channel:
     def get_messages(self):
         return self._messages
 
+
     def get_members(self):
         return self._members
     
@@ -146,16 +153,21 @@ class Channel:
         return self._public
     
     
+    def get_m_id(self):
+        return self._message_id_max
+    
+    
     def set_id(self, id):
         self._channel_id = id
     
 
-    def sett_name(self, name):
+    def set_name(self, name):
         self._channel_name = name
     
 
     def add_message(self, message):
         self._messages.append(message)
+
 
     def add_member(self, member):
         self._members.append(member)
@@ -167,6 +179,14 @@ class Channel:
 
     def set_public(self, public):
         self._public = public
+    
+
+    def increment_m_id(self):
+        self._message_id_max += 1
+
+
+    def set_standup(self, standup):
+        self._standup = standup
 
     def set_standup(self, standup):
         self._standup = standup
@@ -185,7 +205,7 @@ class Messages:
         self._time_sent = time_sent         # time that the message is posted 
                                             # used for sendlater or standup
         self._reacts = reacts               # List of dictionaries
-                                            # with u_id as key, and react_id, is_this_user_reacted as values
+                                            # {u_id , react_id and is_this_user_reacted}
                                             # is_this_user_reacted:whether or not the authorised user has been one of the reacts to this post
         self._pinned = False                # bool of whether the message is pinned or not
 
@@ -211,6 +231,15 @@ class Messages:
             'is_pinned': self._pinned,
     }
 
+    def get_m_id(self):
+        return self._message_id
+
+    def get_u_id(self):
+        return self._u_id
+
+    def is_pinned(self):
+        return self._pinned
+
 
 def get_data():
     global DATABASE
@@ -228,12 +257,15 @@ def save_data():
         pickle.dump(DATABASE, dump)
 
 
-# initialise an empty database
-DATABASE = {
-    "users" : [],
-    "channels" : [],
-    "tokens" : {},
-    "reset" : {}
-}
+def clear_data():
+    global DATABASE
+    DATABASE = {
+        "users" : [],
+        "channels" : [],
+        "tokens" : {},
+        "reset" : {}
+    }
 
+
+clear_data()
 print("Setup complete")
