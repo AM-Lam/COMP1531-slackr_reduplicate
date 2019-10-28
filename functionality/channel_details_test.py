@@ -36,8 +36,12 @@ def test_run_all():
     # search details
     detaildict = channel_details(token2, unswchannelid)
     assert detaildict['name'] == "unswchannel"
-    assert detaildict['owner_members'] == [1]
-    assert detaildict['all_members'] == [1, 2]
+    assert detaildict['owner_members'] == [
+        {'u_id': 1, 'name_first': 'user', 'name_last': 'a'}]
+    
+    assert detaildict['all_members'] == [
+        {'u_id': 1, 'name_first': 'user', 'name_last': 'a'},
+        {'u_id': 2, 'name_first': 'ussr', 'name_last': 'b'}]
     
     # add user 3
     channel_join(user3["token"], unswchannelid)
@@ -45,5 +49,11 @@ def test_run_all():
     # search details
     detaildict2 = channel_details(token2, unswchannelid)
     assert detaildict2['name'] == "unswchannel"
-    assert detaildict2['owner_members'] == [1]
-    assert detaildict2['all_members'] == [1, 2, 3]
+    
+    assert detaildict2['owner_members'] == [
+        {'u_id': 1, 'name_first': 'user', 'name_last': 'a'}]
+    
+    assert detaildict2['all_members'] == [
+        {'u_id': 1, 'name_first': 'user', 'name_last': 'a'},
+        {'u_id': 2, 'name_first': 'ussr', 'name_last': 'b'},
+        {'u_id': 3, 'name_first': 'the', 'name_last': 'rabbit'}]
