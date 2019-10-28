@@ -125,3 +125,9 @@ dmypy.json
 
 # Other
 *.py~
+<<<<<<< HEAD
+=======
+
+# database dump
+db_dump.p
+>>>>>>> master

@@ -1,25 +1,29 @@
 import pytest
-import auth_logout
-import auth_register
-import auth_login
+from .auth_logout import *
+from .auth_register import *
+from .auth_login import *
+from .database import *
 
 
 def test_validtoken1():
+    clear_data()
     # following test should fail as user is not logged in!
-    dictreg = auth_register.auth_register("arpit@gmail.com", "passwording", "arpit", "rulania")
+    dictreg = auth_register("arpit@gmail.com", "passwording", "arpit", "rulania")
     tokenreg = dictreg["token"]
-    auth_logout.auth_logout(tokenreg)
-    pytest.raises(ValueError, auth_logout.auth_logout, tokenreg)
+    auth_logout(tokenreg)   # logging out.
+    pytest.raises(ValueError, auth_logout, tokenreg) # trying to logout something already logged out.
 
 # validtoken test should pass
-def test_validtoken(tokenlog):
-    dictreg = auth_register.auth_register("arpit@gmail.com", "passwording", "arpit", "rulania")
+def test_validtoken():
+    clear_data()
+    dictreg = auth_register("arpitrulania@gmail.com", "passwording", "arpit", "rulania")
     tokenlog = dictreg["token"]
-    assert(auth_logout.auth_logout(tokenlog)) #assuming a successful logout returns a true boolean
+    assert(auth_logout(tokenlog)['is_success']) == True #assuming a successful logout returns a true boolean
 
 # invalid token test should fail
-def test_invalidtoken(tokenlog):
-    dictreg = auth_register.auth_register("arpit@gmail.com", "passwording", "arpit", "rulania")
-    tokenlog = "invalid"
-    pytest.raises(ValueError, auth_logout.auth_logout, tokenlog)
+def test_invalidtoken():
+    clear_data()
+    dictreg = auth_register("arpitinit@gmail.com", "passwording", "arpit", "rulania")
+    tokenlog = "invalid"    # <-user tries to fool the system by passing any random token.
+    pytest.raises(ValueError, auth_logout, tokenlog)
 

@@ -1,34 +1,33 @@
-import auth_passwordreset_request
 import pytest
-import auth_register
-import auth_login
+from .database import *
+from .auth_passwordreset_request import *
+from .auth_register import *
+from .database import *
 
 
-auth_register.auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
+def test_dummy_func():
+    clear_data()
+    auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
+
 
 ###########################################################################################################################################
 def test_Validate_email():
     # what if the email does not exist in the database -->
-    pytest.raises(ValueError, auth_passwordreset_request.validate_email_existence, 'INVALIDeMAIL@domain.com')   
-
-def test_Validate_email1():
-    # user forgot to put the .au domain in the address-->
-    pytest.raises(ValueError, auth_login.validate_email, 'user3@student.unsw.edu')
-    
-def test_Validate_email2():
-    # did the user forget to put the subdomain (i.e. student.unsw....)? -->
-    pytest.raises(ValueError, auth_login.validate_email, 'user3@unsw.edu.au')
+    pytest.raises(ValueError, validate_email_existence, 'INVALIDeMAIL@domain.com')   
     
 def test_Validate_email3():
     # does my function only accept a particular domain? -->
-    pytest.raises(ValueError, auth_login.validate_email, 'user3@gmail.com.au')
+    pytest.raises(ValueError, validate_email_existence, 'user1@domain.com.au')
     
 def test_Validate_email4():
     # what if the email and password combo is valid? -->
-    assert(auth_login.validate_email('user1@domain.com'))
+    assert(validate_email_existence('user1@domain.com')) is not None
 
 ###########################################################################################################################################
 
 def test_send_code():
-    ## this should be testing if connection to server was succesful and email was sent successfully! 
-    pass
+    ## cant test this since send email code has been moved to server.py i.e. flask
+    update_data = get_data()
+    reset_code = auth_passwordreset_request('user1@domain.com')
+    assert(update_data["reset"][reset_code]) == 'user1@domain.com'
+    

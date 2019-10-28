@@ -1,21 +1,26 @@
-# comment this out until these functions are written
-from channels_list import channels_list
-from channel_details import channel_details
+import jwt
+from .database import *
+from .access_error import *
 
 
 def channel_leave(token, channel_id):
     # somehow get the associated uid, this will presumably need
     # to interact with a database or something similar
-    uid_ = 111
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    u_id = token_payload["u_id"]
 
-    # check if channel exists, if it does not throw a ValueError
-    if channel_id not in [c["channel_id"] for c in channels_list(token)]:
-        raise ValueError
+    server_data = get_data()
 
-    # otherwise remove the user with this token from the channel
-    for user in channel_details(channel_id)['all_members']:
-        if user["u_id"] == uid_:
-            # at this point we will need to interact with a database
-            # to remove this u_id from the list of members
+    # try to remove the user from the channel, if they are not in the
+    # channel then just return without any error
+    channel_exists = False
+    for c in server_data["channels"]:
+        if c._channel_id == channel_id:
+            if u_id in c._members:
+                c._members.remove(u_id)
             return {}
+    
+    # if we get here the channel does not exist and we need to raise an
+    # exception
+    raise ValueError
 
