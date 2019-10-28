@@ -30,62 +30,47 @@ class User:
             "handle" : self._handle,
         }
 
-
-    def update_user_id(self, new_id):
+    def update_id(self, new_id):
         self._u_id = new_id
 
-
-    def update_user_first_name(self, new_fname):
+    def update_first_name(self, new_fname):
         self._first_name = new_fname
 
-
-    def update_user_last_name(self, new_lname):
+    def update_last_name(self, new_lname):
         self._last_name = new_lname
 
-
-    def update_user_password(self, new_password):
+    def update_password(self, new_password):
         self._password = new_password
 
-
-    def update_user_email(self, new_email):
+    def update_email(self, new_email):
         self._email = new_email
 
-
-    def update_user_handle(self, new_handle):
+    def update_handle(self, new_handle):
         self._handle = new_handle
-
 
     def set_global_admin(self, admin):
         self._global_admin = admin
 
-
     def get_u_id(self):
         return self._u_id
-
 
     def get_first_name(self):
         return self._first_name
 
-
     def get_last_name(self):
         return self._last_name
-
 
     def get_password(self):
         return self._password
 
-
     def get_email(self):
         return self._email
-
 
     def get_handle(self):
         return self._handle
 
-
     def is_global_admin(self):
         return self._global_admin
-
 
     def is_slackr_owner(self):
         return self._slackr_owner
@@ -361,6 +346,20 @@ def get_channel(channel_id):
             return channel
     
     raise ValueError(description="Channel does not exist")
+
+
+def get_user(u_id):
+    """
+    Take a u_id and return the user if it exists, otherwise
+    raise a ValueError
+    """
+    users = get_data()["users"]
+
+    for user in users:
+        if user.get_u_id() == u_id:
+            return user
+    
+    raise ValueError(description="User does not exist")
 
 
 def is_user_member(u_id, channel_id):

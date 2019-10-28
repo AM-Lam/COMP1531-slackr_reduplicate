@@ -4,37 +4,65 @@ Functions that relate to the creation, modification and deletion of users.
 
 import urllib
 import jwt
-from .database import get_data, get_secret, check_email_database, check_valid_token, handle_in_use_check
+from .database import *
 from .access_error import *
 
 
 def user_profile_setemail(token, email):
-
-    u_id = check_valid_token(token)
-    check_if_email_valid(email)
+    """
+    user_profile_setemail(token, email);
+    return {}
+    Exception: ValueError when:
+        - Email entered is not a valid email,
+        - Email address is already being used by another user
+    Description: Update the authorised user's email address
+    """
+    
+    is_email_valid(email)
     check_email_database(email)
-    change_email(u_id, email)
+    
+    u_id = check_valid_token(token)
+    get_user(u_id).update_email(email)
 
     return {}
 
 
 def user_profile_sethandle(token, handle_str):
-    # find u_id associated with token
-    u_id = check_valid_token(token)
+    """
+    user_profile_sethandle(token, handle_str);
+    return void
+    Exception: ValueError when:
+        - handle_str is no more than 20 characters
+    Description: Update the authorised user's handle (i.e. display name)
+    """
     
-    handle_check(handle_str)
-    handle_in_use_check(handle_str)
-    change_handle(u_id, handle_str)
+    if not 0 < len(handle_str) < 20:
+        raise ValueError(description="Handles must be between 0 and 20\
+                         characters (exclusive)")
+
+    if is_handle_in_use(handle_str):
+        raise ValueError(description="Handle is already in use")
+    
+    u_id = check_valid_token(token)
+    get_user(u_id).update_handle(handle_str)
 
     return {}
 
 
 def user_profile_setname(token, name_first, name_last):
-    # find u_id associated with token
+    if not 0 < len(name_first) < 50:
+        raise ValueError(description="First name must be between 0 and 50\
+                         characters (exclusive)")
+    
+    if not 0 <= len(name_last) < 50:
+        raise ValueError(description="Last name must be between 0 and 50\
+                         characters (inclusive)")
+
     u_id = check_valid_token(token)
-    first_name_check(name_first)
-    last_name_check(name_last)
-    change_names(u_id, name_first, name_last)
+    user = get_user(u_id)
+    
+    user.update_first_name(name_first)
+    user.update_last_name(name_last)
 
     return {}
 

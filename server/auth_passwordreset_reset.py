@@ -10,7 +10,7 @@ def auth_passwordreset_reset(reset_code, new_password):
         for users in update_data['users']:  # finding the user in the list of users
             if users._email == email:       # looking for the user in the users list in the database.
                 hashed_pass = (hashlib.sha256(new_password.encode()).hexdigest())   # hashing the new password
-                users.update_user_password(hashed_pass)    # updating the old password
+                users.update_password(hashed_pass)    # updating the old password
                 del update_data["reset"][reset_code]    # once the password is updated, delete the reset_code, 
                                                         # so that it can not be used again.
     return {}
