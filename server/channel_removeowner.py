@@ -1,15 +1,24 @@
 import jwt
-from .access_error import *
-from .database import *
+from .database import get_data, get_secret
 from .channels_list import channels_list
+from .access_error import *
 
 
 def channel_removeowner(token, channel_id, u_id):
     server_data = get_data()
+
+    if not server_data["tokens"].get(token, False):
+        raise AccessError(description="This token is invalid")
     
     # first get the u_id from the user token
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
     owner_uid = token_payload['u_id']
+
+    owner = None
+    for u in server_data["users"]:
+        if u.get_u_id() == owner_uid:
+            owner = u
+            break
     
     to_remove = None
     # now check whether or not the channel actually exists, if it does exist
@@ -27,7 +36,7 @@ def channel_removeowner(token, channel_id, u_id):
     if u_id not in to_remove._owners:
         raise ValueError(description="The user is not an owner of this channel")
 
-    if owner_uid not in to_remove._owners:
+    if owner_uid not in to_remove._owners and not owner.is_global_admin():
         raise AccessError(description="You do not have permissions to do this")
     
     

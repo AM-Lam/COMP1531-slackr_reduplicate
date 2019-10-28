@@ -9,75 +9,60 @@ from .database import *
 #       - permission_id does not refer to a value permission,
 #   AccessError when:
 #       - The authorised user is not an admin or owner
-#   Description: Given a User by their user ID, set their permissions to new permissions described by permission_id
+#   Description: Given a User by their user ID, set their permissions to new 
+#   permissions described by permission_id
 
-def admin_userpermission_change(token, u_id, permission_id):
+def admin_userpermission_change(token, u_id, p_id):
+    server_data = get_data()
 
-    admin_user_id = check_valid_token(token)
-    check_valid_user(u_id)
-    check_valid_permission(permission_id)
-    check_owner_or_admin(admin_user_id)
-    change_permission(u_id, permission_id)
+    if not server_data["tokens"].get(token, False):
+        raise AccessError(description="Invalid token")
+
+    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
+    request_u_id = token_payload["u_id"]
+
+    request_user = None
+    user = None
+    for u in server_data["users"]:
+        if u.get_u_id() == u_id:
+            user = u
+        if u.get_u_id() == request_u_id:
+            request_user = u
+        if not request_u_id and not user:
+            break
     
-    return
+    if user == None:
+        raise ValueError(description="u_id does not refer to a real user")
+    
+    if request_user == None:
+        raise ValueError(description="Request does not come from a real user")
+    
+    if not (request_user.is_global_admin() or request_user.is_slackr_owner()):
+        raise AccessError(description="You do not have permissions to do this")
 
-def check_valid_token(token):
-    # find the user ID associated with this token, else raise a ValueError
-    DATABASE = get_data()
-    SECRET = get_secret()
-    token = jwt.decode(token, SECRET, algorithms=['HS256'])
+    if not (1 <= p_id <= 3):
+        raise ValueError(description=f"{p_id} is not a valid permission id")
+    
+    # global admins cannot change the perms of slackr owners
+    if not request_user.is_slackr_owner() and user.is_slackr_owner():
+        raise AccessError(description="You do not have permissions to do this")
 
-    try:
-        for x in DATABASE["users"]:
-            user_id = x.get_u_id()
-            if user_id == token["u_id"]:
-                return user_id
-    except Exception as e:
-        raise ValueError(description="token invalid")
-
-def check_valid_user(u_id):
-    # check if the u_id given currently exists within the global database
-    DATABASE = get_data()
-
-    try:
-        for x in DATABASE["users"]:
-            y = x.get_user_data()
-            if y.get("u_id") == u_id:
-                return True
-    except Exception as e:
-        raise ValueError(description="This user does not exist.")
-
-def check_valid_permission(permission_id):
-    # assuming that 0 = user, 1 = admin, 2 = owner
-    if permission_id < 0 or permission_id > 2:
-        raise ValueError(description="Permission does not exist.")
+    # handle the perm changes
+    if p_id == 1:
+        # make the user a slackr owner, only other slackr owners can do this
+        if not request_user.is_slackr_owner():
+            raise AccessError(description="You do not have permissions to do this")
+        user._slackr_owner = True
+        user.set_global_admin(True)
+    elif p_id == 2:
+        # make the user a global admin, this should always be possible if we
+        # reach this point
+        user._slackr_owner = False
+        user.set_global_admin(True)
     else:
-        return True
-
-def check_owner_or_admin(admin_user_id):
-    # check if the permission_id associated with the user is an admin or owner
-    DATABASE = get_data()
-
-    try:
-        for x in DATABASE["users"]:
-            if admin_user_id == x.get_u_id():
-                if x.is_global_admin == True:
-                    return True
-                elif x.is_global_admin == False:
-                    raise AccessError("User is not an administrator.")
-        raise AccessError("User does not have prerequisite permissions.")
-    except Exception as e:
-        raise ValueError(description="Could not access user permissions.")
-
-def change_permission(u_id, permission_id):
-    # change global permissions for user in the global database
-    DATABASE = get_data()
+        # make the user a regular member, this should also always be possible
+        # if we reach this point
+        user._slackr_owner = False
+        user.set_global_admin(False)
     
-    try:
-        for x in DATABASE["channels"]:
-            y = x.get_channel_data()
-            if y.get("u_id") == u_id:
-                x.add_owner(u_id)
-    except Exception as e:
-        raise ValueError(description="Error: Couldn't change permissions.")
-
+    return {}

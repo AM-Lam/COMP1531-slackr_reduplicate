@@ -1,11 +1,10 @@
-from .access_error import *
-from .database import *
 import jwt
+from .database import get_data, get_secret
+from .access_error import *
 
 
 def channel_messages(token, channel_id, start):
     end = 0
-    update_data = get_data()
     does_channel_exist(channel_id)                             # checking if the channel exist.
     end = is_start_greater_then_messages(start, channel_id)    # checks if (start + 50) is greater then the total messages.         
     is_token_a_member_of_channel(token, channel_id)            # this will check if the user is a member of the channel.
@@ -21,6 +20,7 @@ def does_channel_exist(channel_id):
             flag = 1
     if flag == 0:
         raise ValueError(description="channel given does not exist!")
+
 
 def is_start_greater_then_messages(start, channel_id):
     update_data = get_data()
@@ -61,7 +61,8 @@ def retrive_message_list(channel_id, start, end):
                     idx = 1 + start                 # idx is the index for the message list. starts at 1 because if start is zero then we want the index for the first message to be 1.
                     # looping through the message list reversed, because we want the most recent message first 
                     # and using splicing to specify message range.
-                    for i in reversed(channel._messages)[start:length]:  
+                    rev_list = channel._messages[::-1]
+                    for i in rev_list[start:length]:  
                         diction = {'message_id':idx , 'u_id':i._u_id , 'message':i._text , 'time_created':i._time_sent , 'reacts':i._reacts , 'is_pinned':i._pinned}
                         messages.append(diction)
                         idx += 1
@@ -69,7 +70,8 @@ def retrive_message_list(channel_id, start, end):
                     idx = 1 + start
                     # looping through the message list reversed, because we want the most recent message first 
                     # and using splicing to specify message range.
-                    for i in reversed(channel._messages)[start:end]:
+                    rev_list = channel._messages[::-1]
+                    for i in rev_list[start:end]:
                         diction = {'message_id':idx , 'u_id':i._u_id , 'message':i._text , 'time_created':i._time_sent , 'reacts':i._reacts , 'is_pinned':i._pinned}
                         messages.append(diction)
                         idx += 1

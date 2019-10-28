@@ -125,9 +125,7 @@ dmypy.json
 
 # Other
 *.py~
-<<<<<<< HEAD
-=======
+frontend/prebundle/config.js
 
 # database dump
 db_dump.p
->>>>>>> master

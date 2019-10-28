@@ -1,4 +1,6 @@
 from .database import *
+from .access_error import *
+
 
 def auth_logout(token):
     # when logout is called on a token it should be deleted from the currently active tokens dict.
@@ -7,4 +9,4 @@ def auth_logout(token):
         del update_data["tokens"][token]    # deleting the token from existance.
         return {'is_success' : True}        # now that the token has been deleted we return true
     else:
-        raise ValueError("session token is already invalid")
+        raise ValueError(description="session token is already invalid")

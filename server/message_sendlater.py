@@ -1,8 +1,8 @@
 import jwt
 import threading
 from datetime import datetime
+from .database import get_data, get_secret, Messages
 from .access_error import *
-from .database import *
 
 
 def send_message(channel, message, time_sent):
@@ -18,7 +18,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     server_data = get_data()
 
     # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, True):
+    if not server_data["tokens"].get(token, False):
         raise AccessError(description="This token is invalid")
 
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
@@ -57,7 +57,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     channel_.increment_m_id()
     
     # start a thread that will call send_message
-    threading.Thread(target=send_message, args=(channel_, message, time_sent)).start()
+    threading.Thread(target=send_message, args=(channel_, to_send, time_sent)).start()
     
     return { "message_id" : m_id}
 

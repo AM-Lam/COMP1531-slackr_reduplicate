@@ -1,5 +1,5 @@
 import jwt
-from .database import *
+from .database import get_data, get_secret
 from .access_error import *
 
 
@@ -11,7 +11,7 @@ def user_profile(token, u_id):
     check_u_id = token_payload["u_id"]
 
     # not an authorised user
-    if not server_data["tokens"].get(token, True):
+    if not server_data["tokens"].get(token, False):
         raise AccessError 
 
     # authorization problem
@@ -34,4 +34,3 @@ def user_profile(token, u_id):
         # details cannot be found based on u_id
         else:
             raise ValueError(description="User cannot be found")
-    

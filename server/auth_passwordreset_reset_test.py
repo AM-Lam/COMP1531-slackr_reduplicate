@@ -1,9 +1,10 @@
-from .auth_register import *
-from .auth_passwordreset_request import *
-from .auth_passwordreset_reset import *
-from .database import *
 import pytest
 import hashlib
+from .auth_register import auth_register
+from .auth_passwordreset_request import auth_passwordreset_request
+from .auth_passwordreset_reset import auth_passwordreset_reset, chec_password_strength
+from .database import clear_data, get_data
+from .access_error import *
 
 
 def test_reset_test():
@@ -14,16 +15,14 @@ def test_reset_test():
     # write more tests to check code
     pytest.raises(ValueError, auth_passwordreset_reset, "INVALID-CODE" , 'abcdefgh')
 
-def test_code_is_not_string():
     pytest.raises(ValueError, auth_passwordreset_reset, "123@!@" , 'abcdefgh')
 
-    assert(chec_password_strength("sdfadffsfsfeasdadew"))
+    assert chec_password_strength("sdfadffsfsfeasdadew")
 
     pytest.raises(ValueError, chec_password_strength, 'pew')
 
-#########################################################################################
+    ###########################################################################
 
-def test_working():
     # now lets send a reset request
     reset_code = auth_passwordreset_request('user1@gmail.com')
     # now reset the password

@@ -7,12 +7,10 @@ from .auth_register import auth_register
 from .database import *
 
 
-clear_data()
-
-
 def test_channels_list():
-    # boilerplate user/channel creation code, commented until auth_register
-    # working
+    clear_data()
+
+    # boilerplate user/channel creation code
     user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
     user2 = auth_register("new@email.com", "987654321", "Doug", "Jones")
     

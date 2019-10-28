@@ -1,12 +1,12 @@
 import pytest
 import threading
+from datetime import timedelta, datetime
 from .standup_send import standup_send
 from .standup_start import standup_start
 from .channels_create import channels_create
-from .access_error import *
 from .auth_register import auth_register
-from .database import *
-from datetime import timedelta, datetime
+from .database import clear_data, get_data
+from .access_error import *
 
 
 def test_standup_send():
