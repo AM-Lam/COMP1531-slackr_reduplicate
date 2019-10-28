@@ -1,10 +1,8 @@
 import pytest
 import jwt
 from .database import clear_data
-from .message_pin import message_pin
 from .auth_register import auth_register
-from .message_send import message_send
-from .message_remove import message_remove
+from .message import message_remove, message_send, message_pin
 from .channel import channels_create, channel_leave
 from .access_error import *
 

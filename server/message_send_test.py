@@ -2,7 +2,7 @@ import pytest
 import jwt
 from .database import clear_data
 from .auth_register import auth_register
-from .message_send import message_send
+from .message import message_send
 from .channel import channels_create
 from .access_error import *
 

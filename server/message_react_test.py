@@ -2,10 +2,8 @@ import pytest
 import re
 import jwt
 from .database import clear_data
-from .message_react import message_react
 from .auth_register import auth_register
-from .message_send import message_send
-from .message_remove import message_remove
+from .message import message_remove, message_send, message_react
 from .channel import channels_create
 from .access_error import *
 
