@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
 from datetime import datetime
-from server import *
+from functionality import auth, user, database, channel, message, admin_userpermission_change, standup_send, standup_start
 
 
 def defaultHandler(err):
@@ -26,7 +26,7 @@ def defaultHandler(err):
 
 APP = Flask(__name__)
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
-APP.register_error_handler(Exception, defaultHandler)
+APP.register_error_handler(HTTPException, defaultHandler)
 CORS(APP)
 mail = Mail(APP)
 
@@ -46,7 +46,7 @@ def register():
     last_name = request.form.get('name_last')
     password = request.form.get('password')
     email = request.form.get('email')
-    dumpstring = auth_register.auth_register(email, password, first_name, last_name)
+    dumpstring = auth.auth_register(email, password, first_name, last_name)
     return dumps(dumpstring)
 
 
@@ -54,21 +54,21 @@ def register():
 def login():
     email = request.form.get('email')
     password = request.form.get('password')
-    dumpstring = auth_login.auth_login(email, password)
+    dumpstring = auth.auth_login(email, password)
     return dumps(dumpstring)
 
 
 @APP.route('/auth/logout', methods=['POST'])
 def user_logout():
     token = request.form.get('token')
-    dumpstring = auth_logout.auth_logout(token)
+    dumpstring = auth.auth_logout(token)
     return dumps(dumpstring)
 
 
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
     email = request.form.get('email')
-    dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
+    dumpstring = auth.auth_passwordreset_request(email)
     print(send_code(email, dumpstring)) # remove later
     return dumps(dumpstring)
 
@@ -77,7 +77,7 @@ def email_request():
 def email_reset():
     reset_code = request.form.get('reset_code')
     new_password = request.form.get('new_password')
-    dumpstring = auth_passwordreset_reset.auth_passwordreset_reset(reset_code, new_password)
+    dumpstring = auth.auth_passwordreset_reset(reset_code, new_password)
     return dumps(dumpstring)
 
 
@@ -86,7 +86,7 @@ def channel_invite_e():
     token = request.form.get('token')
     channel_id = request.form.get('channel_id')
     u_id = request.form.get('u_id')
-    dumpstring = channel_invite.channel_invite(token,channel_id,u_id)
+    dumpstring = channel.channel_invite(token, channel_id, u_id)
     return dumps(dumpstring)
 
 
@@ -94,7 +94,8 @@ def channel_invite_e():
 def channel_details_e():
     token = request.args.get('token')
     channel_id = request.args.get('channel_id')
-    dumpstring = channel_details.channel_details(token,channel_id)
+    print(token, channel_id)
+    dumpstring = channel.channel_details(token, channel_id)
     return dumps(dumpstring)
 
 
@@ -103,7 +104,8 @@ def channel_messages_e():
     token = request.args.get('token')
     channel_id = request.args.get('channel_id')
     start = request.args.get('start')
-    dumpstring = channel_messages.channel_messages(token,channel_id, start)
+    print(token, channel_id, start)
+    dumpstring = channel.channel_messages(token, channel_id, start)
     return dumps(dumpstring)
 
 
@@ -114,9 +116,9 @@ def run_channels_create():
         add it to the  server database
     """
     request_data = request.form
-    return_value = channels_create.channels_create(request_data["token"],
-                                                   request_data["name"],
-                                                   bool(request_data["is_public"]))
+    return_value = channel.channels_create(request_data["token"],
+                                           request_data["name"],
+                                           bool(request_data["is_public"]))
 
     return dumps(return_value)
 
@@ -127,10 +129,9 @@ def run_message_send():
         add it to the  server database
     """
     request_data = request.form
-    return_value = message_send.message_send(request_data["token"],
-                                            request_data["channel_id"],
-                                            request_data["message"]
-                                            )
+    return_value = message.message_send(request_data["token"],
+                                        request_data["channel_id"],
+                                        request_data["message"])
 
     return dumps(return_value)
 
@@ -142,8 +143,8 @@ def run_message_remove():
         update the server database
     """
     request_data = request.form
-    return_value = message_remove.message_remove(request_data["token"],
-                                                 request_data["message_id"])
+    return_value = message.message_remove(request_data["token"],
+                                          request_data["message_id"])
 
     return dumps(return_value)
 
@@ -155,10 +156,9 @@ def run_message_edit():
         update the server database
     """
     request_data = request.form
-    return_value = message_edit.message_edit(request_data["token"],
-                                            request_data["message_id"],
-                                            request_data["message"]
-                                            )
+    return_value = message.message_edit(request_data["token"],
+                                        request_data["message_id"],
+                                        request_data["message"])
 
     return dumps(return_value)
 
@@ -170,10 +170,9 @@ def run_message_react():
         add it to the server database
     """
     request_data = request.form
-    return_value = message_react.message_react(request_data["token"],
-                                                request_data["message_id"],
-                                                request_data["react_id"]
-                                                )
+    return_value = message.message_react(request_data["token"],
+                                         request_data["message_id"],
+                                         request_data["react_id"])
 
     return dumps(return_value)
 
@@ -185,10 +184,9 @@ def run_message_unreact():
         add it to the server database
     """
     request_data = request.form
-    return_value = message_unreact.message_unreact(request_data["token"],
-                                                    request_data["message_id"],
-                                                    request_data["react_id"]
-                                                    )
+    return_value = message.message_unreact(request_data["token"],
+                                           request_data["message_id"],
+                                           request_data["react_id"])
 
     return dumps(return_value)
 
@@ -200,9 +198,8 @@ def run_message_pin():
         add it to the server database
     """
     request_data = request.form
-    return_value = message_pin.message_pin( request_data["token"],
-                                            request_data["message_id"]
-                                        )
+    return_value = message.message_pin(request_data["token"],
+                                       request_data["message_id"])
 
     
     return dumps(return_value)
@@ -216,8 +213,8 @@ def run_message_unpin():
     """
     request_data = request.form
 
-    return_value = message_unpin.message_unpin(request_data["token"],
-                                              request_data["message_id"])
+    return_value = message.message_unpin(request_data["token"],
+                                         request_data["message_id"])
 
     return dumps(return_value)
 
@@ -229,8 +226,8 @@ def run_user_profile():
         add it to the server database
     """
     request_data = request.args
-    return_value = user_profile.user_profile(request_data["token"],
-                                             request_data["u_id"])
+    return_value = user.user_profile(request_data["token"],
+                                     request_data["u_id"])
 
     return dumps(return_value)
 
@@ -238,8 +235,8 @@ def run_user_profile():
 @APP.route("/channel/leave", methods=["POST"])
 def run_channel_leave():
     request_data = request.form
-    return_value = channel_leave.channel_leave(request_data["token"],
-                                               request_data["channel_id"])
+    return_value = channel.channel_leave(request_data["token"],
+                                         request_data["channel_id"])
 
     return dumps(return_value)
 
@@ -253,7 +250,7 @@ def run_channels_listall():
     with the stakeholders.
     """
     request_data = request.args
-    return_value = channels_listall.channels_listall(request_data["token"])
+    return_value = channel.channels_listall(request_data["token"])
 
     return dumps(return_value)
 
@@ -261,7 +258,7 @@ def run_channels_listall():
 @APP.route('/channels/list', methods=['GET'])
 def run_channels_list():
     request_data = request.args
-    return_value = channels_list.channels_list(request_data["token"])
+    return_value = channel.channels_list(request_data["token"])
 
     return dumps(return_value)
 
@@ -269,7 +266,7 @@ def run_channels_list():
 @APP.route('/channel/join', methods=['POST'])
 def run_channel_join():
     request_data = request.form
-    return_value = return_value = channel_join.channel_join(
+    return_value = return_value = channel.channel_join(
         request_data["token"],
         request_data["channel_id"]
     )
@@ -294,7 +291,7 @@ def send_code(email, code):
 @APP.route('/channel/addowner', methods=["POST"])
 def run_channel_addowner():
     request_data = request.form
-    return_value = channel_addowner.channel_addowner(
+    return_value = channel.channel_addowner(
         request_data["token"],
         request_data["channel_id"],
         request_data["u_id"]
@@ -306,7 +303,7 @@ def run_channel_addowner():
 @APP.route('/channel/removeowner', methods=["POST"])
 def run_channel_removeowner():
     request_data = request.form
-    return_value = channel_addowner.channel_addowner(
+    return_value = channel.channel_addowner(
         request_data["token"],
         request_data["channel_id"],
         request_data["u_id"]
@@ -318,7 +315,7 @@ def run_channel_removeowner():
 @APP.route('/message/sendlater', methods=["POST"])
 def run_message_sendlater():
     request_data = request.form
-    return_value = channel_addowner.channel_addowner(
+    return_value = message.message_sendlater(
         request_data["token"],
         request_data["channel_id"],
         request_data["message"],
@@ -331,7 +328,7 @@ def run_message_sendlater():
 @APP.route('/user/profile/setname', methods=["PUT"])
 def run_profile_setname():
     request_data = request.form
-    return_value = user_profile_setname.user_profile_setname(
+    return_value = user.user_profile_setname(
         request_data["token"],
         request_data["name_first"],
         request_data["name_last"]
@@ -343,7 +340,7 @@ def run_profile_setname():
 @APP.route('/user/profile/setemail', methods=["PUT"])
 def run_profile_setemail():
     request_data = request.form
-    return_value = user_profile_setemail.user_profile_setemail(
+    return_value = user.user_profile_setemail(
         request_data["token"],
         request_data["email"],
     )
@@ -354,7 +351,7 @@ def run_profile_setemail():
 @APP.route('/user/profile/sethandle', methods=["PUT"])
 def run_profile_sethandle():
     request_data = request.form
-    return_value = user_profile_sethandle.user_profile_sethandle(
+    return_value = user.user_profile_sethandle(
         request_data["token"],
         request_data["handle_str"],
     )
@@ -365,7 +362,7 @@ def run_profile_sethandle():
 @APP.route('/user/profile/uploadphoto', methods=["POST"])
 def run_profile_uploadphoto():
     request_data = request.form
-    return_value = user_profile_uploadphoto.user_profile_uploadphoto(
+    return_value = user.user_profiles_uploadphoto(
         request_data["token"],
         request_data["img_url"],
         request_data["x_start"],
@@ -403,7 +400,7 @@ def run_standup_send():
 @APP.route('/search', methods=["GET"])
 def run_search():
     request_data = request.args
-    return_value = search.search(
+    return_value = message.search(
         request_data["token"],
         request_data["query_str"],
     )

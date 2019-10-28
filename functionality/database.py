@@ -129,70 +129,53 @@ class Channel:
             "name" : self._channel_name
         }
 
-
     def get_id(self):
         return self._channel_id
-
 
     def get_name(self):
         return self._channel_name
 
-
     def get_messages(self):
         return self._messages
-
 
     def get_members(self):
         return self._members
 
-
     def get_owners(self):
         return self._owners
-
 
     def is_public(self):
         return self._public
 
-
     def get_m_id(self):
         return self._message_id_max
-
 
     def get_pins(self):
         return self._pinned_messages
 
-
     def set_id(self, new_id):
         self._channel_id = new_id
-
 
     def set_name(self, name):
         self._channel_name = name
 
-
     def add_message(self, message):
         self._messages.append(message)
-
 
     def add_member(self, member):
         self._members.append(member)
 
-
     def add_owner(self, owner):
         self._owners.append(owner)
-
 
     def set_public(self, public):
         self._public = public
 
-
     def increment_m_id(self):
         self._message_id_max += 1
 
-
     def set_standup(self, standup):
         self._standup = standup
-
 
     def add_pin(self, message_id):
         self._pinned_messages.append(message_id)

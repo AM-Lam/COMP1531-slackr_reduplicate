@@ -11,10 +11,10 @@ def test_channels_create():
     user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
     
     # try to create a valid, public channel
-    assert channels_create(user1["token"], "Channel 1", True) == {"channel_id" : 1}
+    assert channels_create(user1["token"], "Channel 1", True) == {"channel_id" : 0}
 
     # try to create a valid, private channel
-    assert channels_create(user1["token"], "Channel 1", True) == {"channel_id" : 2}
+    assert channels_create(user1["token"], "Channel 1", True) == {"channel_id" : 1}
     
     # try to create a channel with an invalid name
     pytest.raises(ValueError, channels_create, user1["token"], 

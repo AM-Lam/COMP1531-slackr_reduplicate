@@ -226,7 +226,7 @@ def channels_create(token, name, is_public):
     # make our channel id just be the count of channels we already have
     # incremented by 1, this way the channel_ids will increase
     # sequentially
-    channel_id = len(server_data["channels"]) + 1
+    channel_id = len(server_data["channels"])
 
     # at the start there will be no messages and the only member will
     # be the creator of the channel
