@@ -2,6 +2,7 @@ import pickle
 import re
 import hashlib
 import jwt
+from datetime import datetime
 from .access_error import *
 
 
@@ -324,7 +325,6 @@ def get_channel(channel_id):
     raise a ValueError
     """
     channels = get_data()["channels"]
-
     for channel in channels:
         if channel.get_id() == channel_id:
             return channel
@@ -394,9 +394,9 @@ def get_message_list(channel, start, end):
             "message_id" : message.get_m_id(),
             "u_id" : message.get_u_id(),
             "message" : message.get_text(),
-            "time_created" : message.get_time_sent(),
-            "reacts" : message.get_reacts(),
-            "pinned" : message.is_pinned()
+            "time_created" : message.get_time_sent().timestamp(),
+            "reacts" : [], # message.get_reacts(),
+            "is_pinned" : message.is_pinned()
         })
     
     return return_messages

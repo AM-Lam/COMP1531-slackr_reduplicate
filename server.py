@@ -93,7 +93,7 @@ def channel_invite_e():
 @APP.route('/channel/details', methods=['GET'])
 def channel_details_e():
     token = request.args.get('token')
-    channel_id = request.args.get('channel_id')
+    channel_id = int(request.args.get('channel_id'))
     print(token, channel_id)
     dumpstring = channel.channel_details(token, channel_id)
     return dumps(dumpstring)
@@ -102,10 +102,10 @@ def channel_details_e():
 @APP.route('/channel/messages', methods=['GET'])
 def channel_messages_e():
     token = request.args.get('token')
-    channel_id = request.args.get('channel_id')
-    start = request.args.get('start')
-    print(token, channel_id, start)
+    channel_id = int(request.args.get('channel_id'))
+    start = int(request.args.get('start'))
     dumpstring = channel.channel_messages(token, channel_id, start)
+    print(dumpstring)
     return dumps(dumpstring)
 
 
@@ -130,7 +130,7 @@ def run_message_send():
     """
     request_data = request.form
     return_value = message.message_send(request_data["token"],
-                                        request_data["channel_id"],
+                                        int(request_data["channel_id"]),
                                         request_data["message"])
 
     return dumps(return_value)
@@ -144,7 +144,7 @@ def run_message_remove():
     """
     request_data = request.form
     return_value = message.message_remove(request_data["token"],
-                                          request_data["message_id"])
+                                          int(request_data["message_id"]))
 
     return dumps(return_value)
 
@@ -157,7 +157,7 @@ def run_message_edit():
     """
     request_data = request.form
     return_value = message.message_edit(request_data["token"],
-                                        request_data["message_id"],
+                                        int(request_data["message_id"]),
                                         request_data["message"])
 
     return dumps(return_value)
@@ -171,8 +171,8 @@ def run_message_react():
     """
     request_data = request.form
     return_value = message.message_react(request_data["token"],
-                                         request_data["message_id"],
-                                         request_data["react_id"])
+                                         int(request_data["message_id"]),
+                                         int(request_data["react_id"]))
 
     return dumps(return_value)
 
@@ -185,8 +185,8 @@ def run_message_unreact():
     """
     request_data = request.form
     return_value = message.message_unreact(request_data["token"],
-                                           request_data["message_id"],
-                                           request_data["react_id"])
+                                           int(request_data["message_id"]),
+                                           int(request_data["react_id"]))
 
     return dumps(return_value)
 
@@ -199,7 +199,7 @@ def run_message_pin():
     """
     request_data = request.form
     return_value = message.message_pin(request_data["token"],
-                                       request_data["message_id"])
+                                       int(request_data["message_id"]))
 
     
     return dumps(return_value)
@@ -214,7 +214,7 @@ def run_message_unpin():
     request_data = request.form
 
     return_value = message.message_unpin(request_data["token"],
-                                         request_data["message_id"])
+                                         int(request_data["message_id"]))
 
     return dumps(return_value)
 
@@ -227,7 +227,7 @@ def run_user_profile():
     """
     request_data = request.args
     return_value = user.user_profile(request_data["token"],
-                                     request_data["u_id"])
+                                     int(request_data["u_id"]))
 
     return dumps(return_value)
 
@@ -236,7 +236,7 @@ def run_user_profile():
 def run_channel_leave():
     request_data = request.form
     return_value = channel.channel_leave(request_data["token"],
-                                         request_data["channel_id"])
+                                         int(request_data["channel_id"]))
 
     return dumps(return_value)
 
@@ -268,7 +268,7 @@ def run_channel_join():
     request_data = request.form
     return_value = return_value = channel.channel_join(
         request_data["token"],
-        request_data["channel_id"]
+        int(request_data["channel_id"])
     )
 
     return dumps(return_value)
@@ -293,8 +293,8 @@ def run_channel_addowner():
     request_data = request.form
     return_value = channel.channel_addowner(
         request_data["token"],
-        request_data["channel_id"],
-        request_data["u_id"]
+        int(request_data["channel_id"]),
+        int(request_data["u_id"])
     )
 
     return dumps(return_value)
@@ -305,8 +305,8 @@ def run_channel_removeowner():
     request_data = request.form
     return_value = channel.channel_addowner(
         request_data["token"],
-        request_data["channel_id"],
-        request_data["u_id"]
+        int(request_data["channel_id"]),
+        int(request_data["u_id"])
     )
 
     return dumps(return_value)
@@ -317,8 +317,8 @@ def run_message_sendlater():
     request_data = request.form
     return_value = message.message_sendlater(
         request_data["token"],
-        request_data["channel_id"],
-        request_data["message"],
+        int(request_data["channel_id"]),
+        int(request_data["message"]),
         datetime.utcfromtimestamp(request_data["time_sent"])
     )
 
@@ -365,10 +365,10 @@ def run_profile_uploadphoto():
     return_value = user.user_profiles_uploadphoto(
         request_data["token"],
         request_data["img_url"],
-        request_data["x_start"],
-        request_data["y_start"],
-        request_data["x_end"],
-        request_data["y_end"],
+        int(request_data["x_start"]),
+        int(request_data["y_start"]),
+        int(request_data["x_end"]),
+        int(request_data["y_end"]),
     )
 
     return dumps(return_value)
@@ -379,7 +379,7 @@ def run_standup_start():
     request_data = request.form
     return_value = standup_start.standup_start(
         request_data["token"],
-        request_data["channel_id"],
+        int(request_data["channel_id"]),
     )
 
     return dumps(return_value)
@@ -390,7 +390,7 @@ def run_standup_send():
     request_data = request.form
     return_value = standup_send.standup_send(
         request_data["token"],
-        request_data["channel_id"],
+        int(request_data["channel_id"]),
         request_data["message"],
     )
 
@@ -413,8 +413,8 @@ def run_admin_userpermission_change():
     request_data = request.form
     return_value = admin_userpermission_change.admin_userpermission_change(
         request_data["token"],
-        request_data["u_id"],
-        request_data["permission_id"],
+        int(request_data["u_id"]),
+        int(request_data["permission_id"]),
     )
 
     return dumps(return_value)

@@ -61,8 +61,26 @@ def channel_details(token, channel_id):
     if u_id not in channel_members:
         raise AccessError(description='You do not have permission to do this')
     
+    # TODO: Rewrite this to not be awful, will likely require
+    # rethinking our data structures
+    
+    # convert the channel_members list to a form the frontend can read
+    channel_members = [{
+        "u_id" : user.get_u_id(),
+        "name_first" : user.get_first_name(),
+        "name_last" : user.get_last_name()
+    } for user in get_data()["users"] if user.get_u_id() in channel_members]
+    
+    # do the same thing with the channel owners
+    channel_owners = channel.get_owners()
+    channel_owners = [{
+        "u_id" : user.get_u_id(),
+        "name_first" : user.get_first_name(),
+        "name_last" : user.get_last_name()
+    } for user in get_data()["users"] if user.get_u_id() in channel_owners]
+    
     return {"name" : channel.get_name(), 
-            "owner_members" : channel.get_owners(),
+            "owner_members" : channel_owners,
             "all_members" : channel_members}
 
 
@@ -146,8 +164,6 @@ def channel_messages(token, channel_id, start):
     u_id = check_valid_token(token)
 
     # this will check if the user is a member of the channel.
-    print(get_channel(channel_id).get_members())
-    print(get_channel(channel_id))
     if not is_user_member(u_id, channel_id):
         raise AccessError("You do not have permission to do this")
 

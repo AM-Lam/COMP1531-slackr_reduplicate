@@ -70,17 +70,9 @@ def user_profile_setname(token, name_first, name_last):
 def user_profile(token, u_id):
     server_data = get_data()
 
-    # now grab the u_id associated with the provided token
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    check_u_id = token_payload["u_id"]
-
-    # not an authorised user
+    # not a valid token
     if not server_data["tokens"].get(token, False):
         raise AccessError 
-
-    # authorization problem
-    if check_u_id != u_id:
-        raise ValueError(description="Invalid user")
     
     for info in server_data['users']:
         if info.get_u_id() == u_id:
@@ -95,6 +87,7 @@ def user_profile(token, u_id):
                 'name_last': last_name,
                 'handle_str': handle 
             }
+    
     raise ValueError(description="User cannot be found")
 
 
