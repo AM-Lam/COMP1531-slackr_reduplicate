@@ -2,11 +2,10 @@ import pytest
 import jwt
 from .database import get_data, clear_data
 from .auth_register import auth_register
-from .channels_create import channels_create
-from .channel_join import channel_join
 from .message_send import message_send
 from .message_remove import message_remove
 from .message_edit import message_edit
+from .channel import channel_join, channels_create
 from .access_error import *
 
 

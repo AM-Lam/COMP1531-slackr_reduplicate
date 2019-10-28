@@ -1,10 +1,8 @@
 import pytest
-from .access_error import *
-from .channel_details import channel_details, verify_user_status, check_channel_existence
 from .auth_register import auth_register
-from .channels_create import channels_create
-from .channel_join import channel_join
-from .database import clear_data
+from .channel import channel_join, channels_create, channel_details
+from .database import clear_data, get_channel, is_user_member
+from .access_error import *
 
 
 def test_run_all():
@@ -27,12 +25,10 @@ def test_run_all():
     # what if the channel does not exist?
     invalid_channel = 999
     with pytest.raises(ValueError , match=r"*"):
-        check_channel_existence(invalid_channel)
+        get_channel(invalid_channel)
 
     # user2 is not a part of the channel
-    with pytest.raises(AccessError , match=r"*"):
-        verify_user_status(token2 ,unswchannelid)
-
+    assert is_user_member(user2["u_id"], unswchannel["channel_id"]) == False
 
     # adding user 2 to the channel
     channel_join(user2["token"], unswchannelid)
@@ -41,7 +37,7 @@ def test_run_all():
     detaildict = channel_details(token2, unswchannelid)
     assert detaildict['name'] == "unswchannel"
     assert detaildict['owner_members'] == [1]
-    assert detaildict['all_members'] == [1 , 2]
+    assert detaildict['all_members'] == [1, 2]
     
     # add user 3
     channel_join(user3["token"], unswchannelid)
@@ -50,4 +46,4 @@ def test_run_all():
     detaildict2 = channel_details(token2, unswchannelid)
     assert detaildict2['name'] == "unswchannel"
     assert detaildict2['owner_members'] == [1]
-    assert detaildict2['all_members'] == [1,2,3]
+    assert detaildict2['all_members'] == [1, 2, 3]

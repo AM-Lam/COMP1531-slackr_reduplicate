@@ -1,10 +1,11 @@
+from datetime import timedelta, datetime
 import pytest
 from .standup_start import standup_start
-from .channels_create import channels_create
-from .access_error import *
 from .auth_register import auth_register
+from .channel import channels_create
 from .database import *
-from datetime import timedelta, datetime
+from .access_error import *
+
 
 
 def test_standup_start():

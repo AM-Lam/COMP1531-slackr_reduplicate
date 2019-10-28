@@ -4,8 +4,7 @@ from datetime import datetime, timedelta
 from .database import get_data, clear_data
 from .message_sendlater import message_sendlater
 from .auth_register import auth_register
-from .channels_create import channels_create
-from .channel_messages import channel_messages
+from .channel import channel_messages, channels_create
 from .access_error import *
 
 

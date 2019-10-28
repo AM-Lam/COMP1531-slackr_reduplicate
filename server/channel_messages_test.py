@@ -1,9 +1,7 @@
 import pytest
-from .channel_messages import *
-from .channels_create import *
-from .auth_register import *
-from .channel_invite import *
-from .message_send import *
+from .auth_register import auth_register
+from .message_send import message_send
+from .channel import channel_messages, channels_create, channel_invite
 from .database import *
 
 
@@ -22,12 +20,6 @@ def test_run_all():
     uid1 = user1['u_id']
     uid2 = user2['u_id']
     uid3 = user3['u_id']
-
-
-    # channel does not exist
-    def test_channel_exists_or_not():
-        with pytest.raises(ValueError, match=r"*"):
-            does_channel_exist(9999999999999999)
 
     # start greater than the total number of messages
     # user1 will be the channel owner

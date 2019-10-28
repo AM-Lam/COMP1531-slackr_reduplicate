@@ -11,7 +11,6 @@ from .access_error import *
 def auth_register(email, password, first_name, last_name):
     update_data = get_data()
     
-    
     check_first(first_name)
     check_last(last_name)
     
@@ -47,7 +46,7 @@ def auth_register(email, password, first_name, last_name):
     # adding the person to the user list.
     update_data['users'].append(person)
     
-    return { "u_id": u_id, "token": token }
+    return {"u_id": u_id, "token": token}
 
 
 def check_regEmailtype(email):

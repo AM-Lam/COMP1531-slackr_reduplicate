@@ -3,10 +3,10 @@ import jwt
 from .database import clear_data
 from .message_unreact import message_unreact
 from .auth_register import auth_register
-from .channels_create import channels_create
 from .message_send import message_send
 from .message_remove import message_remove
 from .message_react import message_react
+from .channel import channels_create
 from .access_error import *
 
 

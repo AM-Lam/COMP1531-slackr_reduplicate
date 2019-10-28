@@ -1,6 +1,6 @@
 import jwt
-from .channels_list import channels_list
 from .database import get_data, get_secret
+from .channel import channels_list
 from .access_error import *
 
 

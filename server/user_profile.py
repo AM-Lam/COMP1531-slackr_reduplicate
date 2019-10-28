@@ -16,7 +16,7 @@ def user_profile(token, u_id):
 
     # authorization problem
     if check_u_id != u_id:
-            raise ValueError(description="Invalid user")
+        raise ValueError(description="Invalid user")
     
     for info in server_data['users']:
         if info._u_id == u_id:
@@ -32,5 +32,4 @@ def user_profile(token, u_id):
                 'handle_str': handle 
             }
         # details cannot be found based on u_id
-        else:
-            raise ValueError(description="User cannot be found")
+    raise ValueError(description="User cannot be found")

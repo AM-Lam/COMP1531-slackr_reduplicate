@@ -1,10 +1,8 @@
 import pytest
 import jwt
 from .database import clear_data, get_data
-from .channel_removeowner import channel_removeowner
 from .auth_register import auth_register
-from .channels_create import channels_create
-from .channel_addowner import channel_addowner
+from .channel import channel_addowner, channels_create, channel_removeowner
 from .access_error import *
 
 
@@ -25,7 +23,6 @@ def test_channel_removeowner():
             break
     
     channel1 = channels_create(user1["token"], "Channel 1", True)
-    channel2 = channels_create(user1["token"], "Channel 2", True)
     
     # now add user2 as an owner to channel1
     channel_addowner(user1["token"], channel1["channel_id"], user2["u_id"])

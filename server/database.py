@@ -1,4 +1,7 @@
 import pickle
+import re
+import jwt
+from .access_error import *
 
 
 DATABASE = None
@@ -257,14 +260,17 @@ class Messages:
     def get_u_id(self):
         return self._u_id
 
-
     def get_text(self):
         return self._text
 
-
     def is_pinned(self):
         return self._pinned
-
+    
+    def get_time_sent(self):
+        return self._time_sent
+    
+    def get_reacts(self):
+        return self._reacts
 
     def edit_text(self, new):
         self._text = new
@@ -294,6 +300,135 @@ def clear_data():
         "tokens" : {},
         "reset" : {}
     }
+
+
+# Helper Functions
+def is_email_valid(email):
+    # run the re module to identify if an email is valid
+    regex = r'^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+    if re.search(regex, email):
+        return True
+    raise ValueError(description="Email is invalid.")
+
+
+def check_email_database(email):
+    # check if the email is already being used/is within the database
+    all_users = get_data()["users"]
+
+    for user in all_users:
+        if user.get_email() == email:
+            raise ValueError(description="Email is already in use.")
+
+    return True
+
+
+def check_valid_token(token):
+    # find the user ID associated with this token, else raise a ValueError
+    db = get_data()
+
+    if not db["tokens"].get(token, False):
+        raise ValueError(description="Invalid token")
+
+    token_payload = jwt.decode(token, get_secret(), algorithms=['HS256'])
+    u_id = token_payload["u_id"]
+
+    for user in db["users"]:
+        if u_id == user.get_u_id():
+            return u_id
+    raise ValueError(description="User does not exist")
+
+
+def is_handle_in_use(handle_str):
+    # check if the handle is already being used/exists within the database
+    users = get_data()["users"]
+    
+    for user in users:
+        if user.get_handle() == handle_str:
+            return True
+    
+    return False
+
+
+def get_channel(channel_id):
+    """
+    Take a channel_id and return the channel if it exists, otherwise
+    raise a ValueError
+    """
+    channels = get_data()["channels"]
+
+    for channel in channels:
+        if channel.get_id() == channel_id:
+            return channel
+    
+    raise ValueError(description="Channel does not exist")
+
+
+def is_user_member(u_id, channel_id):
+    """
+    Take a channel and a u_id, return True if the user is a member and false if
+    they are not
+    """
+
+    if u_id in get_channel(channel_id).get_members():
+        return True
+    
+    return False
+
+
+def is_user_owner(u_id, channel_id):
+    """
+    Take a channel and a u_id, return True if the user is an owner and false if
+    they are not
+    """
+
+    if u_id in get_channel(channel_id).get_owners():
+        return True
+    
+    return False
+
+
+def message_count(channel):
+    """
+    Take a channel and return how many messages have been sent in it
+    """
+
+    return len(channel.get_messages())
+
+
+def get_message_list(channel, start, end):
+    """
+    Taking a Channel, a start and an end return a list of the messages
+    in that channel in the order they appeared
+    """
+    # initialising a messages list.
+    return_messages = []
+
+    # get the messages from the channel and reverse the list to get
+    # them in chronological order
+    messages = channel.get_messages()[::-1]
+    for message in messages[start:end]:
+        return_messages.append({
+            "message_id" : message.get_m_id(),
+            "u_id" : message.get_u_id(),
+            "message" : message.get_text(),
+            "time_created" : message.get_time_sent(),
+            "reacts" : message.get_reacts(),
+            "pinned" : message.is_pinned()
+        })
+    
+    return return_messages
+
+
+def is_valid_u_id(u_id):
+    """
+    Take a u_id and return True if it is valid, otherwise return False
+    """
+
+    for user in get_data()["users"]:
+        if user.get_u_id() == u_id:
+            return True
+    
+    return False
 
 
 clear_data()
