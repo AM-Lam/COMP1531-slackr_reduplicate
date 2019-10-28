@@ -3,7 +3,7 @@ import threading
 from datetime import timedelta, datetime
 from .standup_send import standup_send
 from .standup_start import standup_start
-from .auth_register import auth_register
+from .auth import auth_register
 from .database import clear_data, get_data
 from .channel import channels_create
 from .access_error import *

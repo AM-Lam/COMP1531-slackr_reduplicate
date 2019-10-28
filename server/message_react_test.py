@@ -2,7 +2,7 @@ import pytest
 import re
 import jwt
 from .database import clear_data
-from .auth_register import auth_register
+from .auth import auth_register
 from .message import message_remove, message_send, message_react
 from .channel import channels_create
 from .access_error import *

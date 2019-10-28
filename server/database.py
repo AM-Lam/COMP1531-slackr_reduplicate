@@ -1,5 +1,6 @@
 import pickle
 import re
+import hashlib
 import jwt
 from .access_error import *
 
@@ -428,6 +429,52 @@ def is_valid_u_id(u_id):
             return True
     
     return False
+
+
+def u_id_from_email(email, password):
+    """
+    Take an email and a password, if the user with this email also has this
+    password return the u_id of the user otherwise raise an error
+    """
+
+    wrong_pasword = False
+    hash_pass = hashlib.sha256(password.encode()).hexdigest()
+    for user in get_data()['users']:
+        if user.get_email() == email:
+            if user.get_password() == hash_pass:
+                return user._u_id
+            wrong_pasword = True
+            break
+    
+    if wrong_pasword:
+        raise ValueError(description="Wrong password, please try again")
+    
+    raise ValueError(description="Email does not exist")
+
+
+def u_id_from_email_reset(email):
+    """
+    Take an email to send a reset code to, if the email exists return the u_id
+    otherwise raise a ValueError
+    """
+
+    for user in get_data()['users']:
+        if user.get_email() == email:
+            return user._u_id
+    
+    raise ValueError(description="There are no users with this password")
+
+
+def check_reset_code(reset_code):
+    # this will check if the reset code sent by the 
+    # auth_passwordreset_request function is correct
+   
+    reset_codes = get_data()["reset"]
+    if reset_code in reset_codes:
+        email = reset_codes[reset_code]
+        return email
+    else:
+        raise ValueError("Reset code incorrect!")
 
 
 clear_data()

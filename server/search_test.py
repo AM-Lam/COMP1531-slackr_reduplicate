@@ -1,5 +1,5 @@
 from .message import search
-from .auth_register import auth_register
+from .auth import auth_register
 from .database import *
 
 

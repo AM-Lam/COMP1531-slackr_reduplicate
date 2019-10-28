@@ -1,5 +1,5 @@
 import pytest
-from .auth_register import auth_register
+from .auth import auth_register
 from .database import clear_data, get_data
 from .channel import channels_create
 from .access_error import *

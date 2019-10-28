@@ -1,7 +1,7 @@
 import pytest
 import jwt
 from .database import get_data, clear_data
-from .auth_register import auth_register
+from .auth import auth_register
 from .channel import channel_join, channels_create
 from .message import message_edit, message_send, message_remove
 from .access_error import *

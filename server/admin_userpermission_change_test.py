@@ -2,7 +2,7 @@ import pytest
 from .database import clear_data
 from .access_error import *
 from .admin_userpermission_change import admin_userpermission_change
-from .auth_register import auth_register
+from .auth import auth_register
 
 
 def test_admin_userpermission_change():

@@ -1,6 +1,6 @@
 import pytest
 import jwt
-from .auth_register import auth_register
+from .auth import auth_register
 from .channel import channels_create, channel_addowner
 from .database import *
 from .access_error import *

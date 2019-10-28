@@ -1,6 +1,6 @@
 import pytest
 from .access_error import *
-from .auth_register import auth_register
+from .auth import auth_register
 from .user import user_profile
 from .database import *
 

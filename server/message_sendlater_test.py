@@ -2,7 +2,7 @@ import jwt
 import pytest
 from datetime import datetime, timedelta
 from .database import get_data, clear_data
-from .auth_register import auth_register
+from .auth import auth_register
 from .message import message_sendlater
 from .channel import channel_messages, channels_create
 from .access_error import *

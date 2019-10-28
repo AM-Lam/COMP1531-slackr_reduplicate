@@ -1,8 +1,6 @@
 import pytest
-from .auth_logout import auth_logout
-from .auth_register import auth_register
-from .auth_login import auth_login
 from .database import clear_data
+from .auth import auth_login, auth_register, auth_logout
 from .access_error import *
 
 def test_auth_logout():
