@@ -1,27 +1,4 @@
 """Flask server"""
-<<<<<<< HEAD
-from json import dumps
-from flask import Flask, request
-
-APP = Flask(__name__)
-
-@APP.route('/echo/get', methods=['GET'])
-def echo1():
-    """ Description of function """
-    return dumps({
-        'echo' : request.args.get('echo'),
-    })
-
-@APP.route('/echo/post', methods=['POST'])
-def echo2():
-    """ Description of function """
-    return dumps({
-        'echo' : request.form.get('echo'),
-    })
-
-if __name__ == '__main__':
-    APP.run()
-=======
 import sys
 import atexit
 from flask_cors import CORS
@@ -453,4 +430,3 @@ if __name__ == '__main__':
 
     # when the server exists dump the current database into a file
     atexit.register(database.save_data)
->>>>>>> master
