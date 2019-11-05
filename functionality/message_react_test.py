@@ -5,7 +5,7 @@ from .database import clear_data
 from .auth import auth_register
 from .message import message_remove, message_send, message_react
 from .channel import channels_create
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def test_message_react():

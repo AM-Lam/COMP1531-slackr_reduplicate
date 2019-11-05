@@ -4,7 +4,7 @@ from .database import get_data, clear_data
 from .auth import auth_register
 from .channel import channel_join, channels_create
 from .message import message_edit, message_send, message_remove
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def verify_message(message_obj, correct_data):

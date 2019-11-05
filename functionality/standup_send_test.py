@@ -6,7 +6,7 @@ from .standup_start import standup_start
 from .auth import auth_register
 from .database import clear_data, get_data
 from .channel import channels_create
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def test_standup_send():

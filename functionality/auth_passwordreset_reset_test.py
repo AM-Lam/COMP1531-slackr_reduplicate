@@ -2,7 +2,7 @@ import pytest
 import hashlib
 from .database import clear_data, get_data
 from .auth import auth_passwordreset_request, auth_passwordreset_reset, auth_register
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def test_reset_test():

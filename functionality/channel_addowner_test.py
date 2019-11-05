@@ -2,8 +2,8 @@ import pytest
 import jwt
 from .auth import auth_register
 from .channel import channels_create, channel_addowner
-from .database import *
-from .access_error import *
+from .database import clear_data
+from .access_error import AccessError, ValueError
 
 
 def test_channel_addowner():

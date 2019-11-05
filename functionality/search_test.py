@@ -1,6 +1,6 @@
 from .message import search
 from .auth import auth_register
-from .database import *
+from .database import clear_data
 
 
 def test_search():

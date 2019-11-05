@@ -1,8 +1,8 @@
 import pytest
-from .access_error import *
+from .access_error import AccessError, ValueError
 from .auth import auth_register
 from .user import user_profile
-from .database import *
+from .database import clear_data
 
 def verify_info(user_obj, correct_data):
     clear_data()

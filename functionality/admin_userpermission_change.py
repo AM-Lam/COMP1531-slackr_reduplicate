@@ -1,6 +1,6 @@
 import jwt
-from .access_error import *
-from .database import *
+from .access_error import AccessError, ValueError
+from .database import get_data, get_secret
 
 #   admin_userpermission_change(token, u_id, permission_id);
 #   return void

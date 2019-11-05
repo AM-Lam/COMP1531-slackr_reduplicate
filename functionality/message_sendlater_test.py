@@ -5,7 +5,7 @@ from .database import get_data, clear_data
 from .auth import auth_register
 from .message import message_sendlater
 from .channel import channel_messages, channels_create
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def test_message_sendlater():

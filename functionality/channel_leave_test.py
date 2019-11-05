@@ -2,7 +2,7 @@ import pytest
 from .auth import auth_register
 from .channel import channels_create, channel_leave
 from .database import clear_data
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def test_channel_leave():

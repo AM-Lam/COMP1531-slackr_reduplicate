@@ -4,8 +4,8 @@ Functions that relate to the creation, modification and deletion of users.
 
 import urllib
 import jwt
-from .database import *
-from .access_error import *
+from .database import is_email_valid, check_email_database, check_valid_token, check_valid_token, get_data, get_user, is_handle_in_use
+from .access_error import AccessError, ValueError
 
 
 def user_profile_setemail(token, email):

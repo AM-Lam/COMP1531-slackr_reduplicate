@@ -3,7 +3,7 @@ import jwt
 from .database import clear_data, get_data
 from .auth import auth_register
 from .channel import channel_addowner, channels_create, channel_removeowner
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def test_channel_removeowner():

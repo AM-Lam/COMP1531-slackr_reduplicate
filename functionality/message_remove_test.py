@@ -4,7 +4,7 @@ from .database import clear_data, get_data
 from .auth import auth_register
 from .message import message_send, message_remove
 from .channel import channels_create, channel_join
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def test_message_remove():

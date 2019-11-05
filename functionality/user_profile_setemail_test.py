@@ -2,7 +2,7 @@ import pytest
 from .user import user_profile_setemail
 from .auth import auth_register
 from .database import clear_data
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def test_user_profile_setemail():

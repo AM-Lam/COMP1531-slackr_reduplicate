@@ -3,8 +3,8 @@ import pytest
 from .standup_start import standup_start
 from .auth import auth_register
 from .channel import channels_create
-from .database import *
-from .access_error import *
+from .database import clear_data
+from .access_error import AccessError, ValueError
 
 
 

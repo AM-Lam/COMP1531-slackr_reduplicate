@@ -2,7 +2,7 @@ import pytest
 from .auth import auth_register
 from .channel import channel_join, channels_create, channel_details
 from .database import clear_data, get_channel, is_user_member
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 
 def test_run_all():

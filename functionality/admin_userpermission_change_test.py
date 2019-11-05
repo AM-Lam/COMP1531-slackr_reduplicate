@@ -1,6 +1,6 @@
 import pytest
 from .database import clear_data
-from .access_error import *
+from .access_error import AccessError, ValueError
 from .admin_userpermission_change import admin_userpermission_change
 from .auth import auth_register
 

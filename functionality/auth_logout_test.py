@@ -1,7 +1,7 @@
 import pytest
 from .database import clear_data
 from .auth import auth_login, auth_register, auth_logout
-from .access_error import *
+from .access_error import AccessError, ValueError
 
 def test_auth_logout():
     clear_data()

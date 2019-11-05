@@ -2,8 +2,8 @@
 Functions that relate to the creation, modification and deletion of channels.
 """
 import jwt
-from .database import *
-from .access_error import *
+from .database import get_data, get_secret, Channel, check_valid_token, get_channel, is_valid_u_id, is_user_member, is_user_owner, message_count, get_message_list
+from .access_error import AccessError, ValueError
 
 
 def channel_addowner(token, channel_id, u_id):
