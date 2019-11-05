@@ -1,7 +1,8 @@
 import pytest
 from .auth import auth_register
 from .channel import channel_invite, channel_join, channels_create
-from .database import *
+from .access_error import AccessError, ValueError
+from .database import clear_data, Channel, User
 
 
 def test_run_first():

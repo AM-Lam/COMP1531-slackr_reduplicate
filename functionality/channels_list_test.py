@@ -1,7 +1,7 @@
 import pytest
 from .channel import channels_create, channels_list, channel_join, channel_leave
 from .auth import auth_register
-from .database import *
+from .database import clear_data
 
 
 def test_channels_list():
