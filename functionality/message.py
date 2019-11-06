@@ -146,11 +146,16 @@ def message_edit(token, message_id, message):
     # if user is not the poster or admin
     if user_ is None:
         raise AccessError(description="You do not have permission to edit this message")
-    
-    print(f'Message object {message_} has text {message_.get_text()}')
-    # update the database with new message
-    message_.edit_text(message)
-    print(f'Message object {message_} has text {message_.get_text()}')
+
+    # message is deleted if the message is empty string
+    # or do "if message == "":" ?
+    if not message: 
+        message_remove(token, message_id)
+    else :
+        print(f'Message object {message_} has text {message_.get_text()}')
+        # update the database with new message
+        message_.edit_text(message)
+        print(f'Message object {message_} has text {message_.get_text()}')
             
     return {}
 

@@ -63,3 +63,34 @@ def test_message_edit():
 
     assert message_edit(user2["token"], message1['message_id'], "Heeeello") == {}
     assert get_message_text(message1["message_id"]) == "Heeeello"
+
+# if the message string is empty, the message will be deleted
+def test_empty_message():
+    clear_data()
+
+    server_data = get_data()
+    
+    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
+    user2 = auth_register("valid2@email.com", "1234567890", "Bob", "Zones")
+
+    user2_obj = None
+    for u in server_data["users"]:
+        if u.get_u_id() == user2["u_id"]:
+            user2_obj = u
+            break
+    
+    channel = channels_create(user1["token"], "Channel 1", True)
+    channel_join(user2["token"], channel["channel_id"])
+
+    message1 = message_send(user1["token"], channel["channel_id"], "Hello")
+    message2 = message_send(user2["token"], channel["channel_id"], "Google Murray Bookchin")
+    
+    # edit a message we created, and check that it updated correctly
+    assert message_edit(user1["token"], message1['message_id'], "Hi") == {}
+
+    # edit a message we created to an empty string, and check that it is deleted
+    assert message_edit(user1["token"], message1['message_id'], "") == {}
+
+    # try to edit a message that does not exist
+    pytest.raises(Value_Error, message_edit, user1["token"], 
+                   message1['message_id'], "Hello There")
