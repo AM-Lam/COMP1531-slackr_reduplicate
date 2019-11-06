@@ -10,17 +10,21 @@ import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ProfilePage from './pages/ProfilePage';
+import SearchPage from './pages/SearchPage';
+
 import ProtectedRoute from './components/Layout/ProtectedRoute';
 
 import { AuthProvider } from './AuthContext';
+import './axios';
 
 function App() {
   const [authDetails, setAuthDetails] = React.useState(
     localStorage.getItem('token')
   );
 
-  function setAuth(token) {
+  function setAuth(token, u_id) {
     localStorage.setItem('token', token);
+    localStorage.setItem('u_id', u_id);
     setAuthDetails(token);
   }
   return (
@@ -46,6 +50,8 @@ function App() {
           <ProtectedRoute exact path="/" component={HomePage} />
           <ProtectedRoute path="/profile/:profile" component={ProfilePage} />
           <ProtectedRoute path="/channel/:channel_id" component={ChannelPage} />
+          <ProtectedRoute path="/search/:query_str" component={SearchPage} />
+          <ProtectedRoute path="/search" component={SearchPage} />
         </Switch>
       </Router>
     </AuthProvider>

@@ -1,13 +1,12 @@
 import React from 'react';
-import * as routecall from '../../utils/routecall';
+import axios from 'axios';
 
 import { IconButton } from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import { url } from '../../utils/constants';
-
 import AuthContext from '../../AuthContext';
+import {StepContext} from '../Channel/ChannelMessages';
 
 function MessageRemove({
   message_id,
@@ -15,10 +14,18 @@ function MessageRemove({
 
   const token = React.useContext(AuthContext);
 
+  let step = React.useContext(StepContext);
+  step = step ? step : () => {}; // sanity check
+
   const messageRemove = () => {
-    routecall.post(`${url}/message/remove`, {
-      token,
-      message_id,
+    axios.delete(`/message/remove`, {
+      data: {
+        token,
+        message_id,
+      }
+    })
+    .then(() => {
+      step();
     });
   };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import * as routecall from '../../utils/routecall';
+import axios from 'axios';
 
 import {
   Badge,
@@ -9,9 +9,8 @@ import {
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbUpOutlinedIcon from '@material-ui/icons/ThumbUpOutlined';
 
-import { url } from '../../utils/constants';
-
 import AuthContext from '../../AuthContext';
+import {StepContext} from '../Channel/ChannelMessages';
 
 function MessageReact({
   message_id,
@@ -19,19 +18,27 @@ function MessageReact({
 }) {
 
   const token = React.useContext(AuthContext);
+  let step = React.useContext(StepContext);
+  step = step ? step : () => {}; // sanity check
 
   const messageReact = (is_reacted) => {
     if (is_reacted) {
-      routecall.post(`${url}/message/unreact`, {
+      axios.post(`/message/unreact`, {
         token,
         message_id,
         react_id: 1 /* FIXME */,
+      })
+      .then(() => {
+        step();
       });
     } else {
-      routecall.post(`${url}/message/react`, {
+      axios.post(`/message/react`, {
         token,
         message_id,
         react_id: 1 /* FIXME */,
+      })
+      .then(() => {
+        step();
       });
     }
   };
