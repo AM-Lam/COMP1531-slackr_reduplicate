@@ -1,6 +1,6 @@
 import React from 'react';
-import * as routecall from '../../utils/routecall';
 import timeago from 'epoch-timeago';
+import axios from 'axios';
 
 import {
   Avatar,
@@ -10,12 +10,11 @@ import {
 } from '@material-ui/core';
 
 
-import { url } from '../../utils/constants';
-
 import AuthContext from '../../AuthContext';
 import MessagePin from './MessagePin';
 import MessageReact from './MessageReact';
 import MessageRemove from './MessageRemove';
+import MessageEdit from './MessageEdit';
 
 
 function Message({
@@ -30,12 +29,14 @@ function Message({
 
   const [name, setName] = React.useState();
   const [initials, setInitials] = React.useState();
+  const [imgUrl, setImgUrl] = React.useState();
   const token = React.useContext(AuthContext);
   React.useEffect(() => {
     setName();
     setInitials();
-    routecall
-      .get(`${url}/user/profile`, {
+    setImgUrl()
+    axios
+      .get(`/user/profile`, {
         params: {
           token,
           u_id,
@@ -47,29 +48,23 @@ function Message({
           name_first = '',
           name_last = '',
           handle_str = '',
+          profile_img_url = '',
         } = data;
         setName(`${name_first} ${name_last}`);
         setInitials(`${name_first[0]}${name_last[0]}`);
+        setImgUrl(`${profile_img_url}`)
       })
       .catch((err) => {
         console.error(err);
       });
   }, [message_id, token, u_id]);
 
-  const messageRemove = () => {
-    routecall.post(`${url}/message/remove`, {
-      token,
-      message_id,
-    });
-  };
-
-
   return (
     <ListItem key={message_id} style={{ width: '100%' }}>
       {name && initials && message && (
         <>
           <ListItemIcon>
-            <Avatar>{initials}</Avatar>
+            <img className="avatar-small" src={imgUrl} />
           </ListItemIcon>
           <div
             style={{
@@ -99,6 +94,9 @@ function Message({
               <MessagePin
                 message_id={message_id}
                 is_pinned={is_pinned}
+              />
+              <MessageEdit
+                message_id={message_id}
               />
               <MessageRemove
                 message_id={message_id}

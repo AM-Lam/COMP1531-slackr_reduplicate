@@ -1,14 +1,14 @@
 import React from 'react';
-import * as routecall from '../../utils/routecall';
+import axios from 'axios';
 
 import MdiIcon from '@mdi/react';
 import { mdiPin, mdiPinOutline } from '@mdi/js';
 import { IconButton } from '@material-ui/core';
 
-import { url } from '../../utils/constants';
-
 import { withTheme } from '@material-ui/styles';
+
 import AuthContext from '../../AuthContext';
+import {StepContext} from '../Channel/ChannelMessages';
 
 function MessagePin({
   message_id,
@@ -20,17 +20,25 @@ function MessagePin({
   React.useEffect(() => setIsPinned(is_pinned),[is_pinned]);
 
   const token = React.useContext(AuthContext);
+  let step = React.useContext(StepContext);
+  step = step ? step : () => {}; // sanity check
 
   const toggle = () => {
     if (isPinned) {
-      routecall.post(`${url}/message/unpin`, {
+      axios.post(`/message/unpin`, {
         token,
         message_id,
+      })
+      .then(() => {
+        step();
       });
     } else {
-      routecall.post(`${url}/message/pin`, {
+      axios.post(`/message/pin`, {
         token,
         message_id,
+      })
+      .then(() => {
+        step();
       });
     }
     // Optimistic re-rendering
