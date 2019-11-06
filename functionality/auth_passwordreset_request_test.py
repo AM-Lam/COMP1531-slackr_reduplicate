@@ -1,7 +1,7 @@
 import pytest
 from .database import clear_data, get_data
 from .auth import auth_register, auth_passwordreset_request
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 def test_request_test():

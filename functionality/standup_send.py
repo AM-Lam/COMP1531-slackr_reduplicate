@@ -1,12 +1,12 @@
 import jwt
 from datetime import timedelta, datetime
 from .database import get_data, get_secret
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 #   standup_send(token, channel_id, message);
 #   return void
-#   Exception: ValueError when:
+#   Exception: Value_Error when:
 #       - Channel (based on ID) does not exist,
 #       - Message is more than 1000 characters,
 #   AccessError when :
@@ -29,7 +29,7 @@ def standup_send(token, channel_id, message):
     return
 
 def check_valid_token(token):
-    # find the user ID associated with this token, else raise a ValueError
+    # find the user ID associated with this token, else raise a Value_Error
     DATABASE = get_data()
     SECRET = get_secret()
     token = jwt.decode(token, SECRET, algorithms=['HS256'])
@@ -38,17 +38,17 @@ def check_valid_token(token):
         user_id = x.get_u_id()
         if user_id == token["u_id"]:
             return user_id
-    raise ValueError(description="token invalid")
+    raise Value_Error(description="token invalid")
 
 
 def check_channel_exist(token, channel_id):
     DATABASE = get_data()
-    # check if channel_id exists, else raise a ValueError
+    # check if channel_id exists, else raise a Value_Error
 
     for x in DATABASE["channels"]:
         if x.get_id() == channel_id:
             return True
-    raise ValueError(description="Channel does not exist or cannot be found.")
+    raise Value_Error(description="Channel does not exist or cannot be found.")
 
 
 def check_channel_member(u_id, channel_id):
@@ -61,14 +61,14 @@ def check_channel_member(u_id, channel_id):
                 return True
             else:
                 raise AccessError(description="You are not a member of this channel.")
-    raise ValueError(description="Channel does not exist or cannot be found.")
+    raise Value_Error(description="Channel does not exist or cannot be found.")
 
 
 def check_message_length(message):
     if len(message) <= 1000:
         return True
     else:
-        raise ValueError(description="Message is too long.")
+        raise Value_Error(description="Message is too long.")
 
 
 def check_valid_standup_time(channel_id):
@@ -87,7 +87,7 @@ def check_valid_standup_time(channel_id):
                     return True
             except TypeError:
                 raise AccessError(description="The standup time has finished.")
-    raise ValueError(description="Channel does not exist or cannot be found.")
+    raise Value_Error(description="Channel does not exist or cannot be found.")
 
 
 def send_message(u_id, message):

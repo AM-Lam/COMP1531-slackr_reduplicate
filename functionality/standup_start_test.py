@@ -4,7 +4,7 @@ from .standup_start import standup_start
 from .auth import auth_register
 from .channel import channels_create
 from .database import clear_data
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 
@@ -21,8 +21,8 @@ def test_standup_start():
     predicted_finish_time = datetime.now() + timedelta(seconds=dev_time)
     assert (predicted_finish_time - standup_start(user["token"], channel["channel_id"]) <= timedelta(6))
 
-    # returns a ValueError if the channel doesn't exist
-    pytest.raises(ValueError, standup_start, user["token"], "not_a_real_channel")
+    # returns a Value_Error if the channel doesn't exist
+    pytest.raises(Value_Error, standup_start, user["token"], "not_a_real_channel")
 
     # returns an AccessError if the user does not have perms
     pytest.raises(AccessError, standup_start, user2["token"], channel["channel_id"])

@@ -2,7 +2,7 @@ import pytest
 from .user import user_profiles_uploadphoto
 from .auth import auth_register
 from .database import clear_data
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 def test_user_profiles_uploadphoto():

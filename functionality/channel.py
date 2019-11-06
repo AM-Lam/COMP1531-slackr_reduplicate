@@ -3,7 +3,7 @@ Functions that relate to the creation, modification and deletion of channels.
 """
 import jwt
 from .database import get_data, get_secret, Channel, check_valid_token, get_channel, is_valid_u_id, is_user_member, is_user_owner, message_count, get_message_list
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 def channel_addowner(token, channel_id, u_id):
@@ -33,10 +33,10 @@ def channel_addowner(token, channel_id, u_id):
     # owner of it raise an error, this will probably need to interact
     # with a database
     if to_add is None:
-        raise ValueError(description="The channel requested does not exist")
+        raise Value_Error(description="The channel requested does not exist")
 
     if u_id in to_add.get_owners():
-        raise ValueError(description="The user is already an owner in this channel")
+        raise Value_Error(description="The user is already an owner in this channel")
 
     # now make sure the calling user has the permissions to make this
     # change, we will need a few functions to be written that access a
@@ -89,10 +89,10 @@ def channel_invite(token, channel_id, u_id):
     channel = get_channel(channel_id)
 
     if not is_valid_u_id(u_id):
-        raise ValueError(description="u_id is not a real user")
+        raise Value_Error(description="u_id is not a real user")
 
     if is_user_member(u_id, channel_id):
-        raise ValueError(description="User is already a member of this channel")
+        raise Value_Error(description="User is already a member of this channel")
     
     if not is_user_owner(inviter_id, channel_id):
         raise AccessError(description="You do not have permission to do this")
@@ -129,7 +129,7 @@ def channel_join(token, channel_id):
             break
 
     if not found_channel:
-        raise ValueError
+        raise Value_Error
 
     # add the user's u_id to the channel's list of members, since the
     # data we get using channels_listall appears to be read-only
@@ -156,7 +156,7 @@ def channel_leave(token, channel_id):
 
     # if we get here the channel does not exist and we need to raise an
     # exception
-    raise ValueError
+    raise Value_Error
 
 
 def channel_messages(token, channel_id, start):    
@@ -171,7 +171,7 @@ def channel_messages(token, channel_id, start):
     message_num = message_count(channel)
 
     if start > message_num:
-        raise ValueError(description="Start greater than the count of messages")
+        raise Value_Error(description="Start greater than the count of messages")
 
     # set end to start + 50 if this is less than the amount of messages
     # in the channel otherwise set it to the amount of messages left
@@ -212,10 +212,10 @@ def channel_removeowner(token, channel_id, u_id):
     # if the channel requested does not exist or the u_id is not an
     # owner of it raise an error
     if to_remove is None:
-        raise ValueError(description="The requested channel does not exist")
+        raise Value_Error(description="The requested channel does not exist")
 
     if u_id not in to_remove.get_owners():
-        raise ValueError(description="The user is not an owner of this channel")
+        raise Value_Error(description="The user is not an owner of this channel")
 
     if owner_uid not in to_remove.get_owners() and not owner.is_global_admin():
         raise AccessError(description="You do not have permissions to do this")
@@ -231,7 +231,7 @@ def channel_removeowner(token, channel_id, u_id):
 def channels_create(token, name, is_public):
     # first check for a valid name
     if len(name) > 20:
-        raise ValueError(description="Channel name is too short")
+        raise Value_Error(description="Channel name is too short")
 
     # now grab the u_id associated with the provided token
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])

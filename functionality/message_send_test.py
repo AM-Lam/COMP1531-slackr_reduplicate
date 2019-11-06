@@ -4,7 +4,7 @@ from .database import clear_data
 from .auth import auth_register
 from .message import message_send
 from .channel import channels_create
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 def verify_message(message_obj, correct_data):
@@ -37,5 +37,5 @@ def test_message_send():
     # reset message_1
     message_1 = None
     # the message is over 1000 characters
-    pytest.raises(ValueError, message_send, user1["token"],
+    pytest.raises(Value_Error, message_send, user1["token"],
                   channel_id["channel_id"], "X" * 1001)

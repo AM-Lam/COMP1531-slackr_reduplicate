@@ -2,7 +2,7 @@ import pytest
 from .auth import auth_register
 from .channel import channels_create, channel_leave
 from .database import clear_data
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 def test_channel_leave():
@@ -24,7 +24,7 @@ def test_channel_leave():
 
     # now check that attempting to leave a non-existent channel raises an 
     # exception
-    pytest.raises(ValueError, channel_leave, user1["token"], 404)
+    pytest.raises(Value_Error, channel_leave, user1["token"], 404)
 
     # try to leave a channel the user is not a part of - this should fail 
     # quietely (see assumptions.md)

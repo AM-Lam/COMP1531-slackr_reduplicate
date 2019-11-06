@@ -3,7 +3,7 @@ import jwt
 from .database import clear_data, get_data
 from .auth import auth_register
 from .channel import channel_addowner, channels_create, channel_removeowner
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 def test_channel_removeowner():
@@ -32,7 +32,7 @@ def test_channel_removeowner():
                                user2["u_id"]) == {}
     
     # test removing user2 when they are not an owner
-    pytest.raises(ValueError, channel_removeowner, user1["token"],
+    pytest.raises(Value_Error, channel_removeowner, user1["token"],
                   channel1["channel_id"], user2["u_id"])
     
     # add user2 as an owner to channel1 again
@@ -49,5 +49,5 @@ def test_channel_removeowner():
                                user2["u_id"]) == {}
     
     # try to remove an owner from a channel that does not exist
-    pytest.raises(ValueError, channel_removeowner, user1["token"], 128,
+    pytest.raises(Value_Error, channel_removeowner, user1["token"], 128,
                   user2["u_id"])

@@ -4,7 +4,7 @@ from .database import get_data, clear_data
 from .auth import auth_register
 from .channel import channel_join, channels_create
 from .message import message_edit, message_send, message_remove
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 def verify_message(message_obj, correct_data):
@@ -55,7 +55,7 @@ def test_message_edit():
     assert get_message_text(message2["message_id"]) == "Chomsky is good"
 
     # try to edit a message that does not exist
-    pytest.raises(ValueError, message_edit, user1["token"], 
+    pytest.raises(Value_Error, message_edit, user1["token"], 
                   10101, "Hello There")
     
     # try to edit a message we do not own as a global admin

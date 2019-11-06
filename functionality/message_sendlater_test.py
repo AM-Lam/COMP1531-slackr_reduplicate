@@ -5,7 +5,7 @@ from .database import get_data, clear_data
 from .auth import auth_register
 from .message import message_sendlater
 from .channel import channel_messages, channels_create
-from .access_error import AccessError, ValueError
+from .access_error import AccessError, Value_Error
 
 
 def test_message_sendlater():
@@ -22,16 +22,16 @@ def test_message_sendlater():
     
     # first test some cases that should raise exceptions
     # message > 1000 characters
-    pytest.raises(ValueError, message_sendlater, user1["token"], 
+    pytest.raises(Value_Error, message_sendlater, user1["token"], 
                   channel1["channel_id"], "X" * 1001, 
                   datetime.now() + timedelta(minutes=1))
     
     # time sent is in the past
-    pytest.raises(ValueError, message_sendlater, user1["token"], 
+    pytest.raises(Value_Error, message_sendlater, user1["token"], 
                   channel1["channel_id"], "Message", datetime(2000, 1, 1))
     
     # non-existent channel
-    pytest.raises(ValueError, message_sendlater, user1["token"], 
+    pytest.raises(Value_Error, message_sendlater, user1["token"], 
                   404, "Message", datetime.now() + timedelta(minutes=1))
     
     # now try to send a valid message in the future
