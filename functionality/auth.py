@@ -67,6 +67,9 @@ def auth_passwordreset_request(email):
 
 
 def auth_passwordreset_reset(reset_code, new_password):
+    """
+    add a good doc string
+    """
     update_data = get_data()
 
     # check if the reset code is valid and retrive the email
