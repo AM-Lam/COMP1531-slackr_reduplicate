@@ -54,6 +54,10 @@ def message_sendlater(token, channel_id, message, time_sent):
 
     if not is_user_member(u_id, channel_id):
         raise AccessError(description="You don't have access in this channel")
+    
+    # if the time to send is in the past raise an error
+    if time_sent < datetime.utcnow():
+        raise Value_Error(description="Cannot send a message in the past")
         
     # now create the message we will be sending
     message_id = channel.get_m_id()
@@ -77,20 +81,20 @@ def message_edit(token, message_id, message):
     
     message_user = None
     channel = None
-    message = None
+    to_edit = None
 
     for channel_id in channels:
         potential_channel = get_channel(channel_id)
 
         try:
-            message = potential_channel.get_message(message_id)
+            to_edit = potential_channel.get_message(message_id)
             channel = potential_channel
-            message_user = get_user(message.get_u_id())
+            message_user = get_user(to_edit.get_u_id())
             break
         except Value_Error:
             continue
 
-    if message is None:
+    if to_edit is None:
         raise Value_Error(description="Message does not exist")
 
     if channel is None:
@@ -101,7 +105,7 @@ def message_edit(token, message_id, message):
         raise AccessError(description="You do not have permission to edit this message")
     
     # update the database with new message
-    message.edit_text(message)
+    to_edit.edit_text(message)
             
     return {}
 

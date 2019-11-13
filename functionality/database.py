@@ -155,14 +155,9 @@ class Channel:
         return self._pinned_messages
     
     def get_message(self, m_id):
-        to_return = None
         for message in self.get_messages():
             if message.get_m_id() == m_id:
-                to_return = message
-                break
-        
-        if to_return is not None:
-            return to_return
+                return message
         
         raise Value_Error(description="Message does not exist")
 
