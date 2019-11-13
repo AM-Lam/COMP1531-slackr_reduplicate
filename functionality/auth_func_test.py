@@ -1,9 +1,10 @@
 import pytest
 import hashlib
 import re
-from .database import clear_data, get_data
-from .auth import auth_login, auth_register, auth_logout, auth_passwordreset_request, auth_passwordreset_reset
-from .access_error import *
+from .database import clear_data, get_data, get_user
+from .auth import (auth_login, auth_register, auth_logout,
+                   auth_passwordreset_request, auth_passwordreset_reset)
+from .access_error import AccessError, Value_Error
 
 
 ############################################################################################################################
@@ -169,11 +170,11 @@ def test_reset_reset2():
     # now reset the password.
     auth_passwordreset_reset(reset_code, 'abcdefgh')
     hashed_pass = (hashlib.sha256('abcdefgh'.encode()).hexdigest())
-    flag = 0
-    update_data = get_data()
-    for i in update_data['users']:
-        if i._email == 'user1@gmail.com':
-            if i._password == hashed_pass:
-                flag = 1
-    assert flag == 1
+    
+    all_users = get_data()["users"]
+    for u_id in all_users:
+        user = get_user(u_id)
+        if user.get_email() == 'user1@gmail.com':
+            assert user.get_password() == hashed_pass
+            break
 

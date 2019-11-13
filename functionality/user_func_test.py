@@ -2,7 +2,7 @@ import pytest
 from .user import user_profile_setemail, user_profile_sethandle, user_profile_setname, user_profile, user_profiles_uploadphoto
 from .auth import auth_register
 from .database import clear_data, get_data
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 ############################################################################################################################

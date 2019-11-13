@@ -4,7 +4,7 @@ Functions that relate to the creation, modification and deletion of channels.
 from .database import (get_data, check_valid_token, get_channel, get_user,
                        is_user_member, is_user_owner, get_message_list,
                        is_valid_u_id, message_count, Channel)
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def channel_addowner(token, channel_id, u_id):

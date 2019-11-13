@@ -4,7 +4,7 @@ from .auth import auth_register
 from .message import message_send
 from .channel import channels_create, channel_addowner, channel_join, channel_details, channel_invite, channel_leave, channel_messages, channel_removeowner, channels_list, channels_listall
 from .database import *
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 #######################################################################
@@ -339,7 +339,7 @@ def test_channel_removeowner():
     pytest.raises(AccessError, channel_removeowner, user3["token"], 
                   channel1["channel_id"], user2["u_id"])
     
-    # test removing user2 from channeel1 as a slackr owner
+    # test removing user2 from channel1 as a slackr owner
     user3_obj.set_global_admin(True)
     assert channel_removeowner(user3["token"], channel1["channel_id"],
                                user2["u_id"]) == {}
