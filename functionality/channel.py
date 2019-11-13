@@ -45,23 +45,22 @@ def channel_details(token, channel_id):
     channel = get_channel(channel_id)
     channel_members = channel.get_members()
 
-    # TODO: Rewrite this to not be awful, will likely require
-    # rethinking our data structures
-
     # convert the channel_members list to a form the frontend can read
+    users = get_data()["users"]
+    
     channel_members = [{
-        "u_id" : user.get_u_id(),
-        "name_first" : user.get_first_name(),
-        "name_last" : user.get_last_name()
-    } for user in get_data()["users"] if user.get_u_id() in channel_members]
+        "u_id" : users[u_id].get_u_id(),
+        "name_first" : users[u_id].get_first_name(),
+        "name_last" : users[u_id].get_last_name()
+    } for u_id in channel_members]
 
     # do the same thing with the channel owners
     channel_owners = channel.get_owners()
     channel_owners = [{
-        "u_id" : user.get_u_id(),
-        "name_first" : user.get_first_name(),
-        "name_last" : user.get_last_name()
-    } for user in get_data()["users"] if user.get_u_id() in channel_owners]
+        "u_id" : users[u_id].get_u_id(),
+        "name_first" : users[u_id].get_first_name(),
+        "name_last" : users[u_id].get_last_name()
+    } for u_id in channel_owners]
 
     return {"name" : channel.get_name(),
             "owner_members" : channel_owners,
