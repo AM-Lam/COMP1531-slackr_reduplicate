@@ -3,7 +3,7 @@ import re
 import hashlib
 import jwt
 from datetime import datetime
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 DATABASE = None
@@ -299,7 +299,7 @@ def is_email_valid(email):
     regex = r'^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
     if re.search(regex, email):
         return True
-    raise ValueError(description="Email is invalid.")
+    raise Value_Error(description="Email is invalid.")
 
 
 def check_email_database(email):
@@ -309,7 +309,7 @@ def check_email_database(email):
     for u_id in all_users:
         user = all_users[u_id]
         if user.get_email() == email:
-            raise ValueError(description="Email is already in use.")
+            raise Value_Error(description="Email is already in use.")
 
     return True
 
@@ -324,7 +324,7 @@ def check_valid_token(token):
 
     # Is this token currently active? If not raise an error
     if not db["tokens"].get(token, False):
-        raise ValueError(description="Invalid token")
+        raise Value_Error(description="Invalid token")
 
     token_payload = jwt.decode(token, get_secret(), algorithms=['HS256'])
     u_id = token_payload["u_id"]
@@ -351,7 +351,7 @@ def is_handle_in_use(handle_str):
 def get_channel(channel_id):
     """
     Take a channel_id and return the channel if it exists, otherwise
-    raise a ValueError
+    raise a Value_Error
     """
     channels = get_data()["channels"]
 
@@ -364,7 +364,7 @@ def get_channel(channel_id):
 def get_user(u_id):
     """
     Take a u_id and return the user if it exists, otherwise
-    raise a ValueError
+    raise a Value_Error
     """
     users = get_data()["users"]
 
@@ -459,15 +459,15 @@ def u_id_from_email(email, password):
             break
     
     if wrong_pasword:
-        raise ValueError(description="Wrong password, please try again")
+        raise Value_Error(description="Wrong password, please try again")
     
-    raise ValueError(description="Email does not exist")
+    raise Value_Error(description="Email does not exist")
 
 
 def u_id_from_email_reset(email):
     """
     Take an email to send a reset code to, if the email exists return the u_id
-    otherwise raise a ValueError
+    otherwise raise a Value_Error
     """
     users = get_data()["users"]
 
@@ -477,7 +477,7 @@ def u_id_from_email_reset(email):
         if user.get_email() == email:
             return u_id
     
-    raise ValueError(description="There are no users with this password")
+    raise Value_Error(description="There are no users with this password")
 
 
 def check_reset_code(reset_code):
@@ -489,7 +489,7 @@ def check_reset_code(reset_code):
         email = reset_codes[reset_code]
         return email
     else:
-        raise ValueError("Reset code incorrect!")
+        raise Value_Error("Reset code incorrect!")
 
 
 clear_data()

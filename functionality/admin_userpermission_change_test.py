@@ -1,6 +1,6 @@
 import pytest
 from .database import clear_data
-from .access_error import *
+from .access_error import AccessError, Value_Error
 from .admin_userpermission_change import admin_userpermission_change
 from .auth import auth_register
 
@@ -32,12 +32,12 @@ def test_admin_userpermission_change():
     pytest.raises(AccessError, admin_userpermission_change, 000, user3["u_id"], 1)
 
     # try to run with a user that does not exist
-    pytest.raises(ValueError, admin_userpermission_change, user2["token"], 666, 3)
+    pytest.raises(Value_Error, admin_userpermission_change, user2["token"], 666, 3)
 
     # try to change to a permision_id that is invalid (too low), this should
     # fail
-    pytest.raises(ValueError, admin_userpermission_change, user2["token"], user4["u_id"], 0)
+    pytest.raises(Value_Error, admin_userpermission_change, user2["token"], user4["u_id"], 0)
 
     # try to change to a permision_id that is invalid (too high), this should
     # fail
-    pytest.raises(ValueError, admin_userpermission_change, user2["token"], user4["u_id"], 4)
+    pytest.raises(Value_Error, admin_userpermission_change, user2["token"], user4["u_id"], 4)

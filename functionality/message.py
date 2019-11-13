@@ -18,7 +18,7 @@ def send_message(channel, message, time_sent):
 def message_send(token, channel_id, message):
     # Message is more than 1000 characters
     if len(message) > 1000:
-        raise ValueError(description="Messages must be less than 1000 characters")
+        raise Value_Error(description="Messages must be less than 1000 characters")
 
     # now grab the u_id associated with the provided token and the
     # channel object
@@ -245,7 +245,7 @@ def message_react(token, message_id, react_id):
     for react in message._reacts:
         if react["react_id"] == react_id:
             if u_id in react["u_ids"]:
-                raise ValueError(description=f"You have already reacted to this message with this react")
+                raise Value_Error(description=f"You have already reacted to this message with this react")
             react_exists = True
             react["u_ids"].append(u_id)
             break
@@ -285,7 +285,6 @@ def message_unreact(token, message_id, react_id):
             break
 
     return {}
-
 
 def search(token, query_str):
     # find u_id associated with token (with non-existent database)

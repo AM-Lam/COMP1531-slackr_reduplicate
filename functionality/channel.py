@@ -12,33 +12,6 @@ def channel_addowner(token, channel_id, u_id):
     Select a user by u_id and add them to the channel owners of this channel
     """
 
-    # get the u_id of the requesting user and the channel object
-    owner_u_id = check_valid_token(token)
-    to_add = get_channel(channel_id)
-
-    if is_user_owner(u_id, channel_id):
-        raise ValueError(description="The user is already an owner in this channel")
-
-    # now make sure the calling user has the permissions to make this
-    # change
-    if not is_user_owner(owner_u_id, channel_id):
-        raise AccessError(description="Lack permissions to add owner to this channel")
-
-    # finally set u_id to be an owner of the channel requested, if they
-    # are not already a member of this channel add them as one as well
-    to_add.get_owners().append(u_id)
-    if not is_user_member(u_id, channel_id):
-        to_add.get_members().append(u_id)
-
-    return {}
-
-
-def channel_details(token, channel_id):
-    """
-    Select a channel by id and return its details.
-    """
-    u_id = check_valid_token(token)
-
     if not is_user_member(u_id, channel_id):
         raise AccessError(description='You do not have permission to do this')
 
@@ -77,7 +50,7 @@ def channel_invite(token, channel_id, u_id):
     channel = get_channel(channel_id)
 
     if not is_valid_u_id(u_id):
-        raise ValueError(description="u_id is not a real user")
+        raise Value_Error(description="u_id is not a real user")
 
     if is_user_member(u_id, channel_id):
         raise ValueError(description="User is already a member of this channel")
@@ -119,14 +92,19 @@ def channel_leave(token, channel_id):
     u_id = check_valid_token(token)
     channel = get_channel(channel_id)
 
+    # get the channel itself
+    channel = get_channel(channel_id)
+
+    # attempt to remove the user from the channel, if they are also an
+    # owner of the channel remove them from tha list as well
     if is_user_member(u_id, channel_id):
         channel.get_members().remove(u_id)
-
+    
     if is_user_owner(u_id, channel_id):
         channel.get_owners().remove(u_id)
-
+    
+    # always return an empty dictionary
     return {}
-
 
 def channel_messages(token, channel_id, start):
     """
@@ -147,7 +125,7 @@ def channel_messages(token, channel_id, start):
     message_num = message_count(channel)
 
     if start > message_num:
-        raise ValueError(description="Start greater than the count of messages")
+        raise Value_Error(description="Start greater than the count of messages")
 
     # set end to start + 50 if this is less than the amount of messages
     # in the channel otherwise set it to the amount of messages left
@@ -177,7 +155,7 @@ def channel_removeowner(token, channel_id, u_id):
     to_remove = get_channel(channel_id)
 
     if u_id not in to_remove.get_owners():
-        raise ValueError(description="The user is not an owner of this channel")
+        raise Value_Error(description="The user is not an owner of this channel")
 
     if owner_uid not in to_remove.get_owners() and not owner.is_global_admin():
         raise AccessError(description="You do not have permissions to do this")
@@ -199,7 +177,7 @@ def channels_create(token, name, is_public):
 
     # first check for a valid name
     if len(name) > 20:
-        raise ValueError(description="Channel name is too short")
+        raise Value_Error(description="Channel name is too short")
 
     # get the u_id of this user
     u_id = check_valid_token(token)

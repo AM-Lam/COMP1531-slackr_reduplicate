@@ -1,6 +1,6 @@
 import jwt
-from .access_error import *
-from .database import *
+from .access_error import AccessError, Value_Error
+from .database import get_data, get_secret
 
 #   admin_userpermission_change(token, u_id, permission_id);
 #   return void
@@ -32,16 +32,16 @@ def admin_userpermission_change(token, u_id, p_id):
             break
     
     if user == None:
-        raise ValueError(description="u_id does not refer to a real user")
+        raise Value_Error(description="u_id does not refer to a real user")
     
     if request_user == None:
-        raise ValueError(description="Request does not come from a real user")
+        raise Value_Error(description="Request does not come from a real user")
     
     if not (request_user.is_global_admin() or request_user.is_slackr_owner()):
         raise AccessError(description="You do not have permissions to do this")
 
     if not (1 <= p_id <= 3):
-        raise ValueError(description=f"{p_id} is not a valid permission id")
+        raise Value_Error(description=f"{p_id} is not a valid permission id")
     
     # global admins cannot change the perms of slackr owners
     if not request_user.is_slackr_owner() and user.is_slackr_owner():

@@ -6,6 +6,6 @@ class AccessError(HTTPException):
     message = "Access Forbidden"
 
 
-class ValueError(HTTPException):
+class Value_Error(HTTPException):
     code = 400
     message = "Incorrect value"

@@ -3,8 +3,10 @@ import random
 import hashlib
 import string
 import jwt
-from .database import *
-from .access_error import *
+from .database import (is_email_valid, get_data, check_email_database, 
+                       get_secret, User, u_id_from_email, get_user,
+                       u_id_from_email_reset, check_reset_code)
+from .access_error import AccessError, Value_Error
 
 
 def auth_login(email, password):
@@ -37,7 +39,7 @@ def auth_logout(token):
         # now that the token has been deleted we return true
         return {'is_success' : True}
     
-    raise ValueError(description="Session token is already invalid")
+    raise Value_Error(description="Session token is already invalid")
 
 
 def auth_passwordreset_request(email):
@@ -73,7 +75,7 @@ def auth_passwordreset_reset(reset_code, new_password):
     email = check_reset_code(reset_code)
 
     if len(new_password) < 6:
-        raise ValueError(description="Passwords must be at least 6 characters\
+        raise Value_Error(description="Passwords must be at least 6 characters\
                          in length")
 
     # find the user in the list of users
@@ -97,16 +99,16 @@ def auth_register(email, password, first_name, last_name):
     update_data = get_data()
     
     if not 0 < len(first_name) < 50:
-        raise ValueError(description="First name must be between 0 and 50\
+        raise Value_Error(description="First name must be between 0 and 50\
                          characters (exclusive)")
 
     if not 0 <= len(last_name) < 50:
-        raise ValueError(description="Last name must be between 0 and 50\
+        raise Value_Error(description="Last name must be between 0 and 50\
                          characters (inclusive)")
     
     # checking if password is strong and getting a hash.
     if len(password) < 6:
-        raise ValueError(description="Passwords must be at least 6 characters\
+        raise Value_Error(description="Passwords must be at least 6 characters\
                          in length")
     
     password = hashlib.sha256(password.encode()).hexdigest()
