@@ -2,7 +2,7 @@ import threading
 from datetime import datetime
 import jwt
 from .database import (check_valid_token, get_data, get_secret, get_channel,
-                       is_user_member, is_user_owner, Messages)
+                       is_user_member, is_user_owner, get_user, Messages)
 from .access_error import *
 
 
@@ -70,228 +70,179 @@ def message_sendlater(token, channel_id, message, time_sent):
 
 
 def message_edit(token, message_id, message):
-    server_data = get_data()
+    channels = get_data()["channels"]
 
-    # now grab the u_id associated with the provided token
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    u_id = token_payload["u_id"]
+    u_id = check_valid_token(token)
+    request_user = get_user(u_id)
     
-    # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, False):
-        raise AccessError(description="This token is invalid")
+    message_user = None
+    channel = None
+    message = None
 
-    # Message is more than 1000 characters
-    if len(message) > 1000:
-        raise ValueError(description="Messages must be less than 1000 characters")
+    for channel_id in channels:
+        potential_channel = get_channel(channel_id)
 
-    # Message with message_id was not sent by the authorised user making this request
-    # person who send this message is not the sender and not an admin or owner in the channel
-    message_ = None
-    channel_ = None
-    # add the message to the server database
-    for channel in server_data["channels"]:
-        for m in channel.get_messages():
-            if m.get_m_id() == message_id:
-                channel_ = channel
-                message_ = m
-                break
-    
-    if message_ is None:
+        try:
+            message = potential_channel.get_message(message_id)
+            channel = potential_channel
+            message_user = get_user(message.get_u_id())
+            break
+        except ValueError:
+            continue
+
+    if message is None:
         raise ValueError(description="Message does not exist")
 
-    user_ = None
-    for user in server_data["users"]:
-        if user.get_u_id() == u_id:
-            if (message_.get_u_id() != u_id and not user.is_global_admin()
-                and not u_id in channel_.get_owners()):
-                break
-            user_ = user
-            break
+    if channel is None:
+        raise ValueError(description="Channel does not exist")
 
     # if user is not the poster or admin
-    if user_ is None:
+    if request_user != message_user and not request_user.is_global_admin():
         raise AccessError(description="You do not have permission to edit this message")
     
-    print(f'Message object {message_} has text {message_.get_text()}')
     # update the database with new message
-    message_.edit_text(message)
-    print(f'Message object {message_} has text {message_.get_text()}')
+    message.edit_text(message)
             
     return {}
 
 
 def message_remove(token, message_id):
-    server_data = get_data()
+    channels = get_data()["channels"]
 
-    # now grab the u_id associated with the provided token
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    u_id = token_payload["u_id"]
-
-    # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, False):
-        raise AccessError(description="This token is invalid")
-
-    # Message with message_id was not sent by the authorised user making this request
-    # person who send this message is not the sender and not an admin or owner in the channel
-    message_ = None
+    u_id = check_valid_token(token)
+    request_user = get_user(u_id)
     
-    # check if this channel
-    for channel in server_data["channels"]:
-        for message in channel._messages:
-            if message.get_m_id() == message_id:
-                message_ = message
-                break
-    
-    if message_ is None:
+    message_user = None
+    channel = None
+    message = None
+
+    for channel_id in channels:
+        potential_channel = get_channel(channel_id)
+
+        try:
+            message = potential_channel.get_message(message_id)
+            channel = potential_channel
+            message_user = get_user(message.get_u_id())
+            break
+        except ValueError:
+            continue
+
+    if message is None:
         raise ValueError(description="Message does not exist")
 
-    user_ = None
-    for user in server_data["users"]:
-        if user.get_u_id() == u_id:
-            if user.get_u_id() != message_.get_u_id() and not user.is_global_admin():
-                break
-            user_ = user
-            break
+    if channel is None:
+        raise ValueError(description="Channel does not exist")
 
-    if user_ == None:
-        # if user is not the poster or an admin
-        raise AccessError(description="You don't have access to delete")
+    # if user is not the poster or admin
+    if request_user != message_user and not request_user.is_global_admin():
+        raise AccessError(description="You do not have permission to edit this message")
     
     # remove the message to the server database
-    channel._messages.remove(message)
+    channel.remove_message(message)
 
     return {}
 
 
 def message_pin(token, message_id):
-    server_data = get_data()
+    channels = get_data()["channels"]
 
-    # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, False):
-        raise AccessError(description="This token is invalid")
+    u_id = check_valid_token(token)
 
-    # now grab the u_id associated with the provided token
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    u_id = token_payload["u_id"]
+    user = get_user(u_id)
 
-    # make sure the user is an admin
-    user_ = None
-    for user in server_data["users"]:
-        if user.get_u_id() == u_id:
-            user_ = user
+    channel = None
+    message = None
+
+    for channel_id in channels:
+        potential_channel = get_channel(channel_id)
+
+        try:
+            message = potential_channel.get_message(message_id)
+            channel = potential_channel
             break
+        except ValueError:
+            continue
+
+    if message is None:
+        raise ValueError(description="Message does not exist")
+
+    if channel is None:
+        raise ValueError(description="Channel does not exist")
     
-    if user_ == None:
-        raise ValueError("u_id does not belong to a real user")
-    
-    # Message with message_id was not sent by the authorised user making this
-    # request person who send this message is not the sender and not an admin
-    # or owner in the channel
-    channel_ = None
-    message_ = None
-    
-    # add the message to the server database
-    for channel in server_data["channels"]:
-        for message in channel._messages:
-            if message.get_m_id() == message_id:
-                channel_ = channel
-                message_ = message
-                break
-    
-    if message_ is None:
-        raise ValueError(description="The provided id does not refer to a real message")
-    
-    if user_.is_global_admin() == False and u_id not in channel_.get_owners():
+    if user.is_global_admin() == False and not is_user_owner(u_id, channel.get_id()):
         raise ValueError(description="Only admins and owners can pin messages!")
-    #  Message with ID message_id is already pinned
-    if message_._pinned == True:
+
+    # Message with ID message_id is already pinned raises an error
+    if message.is_pinned() == True:
         raise ValueError(description="The message is already pinned")
     else:
-        # pin the message and add it to the channels list of pins
-        message_._pinned = True
-        print(message_._pinned)
-        channel_.add_pin(message_.get_m_id())
+        # otherwise pin the message and add it to the channels list of
+        # pins
+        message.set_pinned(True)
+        channel.add_pin(message_id)
 
     return {}
 
 
 def message_unpin(token, message_id):
-    server_data = get_data()
+    channels = get_data()["channels"]
 
-    # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, False):
-        raise AccessError(description="This token is invalid")
+    u_id = check_valid_token(token)
+    user = get_user(u_id)
 
-    # now grab the u_id associated with the provided token
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    u_id = token_payload["u_id"]
+    channel = None
+    message = None
 
-    # Message with message_id was not sent by the authorised user making this request
-    # person who send this message is not the sender and not an admin or owner in the channel
-    channel_ = None
-    message_ = None
-    
-    # add the message to the server database
-    for channel in server_data["channels"]:
-        for message in channel._messages:
-            if message.get_m_id() == message_id:
-                channel_ = channel
-                message_ = message
-                break
+    for channel_id in channels:
+        potential_channel = get_channel(channel_id)
 
-    user_ = None
-    for user in server_data["users"]:
-        if user.get_u_id() == u_id:
-            user_ = user
+        try:
+            message = potential_channel.get_message(message_id)
+            channel = potential_channel
             break
-    
-    if user_ == None:
-        raise ValueError("u_id does not belong to a real user")
+        except ValueError:
+            continue
 
-    if message_ is None:
-        raise ValueError(description="The provided id does not\
-                         refer to a real message")
+    if message is None:
+        raise ValueError(description="Message does not exist")
+
+    if channel is None:
+        raise ValueError(description="Channel does not exist")
     
-    if user_.is_global_admin() == False and u_id not in channel_.get_owners():
-        raise ValueError(description="Only admins and owners can unpin\
-                         messages!")
-    #  Message with ID message_id is already pinned
-    if message_._pinned == False:
+    if user.is_global_admin() == False and not is_user_owner(u_id, channel.get_id()):
+        raise ValueError(description="Only admins and owners can unpin messages!")
+
+    if not message.is_pinned():
         raise ValueError(description="The message is not pinned")
     else:
-        # pin the message and add it to the channels list of pins
-        message_._pinned = False
-        channel_._pinned_messages.remove(message_.get_m_id())
-    
+        # otherwise unpin the message and remove it from the channel's
+        # list of pins
+        message.set_pinned(False)
+        channel.remove_pin(message_id)
+
     return {}
 
 
 def message_react(token, message_id, react_id):
-    server_data = get_data()
+    channels = get_data()["channels"]
 
-    # now grab the u_id associated with the provided token
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    u_id = token_payload["u_id"]
+    u_id = check_valid_token(token)
 
-    # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, False):
-        raise AccessError(description="This token is invalid")
+    message = None
+    for channel_id in channels:
+        channel = get_channel(channel_id)
 
-    # Message with message_id was not sent by the authorised user making this request
-    # person who send this message is not the sender and not an admin or owner in the channel
-    message_ = None
-    # add the message to the server database
-    for channel in server_data["channels"]:
-        for message in channel._messages:
-            if message.get_m_id() == message_id and u_id in channel.get_members():
-                message_ = message
-                break
-    
-    if message_ is None:
+        try:
+            message = channel.get_message(message_id)
+            break
+        except ValueError:
+            continue
+
+    if message is None:
         raise ValueError(description="Message does not exist")
 
     react_exists = False
-    for react in message_._reacts:
+    for react in message._reacts:
         if react["react_id"] == react_id:
             if u_id in react["u_ids"]:
                 raise ValueError(description=f"You have already reacted to this message with this react")
@@ -300,7 +251,7 @@ def message_react(token, message_id, react_id):
             break
     
     if not react_exists:
-        message_._reacts.append({
+        message._reacts.append({
             "react_id" : react_id,
             "u_ids" : [u_id]
         })
@@ -309,33 +260,27 @@ def message_react(token, message_id, react_id):
 
 
 def message_unreact(token, message_id, react_id):
-    server_data = get_data()
+    channels = get_data()["channels"]
 
-    # now grab the u_id associated with the provided token
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    u_id = token_payload["u_id"]
+    u_id = check_valid_token(token)
 
-    # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, False):
-        raise AccessError(description="This token is invalid")
+    message = None
+    for channel_id in channels:
+        channel = get_channel(channel_id)
 
-    # Message with message_id was not sent by the authorised user making this request
-    # person who send this message is not the sender and not an admin or owner in the channel
-    message_ = None
-    # add the message to the server database
-    for channel in server_data["channels"]:
-        for message in channel._messages:
-            if message.get_m_id() == message_id and u_id in channel.get_members():
-                message_ = message
-                break
-    
-    if message_ is None:
+        try:
+            message = channel.get_message(message_id)
+            break
+        except ValueError:
+            continue
+
+    if message is None:
         raise ValueError(description="Message does not exist")
 
-    for react in message_._reacts:
+    for react in message._reacts:
         if react["react_id"] == react_id:
             if u_id not in react["u_ids"]:
-                raise ValueError(description=f"You have not reacted to this message with this react")
+                raise ValueError(description="You have not reacted to this message with this react")
             react["u_ids"].remove(u_id)
             break
 
@@ -344,7 +289,6 @@ def message_unreact(token, message_id, react_id):
 
 def search(token, query_str):
     # find u_id associated with token (with non-existent database)
-    DATABASE = get_data()
     admin_user_id = check_valid_token(token)
 
     # suppress pylint error
@@ -354,7 +298,8 @@ def search(token, query_str):
     message_match = []
     
     # TODO: write check for if user has access to channel
-    for channel in DATABASE["channels"]:
+    for channel_id in get_data()["channels"]:
+        channel = get_channel(channel_id)
         for message in channel.get_messages():
             if query_str in message:
                 message_match.append(message)

@@ -153,6 +153,18 @@ class Channel:
 
     def get_pins(self):
         return self._pinned_messages
+    
+    def get_message(self, m_id):
+        to_return = None
+        for message in self.get_messages():
+            if message.get_m_id() == m_id:
+                to_return = message
+                break
+        
+        if to_return is not None:
+            return to_return
+        
+        raise ValueError(description="Message does not exist")
 
     def set_id(self, new_id):
         self._channel_id = new_id
@@ -162,6 +174,9 @@ class Channel:
 
     def add_message(self, message):
         self._messages.append(message)
+    
+    def remove_message(self, message):
+        self._messages.remove(message)
 
     def add_member(self, member):
         self._members.append(member)
@@ -180,6 +195,9 @@ class Channel:
 
     def add_pin(self, message_id):
         self._pinned_messages.append(message_id)
+    
+    def remove_pin(self, message_id):
+        self._pinned_messages.remove(message_id)
 
 
 class Messages:
@@ -241,6 +259,9 @@ class Messages:
     
     def get_reacts(self):
         return self._reacts
+
+    def set_pinned(self, pinned):
+        self._pinned = pinned
 
     def edit_text(self, new):
         self._text = new
