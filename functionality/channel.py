@@ -12,32 +12,29 @@ def channel_addowner(token, channel_id, u_id):
     Select a user by u_id and add them to the channel owners of this channel
     """
 
-    if not is_user_member(u_id, channel_id):
-        raise AccessError(description='You do not have permission to do this')
-
-    channel = get_channel(channel_id)
-    channel_members = channel.get_members()
-
-    # convert the channel_members list to a form the frontend can read
-    users = get_data()["users"]
+    # get the u_id of the requesting user and the channel object
+    owner_u_id = check_valid_token(token)
+    calling_user = get_user(owner_u_id)
     
-    channel_members = [{
-        "u_id" : users[u_id].get_u_id(),
-        "name_first" : users[u_id].get_first_name(),
-        "name_last" : users[u_id].get_last_name()
-    } for u_id in channel_members]
+    to_add = get_channel(channel_id)
 
-    # do the same thing with the channel owners
-    channel_owners = channel.get_owners()
-    channel_owners = [{
-        "u_id" : users[u_id].get_u_id(),
-        "name_first" : users[u_id].get_first_name(),
-        "name_last" : users[u_id].get_last_name()
-    } for u_id in channel_owners]
+    if is_user_owner(u_id, channel_id):
+        raise Value_Error(description="The user is already an owner in this channel")
 
-    return {"name" : channel.get_name(),
-            "owner_members" : channel_owners,
-            "all_members" : channel_members}
+    # now make sure the calling user has the permissions to make this
+    # change
+    if not is_user_owner(owner_u_id, channel_id) and not \
+       (calling_user.is_global_admin() or calling_user.is_slackr_owner()):
+        raise AccessError(description="Lack permissions to add owner to this channel")
+
+    # finally set u_id to be an owner of the channel requested, if they
+    # are not already a member of this channel add them as one as well
+    to_add.get_owners().append(u_id)
+    if not is_user_member(u_id, channel_id):
+        to_add.get_members().append(u_id)
+
+    return {}
+
 
 
 def channel_details(token, channel_id):
