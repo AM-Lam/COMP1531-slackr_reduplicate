@@ -318,8 +318,8 @@ def run_message_sendlater():
     return_value = message.message_sendlater(
         request_data["token"],
         int(request_data["channel_id"]),
-        int(request_data["message"]),
-        datetime.utcfromtimestamp(request_data["time_sent"])
+        request_data["message"],
+        datetime.utcfromtimestamp(int(request_data["time_sent"]) / 1000)
     )
 
     return dumps(return_value)
