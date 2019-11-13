@@ -139,7 +139,6 @@ def channel_leave(token, channel_id):
     # always return an empty dictionary
     return {}
 
-
 def channel_messages(token, channel_id, start):
     """
     Retrieve 50 messages from the channel referred to by channel_id
