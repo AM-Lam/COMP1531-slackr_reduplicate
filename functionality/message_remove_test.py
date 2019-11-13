@@ -22,6 +22,7 @@ def test_message_remove():
     # check that the database was correctly updated
     assert message_remove(user1["token"], message_1['message_id']) == {}
 
+
 def test_no_message():
     clear_data()
     

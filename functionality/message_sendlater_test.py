@@ -1,7 +1,7 @@
 import jwt
 import pytest
 from datetime import datetime, timedelta
-from .database import get_data, clear_data
+from .database import get_data, clear_data, get_channel
 from .auth import auth_register
 from .message import message_sendlater
 from .channel import channel_messages, channels_create
@@ -18,7 +18,7 @@ def test_message_sendlater():
     channel1 = channels_create(user1["token"], "Channel 1", True)
 
     # get the channel object, we need this to check if messages were sent
-    channelObj = server_data["channels"][0]
+    channelObj = get_channel(channel1["channel_id"])
     
     # first test some cases that should raise exceptions
     # message > 1000 characters
