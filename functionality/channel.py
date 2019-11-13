@@ -58,7 +58,7 @@ def channel_details(token, channel_id):
     
     channel_members = channel.get_members()
 
-    if u_id not in channel_members:
+    if not is_user_member(u_id, channel_id) and not is_user_owner(u_id, channel_id):
         raise AccessError(description='You do not have permission to do this')
     
     # TODO: Rewrite this to not be awful, will likely require
@@ -68,7 +68,8 @@ def channel_details(token, channel_id):
     channel_members = [{
         "u_id" : user.get_u_id(),
         "name_first" : user.get_first_name(),
-        "name_last" : user.get_last_name()
+        "name_last" : user.get_last_name(),
+        "profile_image" : ""
     } for user in get_data()["users"] if user.get_u_id() in channel_members]
     
     # do the same thing with the channel owners
@@ -76,7 +77,8 @@ def channel_details(token, channel_id):
     channel_owners = [{
         "u_id" : user.get_u_id(),
         "name_first" : user.get_first_name(),
-        "name_last" : user.get_last_name()
+        "name_last" : user.get_last_name(),
+        "profile_image" : ""
     } for user in get_data()["users"] if user.get_u_id() in channel_owners]
     
     return {"name" : channel.get_name(), 
@@ -144,19 +146,19 @@ def channel_leave(token, channel_id):
     token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
     u_id = token_payload["u_id"]
 
-    server_data = get_data()
+    # get the channel itself
+    channel = get_channel(channel_id)
 
-    # try to remove the user from the channel, if they are not in the
-    # channel then just return without any error
-    for c in server_data["channels"]:
-        if c.get_id() == channel_id:
-            if u_id in c.get_members():
-                c.get_members().remove(u_id)
-            return {}
-
-    # if we get here the channel does not exist and we need to raise an
-    # exception
-    raise ValueError
+    # attempt to remove the user from the channel, if they are also an
+    # owner of the channel remove them from tha list as well
+    if is_user_member(u_id, channel_id):
+        channel.get_members().remove(u_id)
+    
+    if is_user_owner(u_id, channel_id):
+        channel.get_owners().remove(u_id)
+    
+    # always return an empty dictionary
+    return {}
 
 
 def channel_messages(token, channel_id, start):    
