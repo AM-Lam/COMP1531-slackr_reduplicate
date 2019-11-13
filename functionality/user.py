@@ -73,20 +73,16 @@ def user_profile(token, u_id):
     # not a valid token
     if not server_data["tokens"].get(token, False):
         raise AccessError 
-    
-    for info in server_data['users']:
-        if info.get_u_id() == u_id:
-            email = info.get_email()
-            first_name = info.get_first_name()
-            last_name = info.get_last_name()
-            handle = info.get_handle()
-            
-            return { 
-                'email': email,
-                'name_first': first_name,
-                'name_last': last_name,
-                'handle_str': handle 
-            }
+
+    if u_id in server_data["users"]:
+        user = server_data["users"][u_id]
+
+        return {
+            "email" : user.get_email(),
+            "name_first" : user.get_first_name(),
+            "name_last" : user.get_last_name(),
+            "handle_str" : user.get_handle()
+        }
     
     raise ValueError(description="User cannot be found")
 

@@ -217,7 +217,7 @@ def channels_create(token, name, is_public):
     new_channel = Channel(channel_id, name, [], [u_id], is_public)
 
     # add the channel to the server database
-    server_data["channels"].append(new_channel)
+    server_data["channels"][channel_id] = new_channel
 
     # return the new channel's id
     return {"channel_id" : channel_id}
@@ -230,14 +230,15 @@ def channels_list(token):
     """
 
     # this is pretty simple, just grab the "database"
-    database = get_data()
+    channels_raw = get_data()["channels"]
 
     u_id = check_valid_token(token)
 
     # use a quick list comprehension to get the channels that this u_id
     # is listed as a member of
     channels = [
-        c.frontend_format() for c in database["channels"] if u_id in c.get_members()
+        channels_raw[c_id].frontend_format() for c_id in channels_raw if u_id
+        in channels_raw[c_id].get_members()
     ]
 
     # quick little list comprehension to return the channels in the
@@ -251,11 +252,15 @@ def channels_listall(token):
     """
 
     # this is pretty simple, just grab the "database"
-    database = get_data()
+    channels_raw = get_data()["channels"]
 
     # make sure the token is valid
     check_valid_token(token)
 
+    channels = [
+        channels_raw[c_id].frontend_format() for c_id in channels_raw
+    ]
+
     # quick little list comprehension to return the channels in the
     # format we need
-    return {"channels" : [c.frontend_format() for c in database["channels"]]}
+    return {"channels" : channels}

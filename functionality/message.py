@@ -1,7 +1,8 @@
 import threading
 from datetime import datetime
 import jwt
-from .database import check_valid_token, get_data, get_secret, Messages
+from .database import (check_valid_token, get_data, get_secret, get_channel,
+                       is_user_member, is_user_owner, Messages)
 from .access_error import *
 
 
@@ -15,93 +16,57 @@ def send_message(channel, message, time_sent):
 
 
 def message_send(token, channel_id, message):
-    server_data = get_data()
-
-    # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, False):
-        raise AccessError(description="This token is invalid")
-
-    # now grab the u_id associated with the provided token
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    u_id = token_payload["u_id"]
-    
     # Message is more than 1000 characters
     if len(message) > 1000:
         raise ValueError(description="Messages must be less than 1000 characters")
 
-    channel_ = None
-    # add the message to the server database
-    for channel in server_data["channels"]:
-        if channel.get_id() == channel_id:
-            channel_ = channel
-            break
-    
-    if channel_ is None:
-        raise ValueError(description="Channel does not exist")
+    # now grab the u_id associated with the provided token and the
+    # channel object
+    u_id = check_valid_token(token)
+    channel = get_channel(channel_id)
 
-    if u_id not in channel_.get_members():
+    if not is_user_member(u_id, channel_id):
         raise AccessError(description="You don't have access in this channel")
         
     # now create the message we will be sending
-    message_id = channel_.get_m_id()
+    message_id = channel.get_m_id()
     to_send = Messages(message_id, u_id, message, channel_id,
                        datetime.utcnow(), [])
     
     # increment the channel's max message id
-    channel_.increment_m_id()
+    channel.increment_m_id()
     
-    send_message(channel_, to_send, datetime.utcnow())
+    send_message(channel, to_send, datetime.utcnow())
 
     # return the new message's id
     return {"message_id" : message_id}
 
 
 def message_sendlater(token, channel_id, message, time_sent):
-    server_data = get_data()
-
-    # if the token is not valid raise an AccessError
-    if not server_data["tokens"].get(token, False):
-        raise AccessError(description="This token is invalid")
-
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    u_id = token_payload["u_id"]
-
-    # first deal with an easy to catch error, is the message too large to send
+    # Message is more than 1000 characters
     if len(message) > 1000:
-        raise ValueError(description="Messages must be below 1000 characters")
-    
-    # next error, check the current date against time_sent and raise an
-    # exception if time_sent is in the past
-    if datetime.utcnow() > time_sent:
-        raise ValueError(description="Cannot send messages in the past")
+        raise ValueError(description="Messages must be less than 1000 characters")
+
+    # now grab the u_id associated with the provided token and the
+    # channel object
+    u_id = check_valid_token(token)
+    channel = get_channel(channel_id)
+
+    if not is_user_member(u_id, channel_id):
+        raise AccessError(description="You don't have access in this channel")
         
-    # ensure that the channel we are trying to send a message to actually exists
-    # and that we are an authorised user in it (which I take here to mean a
-    # member of the channel)
-    channel_ = None
-    for channel in server_data["channels"]:
-        if channel_id == channel.get_id():
-            channel_ = channel
-            break
-    
-    if channel_ is None:
-        raise ValueError(description="Channel does not exist")
-    
-    if u_id not in channel_.get_members():
-        raise AccessError(description="You cannot send messages in this channel")
-    
     # now create the message we will be sending
-    m_id = channel_.get_m_id()
-    to_send = Messages(m_id, u_id, message, channel_id,
-                       time_sent, [])
+    message_id = channel.get_m_id()
+    to_send = Messages(message_id, u_id, message, channel_id,
+                       datetime.utcnow(), [])
     
     # increment the channel's max message id
-    channel_.increment_m_id()
+    channel.increment_m_id()
     
     # start a thread that will call send_message
-    threading.Thread(target=send_message, args=(channel_, to_send, time_sent)).start()
+    threading.Thread(target=send_message, args=(channel, to_send, time_sent)).start()
     
-    return {"message_id" : m_id}
+    return {"message_id" : message_id}
 
 
 def message_edit(token, message_id, message):
