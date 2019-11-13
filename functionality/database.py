@@ -265,8 +265,8 @@ def save_data():
 def clear_data():
     global DATABASE
     DATABASE = {
-        "users" : [],
-        "channels" : [],
+        "users" : {},
+        "channels" : {},
         "tokens" : {},
         "reset" : {}
     }
@@ -285,7 +285,8 @@ def check_email_database(email):
     # check if the email is already being used/is within the database
     all_users = get_data()["users"]
 
-    for user in all_users:
+    for u_id in all_users:
+        user = all_users[u_id]
         if user.get_email() == email:
             raise ValueError(description="Email is already in use.")
 
@@ -293,18 +294,24 @@ def check_email_database(email):
 
 
 def check_valid_token(token):
-    # find the user ID associated with this token, else raise a ValueError
+    """
+    Find the user ID associated with this token, else raise a 
+    ValueError
+    """
+    
     db = get_data()
 
+    # Is this token currently active? If not raise an error
     if not db["tokens"].get(token, False):
         raise ValueError(description="Invalid token")
 
     token_payload = jwt.decode(token, get_secret(), algorithms=['HS256'])
     u_id = token_payload["u_id"]
 
-    for user in db["users"]:
-        if u_id == user.get_u_id():
-            return u_id
+    # if the u_id exists return it, otherwise raise an error
+    if u_id in get_data()["users"]:
+        return u_id
+    
     raise ValueError(description="User does not exist")
 
 
@@ -312,7 +319,8 @@ def is_handle_in_use(handle_str):
     # check if the handle is already being used/exists within the database
     users = get_data()["users"]
     
-    for user in users:
+    for u_id in users:
+        user = users[u_id]
         if user.get_handle() == handle_str:
             return True
     
@@ -325,11 +333,11 @@ def get_channel(channel_id):
     raise a ValueError
     """
     channels = get_data()["channels"]
-    for channel in channels:
-        if channel.get_id() == channel_id:
-            return channel
-    
-    raise ValueError(description="Channel does not exist")
+
+    try:
+        return channels[channel_id]
+    except KeyError:
+        raise ValueError(description="Channel does not exist")
 
 
 def get_user(u_id):
@@ -339,11 +347,10 @@ def get_user(u_id):
     """
     users = get_data()["users"]
 
-    for user in users:
-        if user.get_u_id() == u_id:
-            return user
-    
-    raise ValueError(description="User does not exist")
+    try:
+        return users[u_id]
+    except KeyError:
+        raise ValueError(description="User does not exist")
 
 
 def is_user_member(u_id, channel_id):
@@ -407,11 +414,7 @@ def is_valid_u_id(u_id):
     Take a u_id and return True if it is valid, otherwise return False
     """
 
-    for user in get_data()["users"]:
-        if user.get_u_id() == u_id:
-            return True
-    
-    return False
+    return u_id in get_data()["users"]
 
 
 def u_id_from_email(email, password):
@@ -419,13 +422,18 @@ def u_id_from_email(email, password):
     Take an email and a password, if the user with this email also has this
     password return the u_id of the user otherwise raise an error
     """
+    users = get_data()["users"]
 
     wrong_pasword = False
-    hash_pass = hashlib.sha256(password.encode()).hexdigest()
-    for user in get_data()['users']:
+    hashed_pass = hashlib.sha256(password.encode()).hexdigest()
+    
+    for u_id in users:
+        user = users[u_id]
+        
         if user.get_email() == email:
-            if user.get_password() == hash_pass:
-                return user._u_id
+            if user.get_password() == hashed_pass:
+                return u_id
+            
             wrong_pasword = True
             break
     
@@ -440,10 +448,13 @@ def u_id_from_email_reset(email):
     Take an email to send a reset code to, if the email exists return the u_id
     otherwise raise a ValueError
     """
+    users = get_data()["users"]
 
-    for user in get_data()['users']:
+    for u_id in users:
+        user = users[u_id]
+        
         if user.get_email() == email:
-            return user._u_id
+            return u_id
     
     raise ValueError(description="There are no users with this password")
 
