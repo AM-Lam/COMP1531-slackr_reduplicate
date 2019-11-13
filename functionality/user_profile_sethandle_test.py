@@ -2,7 +2,7 @@ import pytest
 from .user import user_profile_sethandle
 from .auth import auth_register
 from .database import clear_data
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_user_profile_sethandle():
@@ -13,8 +13,8 @@ def test_user_profile_sethandle():
     # this test should pass with no issue
     assert user_profile_sethandle(user1["token"], "handle") == {}
 
-    # return a ValueError if the handle is too long
-    pytest.raises(ValueError, user_profile_sethandle, user1["token"], "abcdefghijklmnopqrstuvwxyz")
+    # return a Value_Error if the handle is too long
+    pytest.raises(Value_Error, user_profile_sethandle, user1["token"], "abcdefghijklmnopqrstuvwxyz")
 
     # if the handle (tested by "handle1") is already in use
-    pytest.raises(ValueError, user_profile_sethandle, user2["token"], "handle")
+    pytest.raises(Value_Error, user_profile_sethandle, user2["token"], "handle")

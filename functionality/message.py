@@ -2,7 +2,7 @@ import threading
 from datetime import datetime
 import jwt
 from .database import check_valid_token, get_data, get_secret, Messages
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def send_message(channel, message, time_sent):
@@ -27,7 +27,7 @@ def message_send(token, channel_id, message):
     
     # Message is more than 1000 characters
     if len(message) > 1000:
-        raise ValueError(description="Messages must be less than 1000 characters")
+        raise Value_Error(description="Messages must be less than 1000 characters")
 
     channel_ = None
     # add the message to the server database
@@ -37,7 +37,7 @@ def message_send(token, channel_id, message):
             break
     
     if channel_ is None:
-        raise ValueError(description="Channel does not exist")
+        raise Value_Error(description="Channel does not exist")
 
     if u_id not in channel_.get_members():
         raise AccessError(description="You don't have access in this channel")
@@ -68,12 +68,12 @@ def message_sendlater(token, channel_id, message, time_sent):
 
     # first deal with an easy to catch error, is the message too large to send
     if len(message) > 1000:
-        raise ValueError(description="Messages must be below 1000 characters")
+        raise Value_Error(description="Messages must be below 1000 characters")
     
     # next error, check the current date against time_sent and raise an
     # exception if time_sent is in the past
     if datetime.utcnow() > time_sent:
-        raise ValueError(description="Cannot send messages in the past")
+        raise Value_Error(description="Cannot send messages in the past")
         
     # ensure that the channel we are trying to send a message to actually exists
     # and that we are an authorised user in it (which I take here to mean a
@@ -85,7 +85,7 @@ def message_sendlater(token, channel_id, message, time_sent):
             break
     
     if channel_ is None:
-        raise ValueError(description="Channel does not exist")
+        raise Value_Error(description="Channel does not exist")
     
     if u_id not in channel_.get_members():
         raise AccessError(description="You cannot send messages in this channel")
@@ -117,7 +117,7 @@ def message_edit(token, message_id, message):
 
     # Message is more than 1000 characters
     if len(message) > 1000:
-        raise ValueError(description="Messages must be less than 1000 characters")
+        raise Value_Error(description="Messages must be less than 1000 characters")
 
     # Message with message_id was not sent by the authorised user making this request
     # person who send this message is not the sender and not an admin or owner in the channel
@@ -132,7 +132,7 @@ def message_edit(token, message_id, message):
                 break
     
     if message_ is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     user_ = None
     for user in server_data["users"]:
@@ -146,11 +146,16 @@ def message_edit(token, message_id, message):
     # if user is not the poster or admin
     if user_ is None:
         raise AccessError(description="You do not have permission to edit this message")
-    
-    print(f'Message object {message_} has text {message_.get_text()}')
-    # update the database with new message
-    message_.edit_text(message)
-    print(f'Message object {message_} has text {message_.get_text()}')
+
+    # message is deleted if the message is empty string
+    # or do "if message == "":" ?
+    if not message: 
+        message_remove(token, message_id)
+    else :
+        print(f'Message object {message_} has text {message_.get_text()}')
+        # update the database with new message
+        message_.edit_text(message)
+        print(f'Message object {message_} has text {message_.get_text()}')
             
     return {}
 
@@ -178,7 +183,7 @@ def message_remove(token, message_id):
                 break
     
     if message_ is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     user_ = None
     for user in server_data["users"]:
@@ -217,7 +222,7 @@ def message_pin(token, message_id):
             break
     
     if user_ == None:
-        raise ValueError("u_id does not belong to a real user")
+        raise Value_Error("u_id does not belong to a real user")
     
     # Message with message_id was not sent by the authorised user making this
     # request person who send this message is not the sender and not an admin
@@ -234,13 +239,13 @@ def message_pin(token, message_id):
                 break
     
     if message_ is None:
-        raise ValueError(description="The provided id does not refer to a real message")
+        raise Value_Error(description="The provided id does not refer to a real message")
     
     if user_.is_global_admin() == False and u_id not in channel_.get_owners():
-        raise ValueError(description="Only admins and owners can pin messages!")
+        raise Value_Error(description="Only admins and owners can pin messages!")
     #  Message with ID message_id is already pinned
     if message_._pinned == True:
-        raise ValueError(description="The message is already pinned")
+        raise Value_Error(description="The message is already pinned")
     else:
         # pin the message and add it to the channels list of pins
         message_._pinned = True
@@ -281,18 +286,18 @@ def message_unpin(token, message_id):
             break
     
     if user_ == None:
-        raise ValueError("u_id does not belong to a real user")
+        raise Value_Error("u_id does not belong to a real user")
 
     if message_ is None:
-        raise ValueError(description="The provided id does not\
+        raise Value_Error(description="The provided id does not\
                          refer to a real message")
     
     if user_.is_global_admin() == False and u_id not in channel_.get_owners():
-        raise ValueError(description="Only admins and owners can unpin\
+        raise Value_Error(description="Only admins and owners can unpin\
                          messages!")
     #  Message with ID message_id is already pinned
     if message_._pinned == False:
-        raise ValueError(description="The message is not pinned")
+        raise Value_Error(description="The message is not pinned")
     else:
         # pin the message and add it to the channels list of pins
         message_._pinned = False
@@ -323,13 +328,13 @@ def message_react(token, message_id, react_id):
                 break
     
     if message_ is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     react_exists = False
     for react in message_._reacts:
         if react["react_id"] == react_id:
             if u_id in react["u_ids"]:
-                raise ValueError(description=f"You have already reacted to this message with this react")
+                raise Value_Error(description=f"You have already reacted to this message with this react")
             react_exists = True
             react["u_ids"].append(u_id)
             break
@@ -365,17 +370,16 @@ def message_unreact(token, message_id, react_id):
                 break
     
     if message_ is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     for react in message_._reacts:
         if react["react_id"] == react_id:
             if u_id not in react["u_ids"]:
-                raise ValueError(description=f"You have not reacted to this message with this react")
+                raise Value_Error(description=f"You have not reacted to this message with this react")
             react["u_ids"].remove(u_id)
             break
 
     return {}
-
 
 def search(token, query_str):
     # find u_id associated with token (with non-existent database)

@@ -2,7 +2,7 @@ import pytest
 from .auth import auth_register
 from .channel import channel_join, channels_create, channel_details
 from .database import clear_data, get_channel, is_user_member
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_run_all():
@@ -24,7 +24,7 @@ def test_run_all():
 
     # what if the channel does not exist?
     invalid_channel = 999
-    with pytest.raises(ValueError , match=r"*"):
+    with pytest.raises(Value_Error , match=r"*"):
         get_channel(invalid_channel)
 
     # user2 is not a part of the channel

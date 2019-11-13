@@ -3,12 +3,12 @@ import time
 from datetime import timedelta, datetime
 from .message import message_send
 from .database import get_data, get_secret
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 #   standup_start(token, channel_id);
 #   return {time_finish}
-#   Exception: ValueError when:
+#   Exception: Value_Error when:
 #       - Channel (based on ID) does not exist,
 #   AccessError when:
 #       - The authorised user is not a member of the channel that the message is within
@@ -47,7 +47,7 @@ def standup_start(token, channel_id):
     return time_finish
 
 def check_valid_token(token):
-    # find the user ID associated with this token, else raise a ValueError
+    # find the user ID associated with this token, else raise a Value_Error
     DATABASE = get_data()
     SECRET = get_secret()
     token_payload = jwt.decode(token, SECRET, algorithms=['HS256'])
@@ -56,17 +56,17 @@ def check_valid_token(token):
         user_id = x.get_u_id()
         if user_id == token_payload["u_id"]:
             return user_id
-    raise ValueError(description="token invalid")
+    raise Value_Error(description="token invalid")
 
 def check_channel_exist(channel_id):
-    # check if channel_id exists, else raise a ValueError
+    # check if channel_id exists, else raise a Value_Error
     DATABASE = get_data()
 
     for x in DATABASE["channels"]:
         if x.get_id() == channel_id:
             return True
     
-    raise ValueError(description="Channel does not exist or cannot be found.")
+    raise Value_Error(description="Channel does not exist or cannot be found.")
 
 def check_channel_member(u_id, channel_id):
     # we need to find a way to know what members correspond to which channels, for now, pass
@@ -79,7 +79,7 @@ def check_channel_member(u_id, channel_id):
             else:
                 raise AccessError(description="You are not a member of this channel.")
     
-    raise ValueError(description="Channel does not exist or cannot be found.")
+    raise Value_Error(description="Channel does not exist or cannot be found.")
 
 def start_standup(channel_id):
     # give a timedate object to the database
@@ -95,7 +95,7 @@ def start_standup(channel_id):
             break
     
     if not found_channel:
-        raise ValueError(description="Channel does not exist or cannot be found.")
+        raise Value_Error(description="Channel does not exist or cannot be found.")
 
 def end_standup(token, channel_id, time_finish):
     global MESSAGE_STANDUP
