@@ -5,7 +5,7 @@ from .database import clear_data
 from .auth import auth_register
 from .message import message_remove, message_send, message_react
 from .channel import channels_create
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_message_react():
@@ -33,5 +33,5 @@ def test_no_message():
 
     react_id = 1
     # the message is not existed
-    pytest.raises(ValueError, message_react, user1["token"], 
+    pytest.raises(Value_Error, message_react, user1["token"], 
                   message_1['message_id'], react_id)

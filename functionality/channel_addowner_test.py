@@ -2,8 +2,8 @@ import pytest
 import jwt
 from .auth import auth_register
 from .channel import channels_create, channel_addowner
-from .database import *
-from .access_error import *
+from .database import clear_data
+from .access_error import AccessError, Value_Error
 
 
 def test_channel_addowner():
@@ -28,7 +28,7 @@ def test_channel_addowner():
     
     # try to add a user as an owner to a channel they are already an owner
     # on
-    pytest.raises(ValueError, channel_addowner, user1["token"], channel1["channel_id"], user2["u_id"])
+    pytest.raises(Value_Error, channel_addowner, user1["token"], channel1["channel_id"], user2["u_id"])
     
     # try to add a user as an owner to a channel we do not own
     pytest.raises(AccessError, channel_addowner, user2["token"], channel2["channel_id"], user3["u_id"])

@@ -4,7 +4,7 @@ from .database import clear_data
 from .auth import auth_register
 from .message import message_react, message_remove, message_send, message_unreact
 from .channel import channels_create
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_message_unreact():
@@ -35,4 +35,4 @@ def test_no_message():
     react_id = 1
 
     # the message does not exist
-    pytest.raises(ValueError, message_unreact, user1["token"], message_1['message_id'], react_id)
+    pytest.raises(Value_Error, message_unreact, user1["token"], message_1['message_id'], react_id)

@@ -318,8 +318,8 @@ def run_message_sendlater():
     return_value = message.message_sendlater(
         request_data["token"],
         int(request_data["channel_id"]),
-        int(request_data["message"]),
-        datetime.utcfromtimestamp(request_data["time_sent"])
+        request_data["message"],
+        datetime.utcfromtimestamp(int(request_data["time_sent"]) / 1000)
     )
 
     return dumps(return_value)
@@ -388,7 +388,9 @@ def run_standup_start():
 @APP.route('/standup/send', methods=["POST"])
 def run_standup_send():
     request_data = request.form
-    return_value = standup_send.standup_send(
+    return_value = {}
+    
+    standup_send.standup_send(
         request_data["token"],
         int(request_data["channel_id"]),
         request_data["message"],
@@ -411,13 +413,26 @@ def run_search():
 @APP.route('/admin/userpermission/change', methods=["POST"])
 def run_admin_userpermission_change():
     request_data = request.form
-    return_value = admin_userpermission_change.admin_userpermission_change(
+    return_value = {}
+    
+    admin_userpermission_change.admin_userpermission_change(
         request_data["token"],
         int(request_data["u_id"]),
-        int(request_data["permission_id"]),
-    )
+        int(request_data["permission_id"]))
 
     return dumps(return_value)
+
+
+@APP.route('/users/all', methods=["GET"])
+def run_users_all():
+    # to suppress errors just return an empty list
+    return dumps({"users" : []})
+
+
+@APP.route('/standup/active', methods=["GET"])
+def run_standup_active():
+    # to suppress errors just always return an inactive standup
+    return dumps({"is_active" : False, "time_finish" : None})
 
 
 if __name__ == '__main__':

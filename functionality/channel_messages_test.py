@@ -2,7 +2,8 @@ import pytest
 from .auth import auth_register
 from .message import message_send
 from .channel import channel_messages, channels_create, channel_invite
-from .database import *
+from .access_error import AccessError, Value_Error
+from .database import clear_data
 
 
 def test_run_all():
@@ -34,7 +35,7 @@ def test_run_all():
         messageloop = initmessage + ' aa'
         message_send(token1, unswchannelid, messageloop)
     # now lets call channel messages...
-    with pytest.raises(ValueError, match=r"*"):
+    with pytest.raises(Value_Error, match=r"*"):
         channel_messages(token1, unswchannelid, 93)
 
     # INVALID USER

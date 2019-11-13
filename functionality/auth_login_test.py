@@ -2,8 +2,7 @@ import pytest
 import re
 from .database import clear_data
 from .auth import auth_login, auth_register
-from .access_error import *
-
+from .access_error import AccessError, Value_Error
 
 def test_login():
     clear_data()

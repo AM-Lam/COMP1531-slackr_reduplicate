@@ -2,7 +2,7 @@ import pytest
 from .user import user_profile_setemail
 from .auth import auth_register
 from .database import clear_data
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_user_profile_setemail():
@@ -14,7 +14,7 @@ def test_user_profile_setemail():
     assert user_profile_setemail(user1["token"], "z1234567@cse.unsw.edu.au") == {}
 
     # if the email doesnt exist or is invalid
-    pytest.raises(ValueError, user_profile_setemail, user1["token"], "thisisjustastring")
+    pytest.raises(Value_Error, user_profile_setemail, user1["token"], "thisisjustastring")
 
     # if the email is used by another user (check the site)
-    pytest.raises(ValueError, user_profile_setemail, user2["token"], "z1234567@cse.unsw.edu.au")
+    pytest.raises(Value_Error, user_profile_setemail, user2["token"], "z1234567@cse.unsw.edu.au")
