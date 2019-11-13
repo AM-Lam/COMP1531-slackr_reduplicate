@@ -45,6 +45,9 @@ def channel_details(token, channel_id):
     channel = get_channel(channel_id)
     channel_members = channel.get_members()
 
+    if not is_user_member(u_id, channel_id) and not is_user_owner(u_id, channel_id):
+        raise AccessError(description='You do not have permission to do this')
+    
     # TODO: Rewrite this to not be awful, will likely require
     # rethinking our data structures
 
@@ -52,7 +55,8 @@ def channel_details(token, channel_id):
     channel_members = [{
         "u_id" : user.get_u_id(),
         "name_first" : user.get_first_name(),
-        "name_last" : user.get_last_name()
+        "name_last" : user.get_last_name(),
+        "profile_image" : ""
     } for user in get_data()["users"] if user.get_u_id() in channel_members]
 
     # do the same thing with the channel owners
@@ -60,7 +64,8 @@ def channel_details(token, channel_id):
     channel_owners = [{
         "u_id" : user.get_u_id(),
         "name_first" : user.get_first_name(),
-        "name_last" : user.get_last_name()
+        "name_last" : user.get_last_name(),
+        "profile_image" : ""
     } for user in get_data()["users"] if user.get_u_id() in channel_owners]
 
     return {"name" : channel.get_name(),
@@ -120,12 +125,18 @@ def channel_leave(token, channel_id):
     u_id = check_valid_token(token)
     channel = get_channel(channel_id)
 
+    # get the channel itself
+    channel = get_channel(channel_id)
+
+    # attempt to remove the user from the channel, if they are also an
+    # owner of the channel remove them from tha list as well
     if is_user_member(u_id, channel_id):
         channel.get_members().remove(u_id)
-
+    
     if is_user_owner(u_id, channel_id):
         channel.get_owners().remove(u_id)
-
+    
+    # always return an empty dictionary
     return {}
 
 
