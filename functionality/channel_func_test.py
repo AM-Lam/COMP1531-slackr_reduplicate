@@ -33,7 +33,7 @@ def test_channel_addowner():
     
     # try to add a user as an owner to a channel they are already an owner
     # on
-    pytest.raises(ValueError, channel_addowner, user1["token"], channel1["channel_id"], user2["u_id"])
+    pytest.raises(Value_Error, channel_addowner, user1["token"], channel1["channel_id"], user2["u_id"])
     
     # try to add a user as an owner to a channel we do not own
     pytest.raises(AccessError, channel_addowner, user2["token"], channel2["channel_id"], user3["u_id"])
@@ -71,7 +71,7 @@ def test_channel_details():
 
     # what if the channel does not exist?
     invalid_channel = 999
-    with pytest.raises(ValueError , match=r"*"):
+    with pytest.raises(Value_Error , match=r"*"):
         get_channel(invalid_channel)
 
     # user2 is not a part of the channel
@@ -132,25 +132,25 @@ def test_channel_invite():
     # user1 is now a part of unswchannel
 
     # test if the user is valid.
-    with pytest.raises(ValueError , match=r"*"):
+    with pytest.raises(Value_Error , match=r"*"):
         channel_invite('3131313133', unswchannelid, uid2)
 
     # test if user does not exist on application database
-    with pytest.raises(ValueError , match=r"*"):
+    with pytest.raises(Value_Error , match=r"*"):
         channel_invite(token1, unswchannelid, 'jl mackie')
 
-    # user exists but is already a part of that channel then invite should raise valueError
-    with pytest.raises(ValueError , match=r"*"):
+    # user exists but is already a part of that channel then invite should raise Value_Error
+    with pytest.raises(Value_Error , match=r"*"):
         channel_invite(token1, unswchannelid, uid1)
 
     # what if the channel does not exist?
-    with pytest.raises(ValueError , match=r"*"):
+    with pytest.raises(Value_Error , match=r"*"):
         channel_invite(token1, "this channel does not exist", uid2)
 
     # add user 2 to the channel (invitee -> user 1)
     channel_invite(token1, unswchannelid, uid2)
-    # user 2 is already a part of that channel the invite should raise valueError
-    with pytest.raises(ValueError , match=r"*"):
+    # user 2 is already a part of that channel the invite should raise Value_Error
+    with pytest.raises(Value_Error , match=r"*"):
         channel_invite(token1, unswchannelid, uid2)
 
 
@@ -173,7 +173,7 @@ def test_channel_join():
     
     # now try to join a server that does not exist, this should fail with an
     # access error
-    pytest.raises(ValueError, channel_join, user2['token'], 404)
+    pytest.raises(Value_Error, channel_join, user2['token'], 404)
     
     # try to join a server that exists, but is private as a regular user
     pytest.raises(AccessError, channel_join, user2['token'], 
@@ -209,7 +209,7 @@ def test_channel_leave():
 
     # now check that attempting to leave a non-existent channel raises an 
     # exception
-    pytest.raises(ValueError, channel_leave, user1["token"], 404)
+    pytest.raises(Value_Error, channel_leave, user1["token"], 404)
 
     # try to leave a channel the user is not a part of - this should fail 
     # quietely (see assumptions.md)
@@ -249,7 +249,7 @@ def test_channel_messages():
         messageloop = initmessage + ' aa'
         message_send(token1, unswchannelid, messageloop)
     # now lets call channel messages...
-    with pytest.raises(ValueError, match=r"*"):
+    with pytest.raises(Value_Error, match=r"*"):
         channel_messages(token1, unswchannelid, 93)
 
     # INVALID USER
@@ -332,7 +332,7 @@ def test_channel_removeowner():
                                user2["u_id"]) == {}
     
     # test removing user2 when they are not an owner
-    pytest.raises(ValueError, channel_removeowner, user1["token"],
+    pytest.raises(Value_Error, channel_removeowner, user1["token"],
                   channel1["channel_id"], user2["u_id"])
     
     # add user2 as an owner to channel1 again
@@ -349,7 +349,7 @@ def test_channel_removeowner():
                                user2["u_id"]) == {}
     
     # try to remove an owner from a channel that does not exist
-    pytest.raises(ValueError, channel_removeowner, user1["token"], 128,
+    pytest.raises(Value_Error, channel_removeowner, user1["token"], 128,
                   user2["u_id"])
 
 
@@ -369,7 +369,7 @@ def test_channels_create():
     assert channels_create(user1["token"], "Channel 1", True) == {"channel_id" : 1}
     
     # try to create a channel with an invalid name
-    pytest.raises(ValueError, channels_create, user1["token"], 
+    pytest.raises(Value_Error, channels_create, user1["token"], 
                   "123456789012345678901", False)
 
 

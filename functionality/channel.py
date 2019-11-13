@@ -88,7 +88,7 @@ def channel_invite(token, channel_id, u_id):
         raise Value_Error(description="u_id is not a real user")
 
     if is_user_member(u_id, channel_id):
-        raise ValueError(description="User is already a member of this channel")
+        raise Value_Error(description="User is already a member of this channel")
 
     if not is_user_owner(inviter_id, channel_id):
         raise AccessError(description="You do not have permission to do this")
@@ -179,7 +179,7 @@ def channel_removeowner(token, channel_id, u_id):
     """
     Select a channel by id and a user by id then, if we have the perms,
     remove that user from the list of channel owners. If the user is
-    not an owner raise a ValueError and if we do not have permissions
+    not an owner raise a Value_Error and if we do not have permissions
     to do this raise an AccessError.
     """
 

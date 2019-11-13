@@ -18,10 +18,10 @@ def test_user_profile_setemail():
     assert user_profile_setemail(user1["token"], "z1234567@cse.unsw.edu.au") == {}
 
     # if the email doesnt exist or is invalid
-    pytest.raises(ValueError, user_profile_setemail, user1["token"], "thisisjustastring")
+    pytest.raises(Value_Error, user_profile_setemail, user1["token"], "thisisjustastring")
 
     # if the email is used by another user (check the site)
-    pytest.raises(ValueError, user_profile_setemail, user2["token"], "z1234567@cse.unsw.edu.au")
+    pytest.raises(Value_Error, user_profile_setemail, user2["token"], "z1234567@cse.unsw.edu.au")
 
 
 ############################################################################################################################
@@ -36,11 +36,11 @@ def test_user_profile_sethandle():
     # this test should pass with no issue
     assert user_profile_sethandle(user1["token"], "handle") == {}
 
-    # return a ValueError if the handle is too long
-    pytest.raises(ValueError, user_profile_sethandle, user1["token"], "abcdefghijklmnopqrstuvwxyz")
+    # return a Value_Error if the handle is too long
+    pytest.raises(Value_Error, user_profile_sethandle, user1["token"], "abcdefghijklmnopqrstuvwxyz")
 
     # if the handle (tested by "handle1") is already in use
-    pytest.raises(ValueError, user_profile_sethandle, user2["token"], "handle")
+    pytest.raises(Value_Error, user_profile_sethandle, user2["token"], "handle")
 
 
 ############################################################################################################################
@@ -55,18 +55,18 @@ def test_user_profile_setname():
     assert user_profile_setname(user["token"], "Jane", "Smith") == {}
 
     # trying to input a first name longer than 50 characters
-    pytest.raises(ValueError, user_profile_setname, user["token"],
+    pytest.raises(Value_Error, user_profile_setname, user["token"],
                   "a" * 51, "Smith")
 
     # trying to input a last name longer than 50 characters
-    pytest.raises(ValueError, user_profile_setname, user["token"],
+    pytest.raises(Value_Error, user_profile_setname, user["token"],
                  "Jane", "a" * 51)
 
     # assuming we allow mononymous names, at least one value needs to be filled
     assert user_profile_setname(user["token"], "Plato", "") == {}
 
     # trying to input an empty name
-    pytest.raises(ValueError, user_profile_setname, user["token"], "", "")
+    pytest.raises(Value_Error, user_profile_setname, user["token"], "", "")
 
 
 ############################################################################################################################

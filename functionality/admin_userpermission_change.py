@@ -4,7 +4,7 @@ from .database import get_data, get_secret
 
 #   admin_userpermission_change(token, u_id, permission_id);
 #   return void
-#   Exception: ValueError when:
+#   Exception: Value_Error when:
 #       - u_id does not refer to a valid user,
 #       - permission_id does not refer to a value permission,
 #   AccessError when:

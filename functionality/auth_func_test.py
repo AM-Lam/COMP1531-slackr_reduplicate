@@ -16,7 +16,7 @@ def test_auth_logout1():
     dictreg = auth_register("arpit@gmail.com", "passwording", "arpit", "rulania")
     tokenreg = dictreg["token"]
     auth_logout(tokenreg)   # logging out.
-    pytest.raises(ValueError, auth_logout, tokenreg) # trying to logout something already logged out.
+    pytest.raises(Value_Error, auth_logout, tokenreg) # trying to logout something already logged out.
 
 def test_auth_logout2():
     # validtoken test should pass
@@ -30,7 +30,7 @@ def test_auth_logout3():
     clear_data()
     dictreg = auth_register("arpitinit@gmail.com", "passwording", "arpit", "rulania")
     tokenlog = "invalid"
-    pytest.raises(ValueError, auth_logout, tokenlog)
+    pytest.raises(Value_Error, auth_logout, tokenlog)
 
 
 ############################################################################################################################
@@ -67,13 +67,13 @@ def test_login2():
     
     # here we assume that an existing database has logged the information of user1 and user2 created above
     # what if the email does not exist in the database -->
-    pytest.raises(ValueError, auth_login, 'INVALIDeMAIL@domain.com', 'abcdefgh')   
+    pytest.raises(Value_Error, auth_login, 'INVALIDeMAIL@domain.com', 'abcdefgh')   
     # user forgot to put the .au domain in the address-->
-    pytest.raises(ValueError, auth_login, 'user3@domain.com', 'abcdefgh')
+    pytest.raises(Value_Error, auth_login, 'user3@domain.com', 'abcdefgh')
     # did the user forget to put the subdomain (i.e. student.unsw....)? -->
-    pytest.raises(ValueError, auth_login, 'user2@unsw.edu.au', 'abcdefgh')
+    pytest.raises(Value_Error, auth_login, 'user2@unsw.edu.au', 'abcdefgh')
     # does my function only accept a particular domain? -->
-    pytest.raises(ValueError, auth_login, 'user3@gmail.com.au', 'abcdefgh')
+    pytest.raises(Value_Error, auth_login, 'user3@gmail.com.au', 'abcdefgh')
 
 def test_login3():
     # test should fail if password is wrong or not of correct length!
@@ -87,13 +87,13 @@ def test_login3():
     assert user_3 is not None
     
     # what if the password does not have Enough characters? -->
-    pytest.raises(ValueError, auth_login, 'user1@domain.com' , 'pas31')
+    pytest.raises(Value_Error, auth_login, 'user1@domain.com' , 'pas31')
     # what if the password field was just left empty> -->
-    pytest.raises(ValueError, auth_login, 'user1@domain.com' , '')
+    pytest.raises(Value_Error, auth_login, 'user1@domain.com' , '')
     # what is password has a valid length but is incorrect? -->
-    pytest.raises(ValueError, auth_login, 'user1@domain.com' , 'passwordisthis')
+    pytest.raises(Value_Error, auth_login, 'user1@domain.com' , 'passwordisthis')
     # what if the password exists on the server but is not correctly matched to the provided email -->
-    pytest.raises(ValueError, auth_login, 'user3@domain.com' , 'passew@321')
+    pytest.raises(Value_Error, auth_login, 'user3@domain.com' , 'passew@321')
 
 
 ############################################################################################################################
@@ -114,20 +114,20 @@ def test_register2():
     token = auth_register('user1@gmail.com', 'passew@321', 'user', 'one')
     assert token['token'] is not None
     assert token['u_id'] is not None
-    pytest.raises(ValueError, auth_register, 'user1@gmail.com', 'passew@321', 'user', 'one' )
+    pytest.raises(Value_Error, auth_register, 'user1@gmail.com', 'passew@321', 'user', 'one' )
 
 def test_register3():
     # raise an error if user tries to register with a very long name
     clear_data()
     #-> first name too long
-    pytest.raises(ValueError, auth_register, 'user1@gmail.com', 'passew@321', 'userdhksfbskhdbfkhsdbvhkfsbvhfbvhkdbfvhkbdfkhbvhkdfbvkhdfbvhkdfbvhkdfbvkhdbfvhkbdfkhbvdfhkb', 'o')
+    pytest.raises(Value_Error, auth_register, 'user1@gmail.com', 'passew@321', 'userdhksfbskhdbfkhsdbvhkfsbvhfbvhkdbfvhkbdfkhbvhkdfbvkhdfbvhkdfbvhkdfbvkhdbfvhkbdfkhbvdfhkb', 'o')
     #-> last name too long
-    pytest.raises(ValueError, auth_register, 'user1@gmail.com', 'passew@321', 'o', 'userdhksfbskhdbfkhsdbvhkfsbvhfbvhkdbfvhkbdfkhbvhkdfbvkhdfbvhkdfbvhkdfbvkhdbfvhkbdfkhbvdfhkb')
+    pytest.raises(Value_Error, auth_register, 'user1@gmail.com', 'passew@321', 'o', 'userdhksfbskhdbfkhsdbvhkfsbvhfbvhkdbfvhkbdfkhbvhkdfbvkhdfbvhkdfbvhkdfbvkhdbfvhkbdfkhbvdfhkb')
 
 def test_register4():
     # raise error if password is weak!
     clear_data()
-    pytest.raises(ValueError, auth_register, 'user1@gmail.com', 'pew', 'user', 'one' )
+    pytest.raises(Value_Error, auth_register, 'user1@gmail.com', 'pew', 'user', 'one' )
 
 
 ############################################################################################################################
@@ -156,9 +156,9 @@ def test_reset_reset1():
     auth_register('user1@gmail.com' ,'passew@321', 'user', 'one')
     auth_passwordreset_request('user1@gmail.com')
     #-> invalid codes being passed in!
-    pytest.raises(ValueError, auth_passwordreset_reset, "INVALID-CODE" , 'abcdefgh')
+    pytest.raises(Value_Error, auth_passwordreset_reset, "INVALID-CODE" , 'abcdefgh')
     #->password not strong
-    pytest.raises(ValueError, auth_passwordreset_reset, "123@!@" , 'ab')
+    pytest.raises(Value_Error, auth_passwordreset_reset, "123@!@" , 'ab')
 
 def test_reset_reset2():
     # testing is it works!

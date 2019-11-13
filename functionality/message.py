@@ -45,7 +45,7 @@ def message_send(token, channel_id, message):
 def message_sendlater(token, channel_id, message, time_sent):
     # Message is more than 1000 characters
     if len(message) > 1000:
-        raise ValueError(description="Messages must be less than 1000 characters")
+        raise Value_Error(description="Messages must be less than 1000 characters")
 
     # now grab the u_id associated with the provided token and the
     # channel object
@@ -87,14 +87,14 @@ def message_edit(token, message_id, message):
             channel = potential_channel
             message_user = get_user(message.get_u_id())
             break
-        except ValueError:
+        except Value_Error:
             continue
 
     if message is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     if channel is None:
-        raise ValueError(description="Channel does not exist")
+        raise Value_Error(description="Channel does not exist")
 
     # if user is not the poster or admin
     if request_user != message_user and not request_user.is_global_admin():
@@ -124,14 +124,14 @@ def message_remove(token, message_id):
             channel = potential_channel
             message_user = get_user(message.get_u_id())
             break
-        except ValueError:
+        except Value_Error:
             continue
 
     if message is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     if channel is None:
-        raise ValueError(description="Channel does not exist")
+        raise Value_Error(description="Channel does not exist")
 
     # if user is not the poster or admin
     if request_user != message_user and not request_user.is_global_admin():
@@ -160,21 +160,21 @@ def message_pin(token, message_id):
             message = potential_channel.get_message(message_id)
             channel = potential_channel
             break
-        except ValueError:
+        except Value_Error:
             continue
 
     if message is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     if channel is None:
-        raise ValueError(description="Channel does not exist")
+        raise Value_Error(description="Channel does not exist")
     
     if user.is_global_admin() == False and not is_user_owner(u_id, channel.get_id()):
-        raise ValueError(description="Only admins and owners can pin messages!")
+        raise Value_Error(description="Only admins and owners can pin messages!")
 
     # Message with ID message_id is already pinned raises an error
     if message.is_pinned() == True:
-        raise ValueError(description="The message is already pinned")
+        raise Value_Error(description="The message is already pinned")
     else:
         # otherwise pin the message and add it to the channels list of
         # pins
@@ -200,20 +200,20 @@ def message_unpin(token, message_id):
             message = potential_channel.get_message(message_id)
             channel = potential_channel
             break
-        except ValueError:
+        except Value_Error:
             continue
 
     if message is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     if channel is None:
-        raise ValueError(description="Channel does not exist")
+        raise Value_Error(description="Channel does not exist")
     
     if user.is_global_admin() == False and not is_user_owner(u_id, channel.get_id()):
-        raise ValueError(description="Only admins and owners can unpin messages!")
+        raise Value_Error(description="Only admins and owners can unpin messages!")
 
     if not message.is_pinned():
-        raise ValueError(description="The message is not pinned")
+        raise Value_Error(description="The message is not pinned")
     else:
         # otherwise unpin the message and remove it from the channel's
         # list of pins
@@ -235,11 +235,11 @@ def message_react(token, message_id, react_id):
         try:
             message = channel.get_message(message_id)
             break
-        except ValueError:
+        except Value_Error:
             continue
 
     if message is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     react_exists = False
     for react in message._reacts:
@@ -271,16 +271,16 @@ def message_unreact(token, message_id, react_id):
         try:
             message = channel.get_message(message_id)
             break
-        except ValueError:
+        except Value_Error:
             continue
 
     if message is None:
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     for react in message._reacts:
         if react["react_id"] == react_id:
             if u_id not in react["u_ids"]:
-                raise ValueError(description="You have not reacted to this message with this react")
+                raise Value_Error(description="You have not reacted to this message with this react")
             react["u_ids"].remove(u_id)
             break
 

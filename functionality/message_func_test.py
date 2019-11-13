@@ -61,7 +61,7 @@ def test_message_edit3():
     assert get_message_text(message2["message_id"]) == "Chomsky is good"
 
     # try to edit a message that does not exist
-    pytest.raises(ValueError, message_edit, user1["token"], 
+    pytest.raises(Value_Error, message_edit, user1["token"], 
                   10101, "Hello There")
     
     # try to edit a message we do not own as a global admin
@@ -102,7 +102,7 @@ def test_no_message15():
     message_remove(user1["token"], message_1['message_id'])
 
     # the message does not exist
-    pytest.raises(ValueError, message_pin, user1["token"], message_1['message_id'])
+    pytest.raises(Value_Error, message_pin, user1["token"], message_1['message_id'])
 
 
 ############################################################################################################################
@@ -134,7 +134,7 @@ def test_no_message7():
 
     react_id = 1
     # the message is not existed
-    pytest.raises(ValueError, message_react, user1["token"], 
+    pytest.raises(Value_Error, message_react, user1["token"], 
                   message_1['message_id'], react_id)
 
 
@@ -170,7 +170,7 @@ def test_no_message9():
     assert message_remove(user1["token"], message_1['message_id']) == {}
 
     # check that you cannot remove a message that no longer exists
-    pytest.raises(ValueError, message_remove, user1["token"], message_1['message_id'])
+    pytest.raises(Value_Error, message_remove, user1["token"], message_1['message_id'])
 
 def test_invalid_user10():
     clear_data()
@@ -247,7 +247,7 @@ def test_message_send12():
     # reset message_1
     message_1 = None
     # the message is over 1000 characters
-    pytest.raises(ValueError, message_send, user1["token"],
+    pytest.raises(Value_Error, message_send, user1["token"],
                   channel_id["channel_id"], "X" * 1001)
 
 
@@ -269,16 +269,16 @@ def test_message_sendlater13():
     
     # first test some cases that should raise exceptions
     # message > 1000 characters
-    pytest.raises(ValueError, message_sendlater, user1["token"], 
+    pytest.raises(Value_Error, message_sendlater, user1["token"], 
                   channel1["channel_id"], "X" * 1001, 
                   datetime.now() + timedelta(minutes=1))
     
     # time sent is in the past
-    pytest.raises(ValueError, message_sendlater, user1["token"], 
+    pytest.raises(Value_Error, message_sendlater, user1["token"], 
                   channel1["channel_id"], "Message", datetime(2000, 1, 1))
     
     # non-existent channel
-    pytest.raises(ValueError, message_sendlater, user1["token"], 
+    pytest.raises(Value_Error, message_sendlater, user1["token"], 
                   404, "Message", datetime.now() + timedelta(minutes=1))
     
     # now try to send a valid message in the future
@@ -327,7 +327,7 @@ def test_no_message15():
     assert channel_id is not None
 
     # try to remove a non-existent message
-    pytest.raises(ValueError, message_unpin, user1["token"], 123)
+    pytest.raises(Value_Error, message_unpin, user1["token"], 123)
 
 
 ############################################################################################################################
@@ -362,7 +362,7 @@ def test_no_message17():
     react_id = 1
 
     # the message does not exist
-    pytest.raises(ValueError, message_unreact, user1["token"], message_1['message_id'], react_id)
+    pytest.raises(Value_Error, message_unreact, user1["token"], message_1['message_id'], react_id)
 
 
 ############################################################################################################################

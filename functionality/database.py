@@ -164,7 +164,7 @@ class Channel:
         if to_return is not None:
             return to_return
         
-        raise ValueError(description="Message does not exist")
+        raise Value_Error(description="Message does not exist")
 
     def set_id(self, new_id):
         self._channel_id = new_id
@@ -317,7 +317,7 @@ def check_email_database(email):
 def check_valid_token(token):
     """
     Find the user ID associated with this token, else raise a 
-    ValueError
+    Value_Error
     """
     
     db = get_data()
@@ -333,7 +333,7 @@ def check_valid_token(token):
     if u_id in get_data()["users"]:
         return u_id
     
-    raise ValueError(description="User does not exist")
+    raise Value_Error(description="User does not exist")
 
 
 def is_handle_in_use(handle_str):
@@ -358,7 +358,7 @@ def get_channel(channel_id):
     try:
         return channels[channel_id]
     except KeyError:
-        raise ValueError(description="Channel does not exist")
+        raise Value_Error(description="Channel does not exist")
 
 
 def get_user(u_id):
@@ -371,7 +371,7 @@ def get_user(u_id):
     try:
         return users[u_id]
     except KeyError:
-        raise ValueError(description="User does not exist")
+        raise Value_Error(description="User does not exist")
 
 
 def is_user_member(u_id, channel_id):
