@@ -2,11 +2,14 @@
 |----------|--------------------------------------|------------------|
 | Week 8   | -ask for clarification               | Everyone         |
 |          | -rebuild the database.py             | Everyone         |
-|          | -modify the functions in iteration 2 | Owen, Ann        |
+|          | -modify the functions in iteration 2 | Everyone         |
+|          | -Fix up the styles like the import * | Owen, Ann        |
+
 |----------|--------------------------------------|------------------|
 | Week 9   | -Finish the functions(x32)           | Everyone         |
-|          | -Finish the documents                | Everyone         |
-|          | -modifying the frontend              | Everyone         |
+|          | -Refactor the code from iteration 2  | Owen, Aprit      |
+|          | -Add decorator                       | Owen             |
+|          | -modify the frontend                 | Ann              |
 
 # From last iteration
 - Things should be done last iteration
