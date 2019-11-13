@@ -2,7 +2,7 @@ import pytest
 from .auth import auth_register
 from .channel import channel_join, channels_create
 from .database import clear_data
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_channel_join():
@@ -20,7 +20,7 @@ def test_channel_join():
     
     # now try to join a server that does not exist, this should fail with an
     # access error
-    pytest.raises(ValueError, channel_join, user2['token'], 404)
+    pytest.raises(Value_Error, channel_join, user2['token'], 404)
     
     # try to join a server that exists, but is private as a regular user
     pytest.raises(AccessError, channel_join, user2['token'], 

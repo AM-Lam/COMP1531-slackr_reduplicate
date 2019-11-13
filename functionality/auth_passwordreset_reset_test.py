@@ -2,7 +2,7 @@ import pytest
 import hashlib
 from .database import clear_data, get_data
 from .auth import auth_passwordreset_request, auth_passwordreset_reset, auth_register
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_reset_test():
@@ -12,8 +12,8 @@ def test_reset_test():
     auth_passwordreset_request('user1@gmail.com')
 
     # write more tests to check code
-    pytest.raises(ValueError, auth_passwordreset_reset, "INVALID-CODE" , 'abcdefgh')
-    pytest.raises(ValueError, auth_passwordreset_reset, "123@!@" , 'abcdefgh')
+    pytest.raises(Value_Error, auth_passwordreset_reset, "INVALID-CODE" , 'abcdefgh')
+    pytest.raises(Value_Error, auth_passwordreset_reset, "123@!@" , 'abcdefgh')
 
     ###########################################################################
 

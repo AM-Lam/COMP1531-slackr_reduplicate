@@ -4,7 +4,7 @@ from .database import clear_data, get_data
 from .auth import auth_register
 from .message import message_send, message_remove
 from .channel import channels_create, channel_join
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_message_remove():
@@ -35,7 +35,7 @@ def test_no_message():
     assert message_remove(user1["token"], message_1['message_id']) == {}
 
     # check that you cannot remove a message that no longer exists
-    pytest.raises(ValueError, message_remove, user1["token"], message_1['message_id'])
+    pytest.raises(Value_Error, message_remove, user1["token"], message_1['message_id'])
 
 def test_invalid_user():
     clear_data()

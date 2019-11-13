@@ -4,7 +4,7 @@ from .database import clear_data
 from .auth import auth_register
 from .message import message_pin, message_remove, message_send, message_unpin
 from .channel import channels_create, channel_leave
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_message_unpin():
@@ -31,4 +31,4 @@ def test_no_message():
     assert channel_id is not None
 
     # try to remove a non-existent message
-    pytest.raises(ValueError, message_unpin, user1["token"], 123) 
+    pytest.raises(Value_Error, message_unpin, user1["token"], 123) 
