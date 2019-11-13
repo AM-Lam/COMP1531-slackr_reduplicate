@@ -40,6 +40,41 @@ def channel_addowner(token, channel_id, u_id):
             "all_members" : channel_members}
 
 
+def channel_details(token, channel_id):
+    """
+    Select a channel by id and return its details.
+    """
+    u_id = check_valid_token(token)
+
+    if not is_user_member(u_id, channel_id):
+        raise AccessError(description='You do not have permission to do this')
+
+    channel = get_channel(channel_id)
+    channel_members = channel.get_members()
+
+    # convert the channel_members list to a form the frontend can read
+    users = get_data()["users"]
+    
+    channel_members = [{
+        "u_id" : users[u_id].get_u_id(),
+        "name_first" : users[u_id].get_first_name(),
+        "name_last" : users[u_id].get_last_name()
+    } for u_id in channel_members]
+
+    # do the same thing with the channel owners
+    channel_owners = channel.get_owners()
+    channel_owners = [{
+        "u_id" : users[u_id].get_u_id(),
+        "name_first" : users[u_id].get_first_name(),
+        "name_last" : users[u_id].get_last_name()
+    } for u_id in channel_owners]
+
+    return {"name" : channel.get_name(),
+            "owner_members" : channel_owners,
+            "all_members" : channel_members}
+
+
+
 def channel_invite(token, channel_id, u_id):
     """
     Select a channel by id and user by u_id, check whether or not we
@@ -105,6 +140,7 @@ def channel_leave(token, channel_id):
     
     # always return an empty dictionary
     return {}
+
 
 def channel_messages(token, channel_id, start):
     """
