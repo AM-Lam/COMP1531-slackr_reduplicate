@@ -6,6 +6,7 @@ import urllib
 import jwt
 from .database import *
 from .access_error import *
+from PIL import Image
 
 
 def user_profile_setemail(token, email):
@@ -123,19 +124,22 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
     Description: Given a URL of an image on the internet, crops the image within bounds (x_start, y_start) and (x_end, y_end). Position (0,0) is the top left.
     """
 
-    IMG_LIMIT = 200
-
     # check if the token is valid and decode it
     u_id = check_valid_token(token)
 
     # just to suppress the error form pylint
-    assert user_id is not None
+    assert u_id is not None
 
     # check that the URL is actually open for reading
     if urllib.request.urlopen(img_url).getcode() != 200:
         raise ValueError(description="The URL is not working at the moment!")
 
+    im = Image.open(img_url)
+    IMG_LIMIT = min(im.size)
+
     # TODO: Check if the image is a valid file
+    if im.info["filetype"] != JPEG:
+        raise ValueError(description="Invalid file type.")
 
     # check if the start co-ordinates are valid
     if x_start < 0 or y_start < 0 or x_start >= IMG_LIMIT or y_start >= IMG_LIMIT:
@@ -155,7 +159,10 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
     if side1 != side2:
         raise ValueError(description="Co-ordinate selection is not a square.")
 
-    # TODO: check how to return an image
-    change_photo(img_url, x_start, y_start, x_end, y_end)
+    # TODO: check how to get a URL path for images
+    im.crop(x_start, y_start, x_end, y_end)
+    im.save(u_id + ".jpg", "JPEG")
+
+    get_user(u_id).set_profile_img_url(im)
     
     return
