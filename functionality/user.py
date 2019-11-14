@@ -154,13 +154,20 @@ def users_all():
     permissionGranted = 0
     users_id = check_valid_token(token)
     # if the user exists then return a list of all the users!
-    datab = get_data()
+    datab = get_data()["users"]
     # only the global admins should be able to get this data.
+    peep = datab['users_id']
+    if peep._global_admin == True:
+            permissionGranted = 1
+            return datab["users"]
+
+    '''
     for i in datab["users"]:
         if users_id == i.get_u_id():
             if i._global_admin == True:
                 permissionGranted = 1
                 return datab["users"]
-    
+    '''
+
     if permissionGranted == 0:
         raise ValueError("you dont have clearance to access the user details")
