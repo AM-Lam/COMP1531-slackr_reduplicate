@@ -105,3 +105,16 @@ def test_user_profiles_uploadphoto():
     assert user is not None
 
     # tests will go here in iteration 3
+
+
+############################################################################################################################
+###  USER_PROFILE_UPLOAD_PHOTO TESTS HERE ##################################################################################
+############################################################################################################################
+
+def test_users_all():
+    clear_data()
+    user1 = auth_register("valid@email.com", "1234567", "Bob", "Jones")
+    user2 = auth_register("valid1@email.com", "11221122", "Sally", "Salmon")
+
+    
+
