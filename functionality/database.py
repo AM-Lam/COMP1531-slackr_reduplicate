@@ -1,9 +1,15 @@
+# pylint: disable=C0114
+# pylint: disable=C0115
+# pylint: disable=C0116
+# pylint: disable=R0902
+# pylint: disable=R0913
+# pylint: disable=R0904
+
 import pickle
 import re
 import hashlib
 import jwt
-from datetime import datetime
-from .access_error import AccessError, Value_Error
+from .access_error import Value_Error
 
 
 DATABASE = None
@@ -52,6 +58,9 @@ class User:
 
     def set_global_admin(self, admin):
         self._global_admin = admin
+
+    def set_slackr_owner(self, owner):
+        self._slackr_owner = owner
 
     def get_u_id(self):
         return self._u_id
@@ -118,7 +127,6 @@ class Channel:
             "messages" : self._messages,
             "owners" : self._owners,
             "members" : self._members,
-            "owners" : self._owners,
             "public" : self._public,
             "standup" : self._standup,
         }
@@ -153,12 +161,12 @@ class Channel:
 
     def get_pins(self):
         return self._pinned_messages
-    
+
     def get_message(self, m_id):
         for message in self.get_messages():
             if message.get_m_id() == m_id:
                 return message
-        
+
         raise Value_Error(description="Message does not exist")
 
     def set_id(self, new_id):
@@ -169,7 +177,7 @@ class Channel:
 
     def add_message(self, message):
         self._messages.append(message)
-    
+
     def remove_message(self, message):
         self._messages.remove(message)
 
@@ -190,7 +198,7 @@ class Channel:
 
     def add_pin(self, message_id):
         self._pinned_messages.append(message_id)
-    
+
     def remove_pin(self, message_id):
         self._pinned_messages.remove(message_id)
 
@@ -248,10 +256,10 @@ class Messages:
 
     def is_pinned(self):
         return self._pinned
-    
+
     def get_time_sent(self):
         return self._time_sent
-    
+
     def get_reacts(self):
         return self._reacts
 
@@ -263,22 +271,20 @@ class Messages:
 
 
 def get_data():
-    global DATABASE
     return DATABASE
 
 
 def get_secret():
-    global SECRET
     return SECRET
 
 
 def save_data():
-    global DATABASE
     with open("db_dump.p", "wb") as dump:
         pickle.dump(DATABASE, dump)
 
 
 def clear_data():
+    # pylint: disable=W0603
     global DATABASE
     DATABASE = {
         "users" : {},
@@ -311,35 +317,35 @@ def check_email_database(email):
 
 def check_valid_token(token):
     """
-    Find the user ID associated with this token, else raise a 
+    Find the user ID associated with this token, else raise a
     Value_Error
     """
-    
-    db = get_data()
+
+    server_data = get_data()
 
     # Is this token currently active? If not raise an error
-    if not db["tokens"].get(token, False):
+    if not server_data["tokens"].get(token, False):
         raise Value_Error(description="Invalid token")
 
     token_payload = jwt.decode(token, get_secret(), algorithms=['HS256'])
     u_id = token_payload["u_id"]
 
     # if the u_id exists return it, otherwise raise an error
-    if u_id in get_data()["users"]:
+    if u_id in server_data["users"]:
         return u_id
-    
+
     raise Value_Error(description="User does not exist")
 
 
 def is_handle_in_use(handle_str):
     # check if the handle is already being used/exists within the database
     users = get_data()["users"]
-    
+
     for u_id in users:
         user = users[u_id]
         if user.get_handle() == handle_str:
             return True
-    
+
     return False
 
 
@@ -377,7 +383,7 @@ def is_user_member(u_id, channel_id):
 
     if u_id in get_channel(channel_id).get_members():
         return True
-    
+
     return False
 
 
@@ -389,7 +395,7 @@ def is_user_owner(u_id, channel_id):
 
     if u_id in get_channel(channel_id).get_owners():
         return True
-    
+
     return False
 
 
@@ -421,7 +427,7 @@ def get_message_list(channel, start, end):
             "reacts" : [], # message.get_reacts(),
             "is_pinned" : message.is_pinned()
         })
-    
+
     return return_messages
 
 
@@ -442,20 +448,20 @@ def u_id_from_email(email, password):
 
     wrong_pasword = False
     hashed_pass = hashlib.sha256(password.encode()).hexdigest()
-    
+
     for u_id in users:
         user = users[u_id]
-        
+
         if user.get_email() == email:
             if user.get_password() == hashed_pass:
                 return u_id
-            
+
             wrong_pasword = True
             break
-    
+
     if wrong_pasword:
         raise Value_Error(description="Wrong password, please try again")
-    
+
     raise Value_Error(description="Email does not exist")
 
 
@@ -468,23 +474,23 @@ def u_id_from_email_reset(email):
 
     for u_id in users:
         user = users[u_id]
-        
+
         if user.get_email() == email:
             return u_id
-    
+
     raise Value_Error(description="There are no users with this password")
 
 
 def check_reset_code(reset_code):
-    # this will check if the reset code sent by the 
+    # this will check if the reset code sent by the
     # auth_passwordreset_request function is correct
-   
+
     reset_codes = get_data()["reset"]
     if reset_code in reset_codes:
         email = reset_codes[reset_code]
         return email
-    else:
-        raise Value_Error("Reset code incorrect!")
+
+    raise Value_Error("Reset code incorrect!")
 
 
 clear_data()
