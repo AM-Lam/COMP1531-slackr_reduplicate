@@ -1,14 +1,8 @@
-<<<<<<< HEAD:server/search_test.py
-from .search import search
-from .auth_register import auth_register
-from .access_error import AccessError
-=======
-from .message import search
-from .auth import auth_register
->>>>>>> master:functionality/search_test.py
-from .database import *
-import jwt
 import pytest
+from .search import search
+from .auth import auth_register
+from .database import clear_data
+from .access_error import *
 
 def test_search():
     clear_data()

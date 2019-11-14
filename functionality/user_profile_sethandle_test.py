@@ -11,7 +11,6 @@ def test_user_profile_sethandle():
     user1 = auth_register("valid@email.com", "1234567890", "John", "Doe")
     user2 = auth_register("valid2@email.com", "1234567890", "Bob", "John")
 
-
     # this test should pass with no issue
     assert user_profile_sethandle(user1["token"], "handle") == {}
 

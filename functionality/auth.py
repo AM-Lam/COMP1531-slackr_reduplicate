@@ -169,8 +169,6 @@ def admin_userpermission_change(token, u_id, p_id):
             user = u
         if u.get_u_id() == request_u_id:
             request_user = u
-        if not request_u_id and not user:
-            break
 
     # raise a ValueError if either user can't be found
     if user == None:
@@ -208,4 +206,4 @@ def admin_userpermission_change(token, u_id, p_id):
         user._slackr_owner = False
         user.set_global_admin(False)
     
-    return
+    return {}

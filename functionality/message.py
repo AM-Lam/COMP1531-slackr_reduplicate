@@ -394,7 +394,7 @@ def search(token, query_str):
     assert u_id is not None
 
     # initialise an empty list
-    message_match = []
+    dict = { "messages": []}
     
     # for every channel in the database
     for channel in server_data["channels"]:
@@ -404,7 +404,7 @@ def search(token, query_str):
             for message in channel.get_messages():
                 # if the message contains the search query, add it to the list
                 if query_str in message:
-                    message_match.append(message)
+                    dict["messages"].append(message)
 
     # return the collated list
-    return message_match
+    return dict

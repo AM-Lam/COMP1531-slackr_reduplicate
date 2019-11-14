@@ -29,7 +29,7 @@ def user_profile_setemail(token, email):
     # call a database method that changes the profile email
     get_user(u_id).update_email(email)
 
-    return
+    return {}
 
 def user_profile_sethandle(token, handle_str):
     """
@@ -55,7 +55,7 @@ def user_profile_sethandle(token, handle_str):
     # call a database method that changes the profile handle
     get_user(u_id).update_handle(handle_str)
 
-    return
+    return {}
 
 def user_profile_setname(token, name_first, name_last):
     """
@@ -87,7 +87,7 @@ def user_profile_setname(token, name_first, name_last):
     user.update_first_name(name_first)
     user.update_last_name(name_last)
 
-    return
+    return {}
 
 def user_profile(token, u_id):
     server_data = get_data()
@@ -159,10 +159,12 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
     if side1 != side2:
         raise ValueError(description="Co-ordinate selection is not a square.")
 
-    # TODO: check how to get a URL path for images
-    im.crop(x_start, y_start, x_end, y_end)
-    im.save(u_id + ".jpg", "JPEG")
+    local_filename, headers = urllib.request.urlretrieve(img_url)
 
-    get_user(u_id).set_profile_img_url(im)
+    imageObject = Image.open(local_filename)
+    cropped = imageObject.crop(x_start, y_start, x_end, y_end)
+    cropped.save(u_id + ".jpg", "JPEG")
+
+    get_user(u_id).set_profile_img_url(cropped)
     
-    return
+    return {}
