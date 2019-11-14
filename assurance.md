@@ -59,7 +59,7 @@ For this part of the software development lifecycle(iteration 2), the implementa
 Tools like Python3-coverage were used as a benchmark to make sure that every line of our code was being tested for achieving the perfect functionality. Using this tool helped us create more tests ensuring smooth functionality from the backend.
 
 ## 3.4 TEST PHASE ##
-We have implemented numerous checks and balances to make sure that our backend functions without errors, and that it returns the correct output for the frontend. For each function there is a corresponding _test file that runs a series of unit tests. These unit tests test for correct input, as well as appropriate responses for issues such as ValueErrors or AccessErrors. These unit tests are available to our client if they wish to verify as such.
+We have implemented numerous checks and balances to make sure that our backend functions without errors, and that it returns the correct output for the frontend. For each function there is a corresponding _test file that runs a series of unit tests. These unit tests test for correct input, as well as appropriate responses for issues such as Value_Errors or AccessErrors. These unit tests are available to our client if they wish to verify as such.
 To make sure that our unit tests tested the majority of their function for defects, we also ran a code coverage test with coverage.py, and used the generated html report to write more intensive tests.
 Other tools like pylint and postman were also used for ensuring that the software quality was excellent and the backend works to comply with the frontend 
 

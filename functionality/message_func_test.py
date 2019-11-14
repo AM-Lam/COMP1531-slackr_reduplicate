@@ -2,33 +2,33 @@ import pytest
 import re
 import jwt
 from datetime import datetime, timedelta
-from .database import get_data, clear_data
+from .database import get_data, clear_data, get_channel
 from .auth import auth_register
 from .channel import channel_join, channels_create, channel_leave, channel_messages
 from .message import message_edit, message_send, message_remove, message_pin, message_react, message_sendlater, message_unpin, message_unreact, search
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
-############################################################################################################################
-###  MESSAGE_EDIT TESTS HERE ###############################################################################################
-############################################################################################################################
+# Helper Functions
 
-def verify_message1(message_obj, correct_data):
+def verify_message(message_obj, correct_data):
     if message_obj == correct_data:
         return True
     return False
 
 
-def get_message_text2(m_id):
-    server_data = get_data()
-
-    for c in server_data["channels"]:
-        for m in c.get_messages():
-            if m.get_m_id() == m_id: 
-                return m.get_text()
+def get_message_text(channel_id, m_id):
+    channel = get_channel(channel_id)
+    message = channel.get_message(m_id)
+    return message.get_text()
 
 
-def test_message_edit3():
+#######################################################################
+###  MESSAGE_EDIT TESTS HERE ##########################################
+#######################################################################
+
+
+def test_message_edit():
     clear_data()
 
     server_data = get_data()
@@ -36,11 +36,7 @@ def test_message_edit3():
     user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
     user2 = auth_register("valid2@email.com", "1234567890", "Bob", "Zones")
 
-    user2_obj = None
-    for u in server_data["users"]:
-        if u.get_u_id() == user2["u_id"]:
-            user2_obj = u
-            break
+    user2_obj = server_data["users"][user2["u_id"]]
     
     channel = channels_create(user1["token"], "Channel 1", True)
     channel_join(user2["token"], channel["channel_id"])
@@ -50,7 +46,7 @@ def test_message_edit3():
     
     # edit a message we created, and check that it updated correctly
     assert message_edit(user1["token"], message1['message_id'], "Hi") == {}
-    assert get_message_text(message1["message_id"]) == "Hi"
+    assert get_message_text(channel["channel_id"], message1["message_id"]) == "Hi"
 
     # try to edit a message we did not send as a regular user
     pytest.raises(AccessError, message_edit, user2["token"], 
@@ -58,22 +54,22 @@ def test_message_edit3():
 
     # try to edit a message we did not send as an owner
     assert message_edit(user1["token"], message2['message_id'], "Chomsky is good") == {}
-    assert get_message_text(message2["message_id"]) == "Chomsky is good"
+    assert get_message_text(channel["channel_id"], message2["message_id"]) == "Chomsky is good"
 
     # try to edit a message that does not exist
-    pytest.raises(ValueError, message_edit, user1["token"], 
+    pytest.raises(Value_Error, message_edit, user1["token"], 
                   10101, "Hello There")
     
     # try to edit a message we do not own as a global admin
     user2_obj.set_global_admin(True)
 
     assert message_edit(user2["token"], message1['message_id'], "Heeeello") == {}
-    assert get_message_text(message1["message_id"]) == "Heeeello"
+    assert get_message_text(channel["channel_id"], message1["message_id"]) == "Heeeello"
 
 
-############################################################################################################################
-###  MESSAGE_PIN TESTS HERE ###############################################################################################
-############################################################################################################################
+#######################################################################
+###  MESSAGE_PIN TESTS HERE ###########################################
+#######################################################################
 
 def test_message_pin4():
     clear_data()
@@ -102,12 +98,12 @@ def test_no_message15():
     message_remove(user1["token"], message_1['message_id'])
 
     # the message does not exist
-    pytest.raises(ValueError, message_pin, user1["token"], message_1['message_id'])
+    pytest.raises(Value_Error, message_pin, user1["token"], message_1['message_id'])
 
 
-############################################################################################################################
-###  MESSAGE_REACT TESTS HERE ###############################################################################################
-############################################################################################################################
+#######################################################################
+###  MESSAGE_REACT TESTS HERE #########################################
+#######################################################################
 
 def test_message_react6():
     clear_data()
@@ -134,13 +130,13 @@ def test_no_message7():
 
     react_id = 1
     # the message is not existed
-    pytest.raises(ValueError, message_react, user1["token"], 
+    pytest.raises(Value_Error, message_react, user1["token"], 
                   message_1['message_id'], react_id)
 
 
-############################################################################################################################
-###  MESSAGE_REMOVE TESTS HERE ###############################################################################################
-############################################################################################################################
+#######################################################################
+###  MESSAGE_REMOVE TESTS HERE ########################################
+#######################################################################
 
 def test_message_remove8():
     clear_data()
@@ -170,12 +166,10 @@ def test_no_message9():
     assert message_remove(user1["token"], message_1['message_id']) == {}
 
     # check that you cannot remove a message that no longer exists
-    pytest.raises(ValueError, message_remove, user1["token"], message_1['message_id'])
+    pytest.raises(Value_Error, message_remove, user1["token"], message_1['message_id'])
 
 def test_invalid_user10():
     clear_data()
-
-    server_data = get_data()
 
     user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
     user2 = auth_register("valid2@email.com", "0987654321", "James", "Bones")
@@ -203,7 +197,7 @@ def test_admin_user11():
     user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
     user2 = auth_register("valid2@email.com", "0987654321", "James", "Bones")
 
-    user1_obj = server_data["users"][0]
+    user1_obj = server_data["users"][user1["u_id"]]
     user1_obj.set_global_admin(True)
 
     channel = channels_create(user2["token"], "Channel 1", True)
@@ -218,9 +212,9 @@ def test_admin_user11():
     assert message_remove(user1["token"], message_1['message_id']) == {}
 
 
-############################################################################################################################
-###  MESSAGE_SEND TESTS HERE ###############################################################################################
-############################################################################################################################
+#######################################################################
+###  MESSAGE_SEND TESTS HERE #########################################
+#######################################################################
 
 def test_message_send12():
     clear_data()
@@ -247,13 +241,13 @@ def test_message_send12():
     # reset message_1
     message_1 = None
     # the message is over 1000 characters
-    pytest.raises(ValueError, message_send, user1["token"],
+    pytest.raises(Value_Error, message_send, user1["token"],
                   channel_id["channel_id"], "X" * 1001)
 
 
-############################################################################################################################
-###  MESSAGE_SENDLATER TESTS HERE ###############################################################################################
-############################################################################################################################
+#######################################################################
+###  MESSAGE_SENDLATER TESTS HERE #####################################
+#######################################################################
 
 def test_message_sendlater13():
     clear_data()
@@ -265,20 +259,20 @@ def test_message_sendlater13():
     channel1 = channels_create(user1["token"], "Channel 1", True)
 
     # get the channel object, we need this to check if messages were sent
-    channelObj = server_data["channels"][0]
+    channelObj = server_data["channels"][channel1["channel_id"]]
     
     # first test some cases that should raise exceptions
     # message > 1000 characters
-    pytest.raises(ValueError, message_sendlater, user1["token"], 
+    pytest.raises(Value_Error, message_sendlater, user1["token"], 
                   channel1["channel_id"], "X" * 1001, 
                   datetime.now() + timedelta(minutes=1))
     
     # time sent is in the past
-    pytest.raises(ValueError, message_sendlater, user1["token"], 
+    pytest.raises(Value_Error, message_sendlater, user1["token"], 
                   channel1["channel_id"], "Message", datetime(2000, 1, 1))
     
     # non-existent channel
-    pytest.raises(ValueError, message_sendlater, user1["token"], 
+    pytest.raises(Value_Error, message_sendlater, user1["token"], 
                   404, "Message", datetime.now() + timedelta(minutes=1))
     
     # now try to send a valid message in the future
@@ -299,9 +293,9 @@ def test_message_sendlater13():
     assert len(channelObj.get_messages()) == 1
 
 
-############################################################################################################################
-###  MESSAGE_UNPIN TESTS HERE ###############################################################################################
-############################################################################################################################
+#######################################################################
+###  MESSAGE_UNPIN TESTS HERE #########################################
+#######################################################################
 
 def test_message_unpin14():
     clear_data()
@@ -319,7 +313,7 @@ def test_message_unpin14():
     assert message_unpin(user1["token"], message_1['message_id']) == {}
 
 
-def test_no_message15():
+def test_no_message16():
     clear_data()
     user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
 
@@ -327,12 +321,12 @@ def test_no_message15():
     assert channel_id is not None
 
     # try to remove a non-existent message
-    pytest.raises(ValueError, message_unpin, user1["token"], 123)
+    pytest.raises(Value_Error, message_unpin, user1["token"], 123)
 
 
-############################################################################################################################
-###  MESSAGE_UNREACT TESTS HERE ###############################################################################################
-############################################################################################################################
+#######################################################################
+###  MESSAGE_UNREACT TESTS HERE #######################################
+#######################################################################
 
 def test_message_unreact16():
     clear_data()
@@ -362,12 +356,12 @@ def test_no_message17():
     react_id = 1
 
     # the message does not exist
-    pytest.raises(ValueError, message_unreact, user1["token"], message_1['message_id'], react_id)
+    pytest.raises(Value_Error, message_unreact, user1["token"], message_1['message_id'], react_id)
 
 
-############################################################################################################################
-###  MESSAGE_SEARCH TESTS HERE ###############################################################################################
-############################################################################################################################
+#######################################################################
+###  MESSAGE_SEARCH TESTS HERE ########################################
+#######################################################################
 
 def test_search18():
     clear_data()

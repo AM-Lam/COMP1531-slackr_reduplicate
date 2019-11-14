@@ -1,10 +1,10 @@
 import jwt
 from .access_error import AccessError, Value_Error
-from .database import get_data, get_secret
+from .database import get_data, get_secret, get_user, check_valid_token
 
 #   admin_userpermission_change(token, u_id, permission_id);
 #   return void
-#   Exception: ValueError when:
+#   Exception: Value_Error when:
 #       - u_id does not refer to a valid user,
 #       - permission_id does not refer to a value permission,
 #   AccessError when:
@@ -18,18 +18,10 @@ def admin_userpermission_change(token, u_id, p_id):
     if not server_data["tokens"].get(token, False):
         raise AccessError(description="Invalid token")
 
-    token_payload = jwt.decode(token, get_secret(), algorithms=["HS256"])
-    request_u_id = token_payload["u_id"]
 
-    request_user = None
-    user = None
-    for u in server_data["users"]:
-        if u.get_u_id() == u_id:
-            user = u
-        if u.get_u_id() == request_u_id:
-            request_user = u
-        if not request_u_id and not user:
-            break
+    request_u_id = check_valid_token(token)
+    request_user = get_user(request_u_id)
+    user = get_user(u_id)
     
     if user == None:
         raise Value_Error(description="u_id does not refer to a real user")
