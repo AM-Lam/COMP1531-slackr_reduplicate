@@ -3,7 +3,9 @@ import random
 import hashlib
 import string
 import jwt
-from .database import is_email_valid, get_data, check_email_database, get_secret, User, u_id_from_email, u_id_from_email_reset, check_reset_code
+from .database import (is_email_valid, get_data, check_email_database, 
+                       get_secret, User, u_id_from_email, get_user,
+                       u_id_from_email_reset, check_reset_code)
 from .access_error import AccessError, Value_Error
 
 
@@ -54,7 +56,7 @@ def auth_passwordreset_request(email):
     # getting a random alphabet
     random_alph = random.choice(string.ascii_letters)
 
-    # appending the two toghter
+    # appending the two together
     random_str = str(random_num) + random_alph
 
     # hashing the code
@@ -77,14 +79,15 @@ def auth_passwordreset_reset(reset_code, new_password):
                          in length")
 
     # find the user in the list of users
-    for users in update_data['users']:
+    for u_id in update_data['users']:
         # looking for the user in the users list in the database.
-        if users.get_email() == email:
+        user = get_user(u_id)
+        if user.get_email() == email:
             # hash the new password
             hashed_pass = hashlib.sha256(new_password.encode()).hexdigest()
             
             # update the old password
-            users.update_password(hashed_pass)
+            user.update_password(hashed_pass)
 
             # once the password is updated, delete the reset code
             del update_data["reset"][reset_code]
@@ -137,8 +140,7 @@ def auth_register(email, password, first_name, last_name):
         person.set_global_admin(True)
         person._slackr_owner = True
     
-    # adding the person to the user list.
-    update_data['users'].append(person)
+    # adding the person to the user dictionary.
+    update_data['users'][u_id] = person
     
     return {"u_id": u_id, "token": token}
-    
