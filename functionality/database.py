@@ -478,7 +478,7 @@ def u_id_from_email_reset(email):
         if user.get_email() == email:
             return u_id
 
-    raise Value_Error(description="There are no users with this password")
+    raise Value_Error(description="There are no users with this email")
 
 
 def check_reset_code(reset_code):
