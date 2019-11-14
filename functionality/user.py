@@ -134,11 +134,12 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
     if urllib.request.urlopen(img_url).getcode() != 200:
         raise ValueError(description="The URL is not working at the moment!")
 
-    im = Image.open(img_url)
-    IMG_LIMIT = min(im.size)
+    local_filename, headers = urllib.request.urlretrieve(img_url)
+    imageObject = Image.open(local_filename)
+    IMG_LIMIT = min(imageObject.size)
 
     # TODO: Check if the image is a valid file
-    if im.info["filetype"] != JPEG:
+    if imageObject.info["filetype"] != JPEG:
         raise ValueError(description="Invalid file type.")
 
     # check if the start co-ordinates are valid
@@ -159,9 +160,6 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
     if side1 != side2:
         raise ValueError(description="Co-ordinate selection is not a square.")
 
-    local_filename, headers = urllib.request.urlretrieve(img_url)
-
-    imageObject = Image.open(local_filename)
     cropped = imageObject.crop(x_start, y_start, x_end, y_end)
     cropped.save(u_id + ".jpg", "JPEG")
 
