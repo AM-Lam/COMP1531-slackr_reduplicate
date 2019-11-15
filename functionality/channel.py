@@ -165,7 +165,7 @@ def channel_messages(token, channel_id, start):
     end = start + 50 if start + 50 < message_num else message_num
 
     # this function retrives a message list.
-    messages = get_message_list(channel, start, end)
+    messages = get_message_list(channel, start, end, u_id)
 
     return {'messages' : messages,
             'start' : start,

@@ -259,14 +259,17 @@ class Messages:
 
     def get_time_sent(self):
         return self._time_sent
+    
+    def get_reacts(self):
+        return self._reacts
 
     def get_reacts_frontend(self, u_id):
         # build react list with the right format
         react_list = []
-        for react in self._reacts:
+        for react in self.get_reacts():
             react_list.append({
                 "react_id" : react["react_id"],
-                "u_id" : u_id,
+                "u_ids" : react["u_ids"],
                 "is_this_user_reacted" : u_id in react["u_ids"]
             })
         return react_list
@@ -415,7 +418,7 @@ def message_count(channel):
     return len(channel.get_messages())
 
 
-def get_message_list(channel, start, end):
+def get_message_list(channel, start, end, u_id):
     """
     Taking a Channel, a start and an end return a list of the messages
     in that channel in the order they appeared
@@ -432,7 +435,7 @@ def get_message_list(channel, start, end):
             "u_id" : message.get_u_id(),
             "message" : message.get_text(),
             "time_created" : message.get_time_sent().timestamp(),
-            "reacts" :  message.get_reacts_frontend(message.get_u_id()),
+            "reacts" :  message.get_reacts_frontend(u_id),
             "is_pinned" : message.is_pinned()
         })
 
