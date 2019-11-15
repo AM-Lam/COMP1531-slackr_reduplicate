@@ -150,4 +150,67 @@ def auth_register(email, password, first_name, last_name):
     # adding the person to the user dictionary.
     update_data['users'][u_id] = person
 
-    return {"u_id": u_id, "token": token}
+def admin_userpermission_change(token, u_id, p_id):
+    """
+    admin_userpermission_change(token, u_id, permission_id);
+    return {}
+    Exception: ValueError when:
+        - u_id does not refer to a valid user,
+        - permission_id does not refer to a value permission,
+    AccessError when:
+        - The authorised user is not an admin or owner
+    Description: Given a User by their user ID, set their permissions to new permissions described by permission_id
+    """
+
+    # call the database
+    server_data = get_data()
+
+    # check if the token is valid and decode it
+    request_u_id = check_valid_token(token)
+
+    # attempt to find valid users for both the people giving and receiving perms
+    request_user = None
+    user = None
+    for u in server_data["users"]:
+        if u.get_u_id() == u_id:
+            user = u
+        if u.get_u_id() == request_u_id:
+            request_user = u
+
+    # raise a ValueError if either user can't be found
+    if user == None:
+        raise ValueError(description="u_id does not refer to a real user")
+    elif request_user == None:
+        raise ValueError(description="Request does not come from a real user")
+
+    # raise an AccessError if the requesting user cannot use this function
+    if not (request_user.is_global_admin() or request_user.is_slackr_owner()):
+        raise AccessError(description="You do not have permissions to do this")
+
+    # raise a ValueError if the given permission ID is not valid
+    if not (1 <= p_id <= 3):
+        raise ValueError(description=f"{p_id} is not a valid permission id")
+    
+    # global admins cannot change the perms of slackr owners
+    if not request_user.is_slackr_owner() and user.is_slackr_owner():
+        raise AccessError(description="You do not have permissions to do this")
+
+    # handle the perm changes
+    if p_id == 1:
+        # make the user a slackr owner, only other slackr owners can do this
+        if not request_user.is_slackr_owner():
+            raise AccessError(description="You do not have permissions to do this")
+        user._slackr_owner = True
+        user.set_global_admin(True)
+    elif p_id == 2:
+        # make the user a global admin, this should always be possible if we
+        # reach this point
+        user._slackr_owner = False
+        user.set_global_admin(True)
+    else:
+        # make the user a regular member, this should also always be possible
+        # if we reach this point
+        user._slackr_owner = False
+        user.set_global_admin(False)
+    
+    return {}

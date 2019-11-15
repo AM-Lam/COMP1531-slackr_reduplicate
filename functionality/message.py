@@ -299,15 +299,23 @@ def message_unreact(token, message_id, react_id):
     return {}
 
 def search(token, query_str):
-    # find u_id associated with token (with non-existent database)
+    """
+    search(token, query_str);
+    return {messages}
+    Exception: N/A
+    Description: Given a query string, return a collection of messages that match the query
+    """
+    # call the database
+    server_data = get_data()
+
+    # check if the token is valid and decode it
     u_id = check_valid_token(token)
-    user = get_user(u_id)
 
     # suppress pylint error
     assert u_id is not None
 
-    # pull messages from a list/dictionary of all messages
-    message_match = []
+    # initialise an empty list
+    message_match = { "messages": [] }
 
     for channel_id in get_data()["channels"]:
         # check that the user has access to this channel
@@ -319,6 +327,6 @@ def search(token, query_str):
 
         for message in channel.get_messages():
             if query_str in message:
-                message_match.append(message)
+                message_match["messages"].append(message)
 
     return message_match

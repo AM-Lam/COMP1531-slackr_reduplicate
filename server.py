@@ -86,7 +86,6 @@ def user_logout():
     dumpstring = auth.auth_logout(token)
     return dumps(dumpstring)
 
-
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
     email = request.form.get('email')
@@ -95,7 +94,6 @@ def email_request():
     email_status = send_code(email, reset_code)
 
     return dumps(email_status)
-
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
 def email_reset():
@@ -225,7 +223,6 @@ def run_message_pin():
     return_value = message.message_pin(request_data["token"],
                                        int(request_data["message_id"]))
 
-
     return dumps(return_value)
 
 
@@ -309,7 +306,6 @@ def run_channel_addowner():
 
     return dumps(return_value)
 
-
 @APP.route('/channel/removeowner', methods=["POST"])
 def run_channel_removeowner():
     request_data = request.form
@@ -334,7 +330,6 @@ def run_message_sendlater():
 
     return dumps(return_value)
 
-
 @APP.route('/user/profile/setname', methods=["PUT"])
 def run_profile_setname():
     request_data = request.form
@@ -346,7 +341,6 @@ def run_profile_setname():
 
     return dumps(return_value)
 
-
 @APP.route('/user/profile/setemail', methods=["PUT"])
 def run_profile_setemail():
     request_data = request.form
@@ -357,7 +351,6 @@ def run_profile_setemail():
 
     return dumps(return_value)
 
-
 @APP.route('/user/profile/sethandle', methods=["PUT"])
 def run_profile_sethandle():
     request_data = request.form
@@ -367,7 +360,6 @@ def run_profile_sethandle():
     )
 
     return dumps(return_value)
-
 
 @APP.route('/user/profile/uploadphoto', methods=["POST"])
 def run_profile_uploadphoto():
@@ -383,7 +375,6 @@ def run_profile_uploadphoto():
 
     return dumps(return_value)
 
-
 @APP.route('/standup/start', methods=["POST"])
 def run_standup_start():
     request_data = request.form
@@ -393,7 +384,6 @@ def run_standup_start():
     )
 
     return dumps(return_value)
-
 
 @APP.route('/standup/send', methods=["POST"])
 def run_standup_send():
@@ -408,7 +398,6 @@ def run_standup_send():
 
     return dumps(return_value)
 
-
 @APP.route('/search', methods=["GET"])
 def run_search():
     request_data = request.args
@@ -418,7 +407,6 @@ def run_search():
     )
 
     return dumps(return_value)
-
 
 @APP.route('/admin/userpermission/change', methods=["POST"])
 def run_admin_userpermission_change():
@@ -432,7 +420,6 @@ def run_admin_userpermission_change():
 
     return dumps(return_value)
 
-
 @APP.route('/users/all', methods=["GET"])
 def run_users_all():
     # to suppress errors just return an empty list
@@ -443,7 +430,6 @@ def run_users_all():
 def run_standup_active():
     # to suppress errors just always return an inactive standup
     return dumps({"is_active" : False, "time_finish" : None})
-
 
 if __name__ == '__main__':
     database.clear_data()
