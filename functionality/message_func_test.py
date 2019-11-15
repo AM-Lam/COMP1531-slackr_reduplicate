@@ -92,21 +92,8 @@ def test_message_remove():
     # check that the database was correctly updated
     assert message_remove(user1["token"], message_1['message_id']) == {}
 
-def test_no_message9():
-    set_up = list(setup())
-    user1 = set_up[0]
-    channel_id = set_up[2]
 
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-    assert message_1 is not None
-
-    # check that you can remove the message
-    assert message_remove(user1["token"], message_1['message_id']) == {}
-
-    # check that you cannot remove a message that no longer exists
-    pytest.raises(Value_Error, message_remove, user1["token"], message_1['message_id'])
-
-def test_invalid_user10():
+def test_invalid_user():
     
     set_up = list(setup())
     user1 = set_up[0]
@@ -124,7 +111,7 @@ def test_invalid_user10():
     pytest.raises(AccessError, message_remove, user2["token"], message_1['message_id'])
 
 
-def test_admin_user11():
+def test_admin_user():
     set_up = list(setup())
     server_data = get_data()
 
@@ -191,7 +178,7 @@ def test_message_edit():
 ###  MESSAGE_PIN TESTS HERE ###########################################
 #######################################################################
 
-def test_message_pin4():
+def test_message_pin():
 
     set_up = list(setup())
     user1 = set_up[0]
@@ -206,25 +193,11 @@ def test_message_pin4():
     assert message_pin(user1["token"], message_1['message_id']) == {}
 
 
-def test_no_message15():
-    set_up = list(setup())
-    user1 = set_up[0]
-    channel_id = set_up[2]
-
-    # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-    # message is not existed anymore
-    message_remove(user1["token"], message_1['message_id'])
-
-    # the message does not exist
-    pytest.raises(Value_Error, message_pin, user1["token"], message_1['message_id'])
-
-
 #######################################################################
 ###  MESSAGE_UNPIN TESTS HERE #########################################
 #######################################################################
 
-def test_message_unpin14():
+def test_message_unpin():
     set_up = list(setup())
     user1 = set_up[0]
     channel_id = set_up[2]
@@ -238,22 +211,11 @@ def test_message_unpin14():
 
     assert message_unpin(user1["token"], message_1['message_id']) == {}
 
-
-def test_no_message16():
-    set_up = list(setup())
-    user1 = set_up[0]
-    channel_id = set_up[2]
-
-    assert channel_id is not None
-
-    # try to remove a non-existent message
-    pytest.raises(Value_Error, message_unpin, user1["token"], 123)
-
 #######################################################################
 ###  MESSAGE_REACT TESTS HERE #########################################
 #######################################################################
 
-def test_message_react6():
+def test_message_react():
     set_up = list(setup())
     user1 = set_up[0]
     channel_id = set_up[2]
@@ -265,27 +227,11 @@ def test_message_react6():
     assert message_react(user1["token"], message_1['message_id'], react_id) == {}
 
 
-def test_no_message7():
-    set_up = list(setup())
-    user1 = set_up[0]
-    channel_id = set_up[2]
-
-    # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-    message_remove(user1["token"], message_1['message_id'])
-
-    react_id = 1
-    # the message is not existed
-    pytest.raises(Value_Error, message_react, user1["token"],
-                  message_1['message_id'], react_id)
-
-
-
 #######################################################################
 ###  MESSAGE_UNREACT TESTS HERE #######################################
 #######################################################################
 
-def test_message_unreact16():
+def test_message_unreact():
     set_up = list(setup())
     user1 = set_up[0]
     channel_id = set_up[2]
@@ -299,27 +245,11 @@ def test_message_unreact16():
     assert message_unreact(user1["token"], message_1['message_id'], react_id) == {}
 
 
-def test_no_message17():
-    set_up = list(setup())
-    user1 = set_up[0]
-    channel_id = set_up[2]
-
-    # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-    message_remove(user1["token"], message_1['message_id'])
-
-    react_id = 1
-
-    # the message does not exist
-    pytest.raises(Value_Error, message_unreact, user1["token"], message_1['message_id'], react_id)
-
-
-
 #######################################################################
 ###  MESSAGE_SENDLATER TESTS HERE #####################################
 #######################################################################
 
-def test_message_sendlater13():
+def test_message_sendlater():
     set_up = list(setup())
     user1 = set_up[0]
     channel1 = set_up[2]
@@ -364,7 +294,7 @@ def test_message_sendlater13():
 ###  MESSAGE_SEARCH TESTS HERE ########################################
 #######################################################################
 
-def test_search18():
+def test_search_basic():
     set_up = list(setup())
     user = set_up[0]
 
@@ -373,3 +303,34 @@ def test_search18():
 
     # return nothing if the query string is nothing
     assert search(user["token"], "") == []
+
+# common test case applied to more than one fucntion
+
+def test_no_message():
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
+
+    # try to create a valid message
+    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
+    assert message_1 is not None
+
+    # check that you can remove the message
+    assert message_remove(user1["token"], message_1['message_id']) == {}
+
+    # check that you cannot remove a message that no longer exists
+    pytest.raises(Value_Error, message_remove, user1["token"], message_1['message_id'])
+
+    # check that you cannot pin a message that no longer exists
+    pytest.raises(Value_Error, message_pin, user1["token"], message_1['message_id'])
+
+    # try to unpin a non-existent message
+    pytest.raises(Value_Error, message_unpin, user1["token"], 123)
+
+    react_id = 1
+    # check that you cannot react a message that no longer exists
+    pytest.raises(Value_Error, message_react, user1["token"],
+                  message_1['message_id'], react_id)
+
+    # try to unreact a non-existent message
+    pytest.raises(Value_Error, message_unreact, user1["token"], message_1['message_id'], react_id)
