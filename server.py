@@ -33,7 +33,6 @@ APP = Flask(__name__)
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(HTTPException, default_handler)
 CORS(APP)
-MAIL = Mail(APP)
 
 
 APP.config.update(
@@ -43,6 +42,24 @@ APP.config.update(
     MAIL_USERNAME='deadthundersquirrels@gmail.com',
     MAIL_PASSWORD="passnew%1"
 )
+
+
+def send_code(email, code):
+    # pylint: disable=W0703
+
+    mail = Mail(APP)
+    try:
+        msg = Message(subject="Slackr Email Reset",
+                      sender="deadthundersquirrels@gmail.com",
+                      recipients=[email],
+                      body='hello')
+
+        msg.body = "Your reset code is " + code
+        mail.send(msg)
+    except Exception:
+        raise access_error.Value_Error(description="Failed to send email")
+
+    return {}
 
 
 @APP.route('/auth/register', methods=['POST'])
@@ -73,9 +90,11 @@ def user_logout():
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
     email = request.form.get('email')
-    dumpstring = auth.auth_passwordreset_request(email)
-    print(send_code(email, dumpstring)) # remove later
-    return dumps(dumpstring)
+
+    reset_code = auth.auth_passwordreset_request(email)
+    email_status = send_code(email, reset_code)
+
+    return dumps(email_status)
 
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
@@ -277,22 +296,6 @@ def run_channel_join():
     )
 
     return dumps(return_value)
-
-
-def send_code(email, code):
-    try:
-        with APP.app_context():
-            msg = Message(subject="Your slacky reset code",
-                          sender="deadthundersquirrels@gmail.com",
-                          recipients=[email],
-                          body='hello')
-            msg.body = "your reset code is " + code
-            MAIL.send(msg)
-            return {}
-    except access_error.Value_Error as err:
-        return str(err)
-    except access_error.AccessError as err:
-        return str(err)
 
 
 @APP.route('/channel/addowner', methods=["POST"])
