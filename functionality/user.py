@@ -156,8 +156,8 @@ def users_all():
     # if the user exists then return a list of all the users!
     datab = get_data()["users"]
     # only the global admins should be able to get this data.
-    peep = datab['users_id']
-    if peep._global_admin == True:
+    peep = datab[users_id]
+    if peep.is_global_admin() == True:
             permissionGranted = 1
             return datab["users"]
 
