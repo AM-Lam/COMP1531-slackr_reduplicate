@@ -36,6 +36,7 @@ def setup():
     yield user1
     yield user2
 
+    # create the channel we test with
     channel_id = channels_create(user1["token"], "Channel 1", True)
     yield channel_id
 
@@ -206,10 +207,9 @@ def test_message_pin4():
 
 
 def test_no_message15():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
@@ -225,10 +225,9 @@ def test_no_message15():
 #######################################################################
 
 def test_message_unpin14():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
@@ -241,10 +240,10 @@ def test_message_unpin14():
 
 
 def test_no_message16():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
-    channel_id = channels_create(user1["token"], "Channel 1", True)
     assert channel_id is not None
 
     # try to remove a non-existent message
@@ -255,10 +254,9 @@ def test_no_message16():
 #######################################################################
 
 def test_message_react6():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
@@ -268,10 +266,9 @@ def test_message_react6():
 
 
 def test_no_message7():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
@@ -289,10 +286,9 @@ def test_no_message7():
 #######################################################################
 
 def test_message_unreact16():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
@@ -304,10 +300,9 @@ def test_message_unreact16():
 
 
 def test_no_message17():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
@@ -325,13 +320,11 @@ def test_no_message17():
 #######################################################################
 
 def test_message_sendlater13():
-    clear_data()
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel1 = set_up[2]
 
     server_data = get_data()
-    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
-
-    # create the channel we test with
-    channel1 = channels_create(user1["token"], "Channel 1", True)
 
     # get the channel object, we need this to check if messages were sent
     channel_obj = server_data["channels"][channel1["channel_id"]]
@@ -372,9 +365,8 @@ def test_message_sendlater13():
 #######################################################################
 
 def test_search18():
-    clear_data()
-
-    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
+    set_up = list(setup())
+    user = set_up[0]
 
     # find all the matching messages (nothing)
     assert search(user["token"], "hewwo") == []
