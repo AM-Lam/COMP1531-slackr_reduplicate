@@ -93,7 +93,7 @@ def standup_send(token, channel_id, message):
     # TODO: check if this works
     MESSAGE_STANDUP += str(u_id), ": ", str(message)
 
-    return
+    return {}
 
 def standup_active(token, channel_id):
     """

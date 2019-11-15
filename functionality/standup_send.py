@@ -1,10 +1,7 @@
 import jwt
 from datetime import timedelta, datetime
-<<<<<<< HEAD:server/standup_send.py
 from .standup_start import *
-=======
-from .database import get_data, get_secret
->>>>>>> master:functionality/standup_send.py
+from .database import *
 from .access_error import *
 
 #   standup_send(token, channel_id, message);
