@@ -15,7 +15,7 @@ def channel_addowner(token, channel_id, u_id):
     # get the u_id of the requesting user and the channel object
     owner_u_id = check_valid_token(token)
     calling_user = get_user(owner_u_id)
-    
+
     to_add = get_channel(channel_id)
 
     if is_user_owner(u_id, channel_id):
@@ -51,7 +51,7 @@ def channel_details(token, channel_id):
 
     # convert the channel_members list to a form the frontend can read
     users = get_data()["users"]
-    
+
     channel_members = [{
         "u_id" : users[u_id].get_u_id(),
         "name_first" : users[u_id].get_first_name(),
@@ -131,10 +131,10 @@ def channel_leave(token, channel_id):
     # owner of the channel remove them from tha list as well
     if is_user_member(u_id, channel_id):
         channel.get_members().remove(u_id)
-    
+
     if is_user_owner(u_id, channel_id):
         channel.get_owners().remove(u_id)
-    
+
     # always return an empty dictionary
     return {}
 

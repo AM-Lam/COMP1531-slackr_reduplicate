@@ -1,3 +1,6 @@
+# pylint: disable=C0114
+# pylint: disable=C0116
+
 import pytest
 from .database import clear_data
 from .access_error import AccessError, Value_Error
@@ -7,7 +10,7 @@ from .auth import auth_register
 
 def test_admin_userpermission_change():
     clear_data()
-    
+
     user1 = auth_register("valid@email.com", "1234567890", "John", "Doe")
     user2 = auth_register("valid2@email.com", "1234567890", "Bob", "Doe")
     user3 = auth_register("valid3@email.com", "1234567890", "Jane", "Doe")
