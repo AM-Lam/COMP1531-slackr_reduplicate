@@ -302,7 +302,8 @@ def test_channels_create(users, channels):
 ###  CHANNEL_LIST TESTS HERE ##################################################
 ###############################################################################
 
-# did not use the decorator here because the tests progress as the database builds up!
+# did not use the decorator here because the tests progress as the
+# database builds up!
 def test_channels_list():
     clear_data()
 
@@ -377,7 +378,8 @@ def test_channels_list():
 ###  CHANNEL_LISTALL TESTS HERE ###############################################
 ###############################################################################
 
-# did not use the decorator here because the tests progress as the database builds up!
+# did not use the decorator here because the tests progress as the
+# database builds up!
 def test_channels_listall():
     clear_data()
 

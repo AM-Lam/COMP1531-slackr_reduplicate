@@ -46,7 +46,7 @@ def setup_data(user_num=0, channel_num=0, creators=None, public=None):
                 first = f'user{i + 1}'
                 last = f'last{i + 1}'
                 email = f'{first}@valid.com'
-                password = "1" * 6
+                password = f"{i + 1}" * 6
 
                 users[i] = auth_register(email, password, first, last)
 
