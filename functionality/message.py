@@ -252,7 +252,7 @@ def message_react(token, message_id, react_id):
         raise Value_Error(description="Message does not exist")
 
     react_exists = False
-    for react in message.get_reacts_frontend(u_id):
+    for react in message.get_reacts():
         if react["react_id"] == react_id:
             if u_id in react["u_ids"]:
                 raise Value_Error(description=f"You have already reacted to\
@@ -262,7 +262,7 @@ def message_react(token, message_id, react_id):
             break
 
     if not react_exists:
-        message.get_reacts_frontend(u_id).append({
+        message.get_reacts().append({
             "react_id" : react_id,
             "u_ids" : [u_id]
         })
@@ -288,7 +288,7 @@ def message_unreact(token, message_id, react_id):
     if message is None:
         raise Value_Error(description="Message does not exist")
 
-    for react in message.get_reacts_frontend(u_id):
+    for react in message.get_reacts():
         if react["react_id"] == react_id:
             if u_id not in react["u_ids"]:
                 raise Value_Error(description="You have not reacted to this\
