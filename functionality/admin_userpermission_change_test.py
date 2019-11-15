@@ -5,17 +5,17 @@ import pytest
 from .database import clear_data
 from .access_error import AccessError, Value_Error
 from .admin_userpermission_change import admin_userpermission_change
+from .decorators import setup_data
 from .auth import auth_register
 
+# check if the basic functionality of message_send works or not
+@setup_data(user_num=4)
+def test_admin_userpermission_change(users, channels):
 
-def test_admin_userpermission_change():
-    clear_data()
-
-    user1 = auth_register("valid@email.com", "1234567890", "John", "Doe")
-    user2 = auth_register("valid2@email.com", "1234567890", "Bob", "Doe")
-    user3 = auth_register("valid3@email.com", "1234567890", "Jane", "Doe")
-    user4 = auth_register("valid4@email.com", "1234567890", "Jen", "Doe")
-
+    user1 = users[0]
+    user2 = users[1]    
+    user3 = users[2]
+    user4 = users[3]
     # as a slackr owner attempt to make a member an admin
     assert admin_userpermission_change(user1["token"], user2["u_id"], 2) == {}
 
