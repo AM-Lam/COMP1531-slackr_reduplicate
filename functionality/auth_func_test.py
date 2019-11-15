@@ -125,6 +125,7 @@ def test_register1():
     assert token['token'] is not None
     assert token['u_id'] is not None
 
+
 def test_register2():
     # raise error if user tries to register more than once
     clear_data()
@@ -133,6 +134,7 @@ def test_register2():
     assert token['u_id'] is not None
     pytest.raises(Value_Error, auth_register, 'user1@gmail.com', 'passew@321',
                   'user', 'one')
+
 
 def test_register3():
     # raise an error if user tries to register with a very long name
@@ -143,6 +145,7 @@ def test_register3():
     #-> last name too long
     pytest.raises(Value_Error, auth_register, 'user1@gmail.com', 'passew@321', 'o',
                   'u' * 70)
+
 
 def test_register4():
     # raise error if password is weak!
@@ -158,11 +161,11 @@ def test_register4():
 def test_reset_request():
     # testing if the code is generated and stored successfully!
     clear_data()
-    auth_register('user1@domain.com', 'passew@321', 'user', 'a')
+    auth_register('deadthundersquirrels@gmail.com', 'passew@321', 'user', 'a')
     ## cant test email send since send email send code has been moved to server.py i.e. flask.
     update_data = get_data()
-    reset_code = auth_passwordreset_request('user1@domain.com')
-    assert(update_data["reset"][reset_code]) == 'user1@domain.com'
+    reset_code = auth_passwordreset_request('deadthundersquirrels@gmail.com')
+    assert(update_data["reset"][reset_code]) == 'deadthundersquirrels@gmail.com'
 
 
 ###############################################################################
@@ -173,8 +176,8 @@ def test_reset_request():
 def test_reset_reset1():
     # raise errors if the reset code is incorrect.
     clear_data()
-    auth_register('user1@gmail.com', 'passew@321', 'user', 'one')
-    auth_passwordreset_request('user1@gmail.com')
+    auth_register('deadthundersquirrels@gmail.com', 'passew@321', 'user', 'one')
+    auth_passwordreset_request('deadthundersquirrels@gmail.com')
     #-> invalid codes being passed in!
     pytest.raises(Value_Error, auth_passwordreset_reset, "INVALID-CODE", 'abcdefgh')
     #->password not strong
@@ -183,9 +186,9 @@ def test_reset_reset1():
 def test_reset_reset2():
     # testing is it works!
     clear_data()
-    auth_register('user1@gmail.com', 'passew@321', 'user', 'one')
+    auth_register('deadthundersquirrels@gmail.com', 'passew@321', 'user', 'one')
     # now lets send a reset request.
-    reset_code = auth_passwordreset_request('user1@gmail.com')
+    reset_code = auth_passwordreset_request('deadthundersquirrels@gmail.com')
     # now reset the password.
     auth_passwordreset_reset(reset_code, 'abcdefgh')
     hashed_pass = (hashlib.sha256('abcdefgh'.encode()).hexdigest())
@@ -193,6 +196,6 @@ def test_reset_reset2():
     all_users = get_data()["users"]
     for u_id in all_users:
         user = get_user(u_id)
-        if user.get_email() == 'user1@gmail.com':
+        if user.get_email() == 'deadthundersquirrels@gmail.com':
             assert user.get_password() == hashed_pass
             break
