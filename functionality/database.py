@@ -266,7 +266,7 @@ class Messages:
         for react in self._reacts:
             react_list.append({
                 "react_id" : react["react_id"],
-                "u_id" : react["u_ids"],
+                "u_id" : u_id,
                 "is_this_user_reacted" : u_id in react["u_ids"]
             })
         return react_list

@@ -8,7 +8,7 @@ from .channel import (channels_create, channel_addowner, channel_join,
                       channel_details, channel_invite, channel_leave,
                       channel_messages, channel_removeowner, channels_list,
                       channels_listall)
-from .database import clear_data, get_channel, is_user_member, get_user
+from .database import clear_data, get_channel, is_user_member, get_user, get_data
 from .access_error import AccessError, Value_Error
 
 
