@@ -1,16 +1,21 @@
 """Flask server"""
+
+# pylint: disable=C0116
+
 import sys
 import atexit
-from flask_cors import CORS
+from datetime import datetime
 from json import dumps
-from flask import Flask, request, jsonify
+from flask_cors import CORS
+from flask import Flask, request
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
-from datetime import datetime
-from functionality import auth, user, database, channel, message, admin_userpermission_change, standup_send, standup_start
+from functionality import (auth, user, database, channel, message,
+                           admin_userpermission_change, standup_send,
+                           standup_start, access_error)
 
 
-def defaultHandler(err):
+def default_handler(err):
     response = err.get_response()
 
     response.data = dumps({
@@ -26,18 +31,35 @@ def defaultHandler(err):
 
 APP = Flask(__name__)
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
-APP.register_error_handler(HTTPException, defaultHandler)
+APP.register_error_handler(HTTPException, default_handler)
 CORS(APP)
-mail = Mail(APP)
 
 
 APP.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=465,
     MAIL_USE_SSL=True,
-    MAIL_USERNAME = 'deadthundersquirrels@gmail.com',
-    MAIL_PASSWORD = "passnew%1"
+    MAIL_USERNAME='deadthundersquirrels@gmail.com',
+    MAIL_PASSWORD="passnew%1"
 )
+
+
+def send_code(email, code):
+    # pylint: disable=W0703
+
+    mail = Mail(APP)
+    try:
+        msg = Message(subject="Slackr Email Reset",
+                      sender="deadthundersquirrels@gmail.com",
+                      recipients=[email],
+                      body='hello')
+
+        msg.body = "Your reset code is " + code
+        mail.send(msg)
+    except Exception:
+        raise access_error.Value_Error(description="Failed to send email")
+
+    return {}
 
 
 @APP.route('/auth/register', methods=['POST'])
@@ -64,22 +86,14 @@ def user_logout():
     dumpstring = auth.auth_logout(token)
     return dumps(dumpstring)
 
-<<<<<<< HEAD
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
     email = request.form.get('email')
-    dumpstring = auth_passwordreset_request.auth_passwordreset_request(email)
-    return dumps (dumpstring)
-=======
 
-@APP.route('/auth/passwordreset/request', methods=['POST'])
-def email_request():
-    email = request.form.get('email')
-    dumpstring = auth.auth_passwordreset_request(email)
-    print(send_code(email, dumpstring)) # remove later
-    return dumps(dumpstring)
+    reset_code = auth.auth_passwordreset_request(email)
+    email_status = send_code(email, reset_code)
 
->>>>>>> master
+    return dumps(email_status)
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
 def email_reset():
@@ -132,7 +146,7 @@ def run_channels_create():
 
 @APP.route('/message/send', methods=["POST"])
 def run_message_send():
-    """ 
+    """
         run the message_send function to send a message and
         add it to the  server database
     """
@@ -146,28 +160,20 @@ def run_message_send():
 
 @APP.route('/message/remove', methods=["DELETE"])
 def run_message_remove():
-    """ 
+    """
         run the message_remove function to remove a message and
         update the server database
     """
-<<<<<<< HEAD
-    request_data = request.get_json()
-    return_value = ""
-    return_value = message_remove.message_remove(request_data["token"],
-                                                    request_data["message_id"]
-                                                    )
-=======
     request_data = request.form
     return_value = message.message_remove(request_data["token"],
                                           int(request_data["message_id"]))
->>>>>>> master
 
     return dumps(return_value)
 
 
 @APP.route('/message/edit', methods=["PUT"])
 def run_message_edit():
-    """ 
+    """
         run the message_edit function to edit a message and
         update the server database
     """
@@ -181,7 +187,7 @@ def run_message_edit():
 
 @APP.route('/message/react', methods=["POST"])
 def run_message_react():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
@@ -195,7 +201,7 @@ def run_message_react():
 
 @APP.route('/message/unreact', methods=["POST"])
 def run_message_unreact():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
@@ -209,7 +215,7 @@ def run_message_unreact():
 
 @APP.route('/message/pin', methods=["POST"])
 def run_message_pin():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
@@ -222,7 +228,7 @@ def run_message_pin():
 
 @APP.route('/message/unpin', methods=["POST"])
 def run_message_unpin():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
@@ -236,24 +242,10 @@ def run_message_unpin():
 
 @APP.route('/user/profile', methods=["GET"])
 def run_user_profile():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
-<<<<<<< HEAD
-    request_data = request.get_json()
-    return_value = user_profile.user_profile(request_data["token"],
-                                            request_data["u_id"]
-                                            )
-
-    return dumps(return_value)
-
-@APP.route("/channel/leave", methods=["POST"])
-def run_channel_leave():
-    request_data = request.get_json()
-    return_value = channel_leave.channel_leave(request_data["token"],
-                                               request_data["channel_id"])
-=======
     request_data = request.args
     return_value = user.user_profile(request_data["token"],
                                      int(request_data["u_id"]))
@@ -266,14 +258,13 @@ def run_channel_leave():
     request_data = request.form
     return_value = channel.channel_leave(request_data["token"],
                                          int(request_data["channel_id"]))
->>>>>>> master
 
     return dumps(return_value)
 
 
 @APP.route('/channels/listall', methods=["GET"])
 def run_channels_listall():
-    """
+    """s
     Retrieve a list of all the channels that have been created and return
     as a list of dictionaries. At the moment we are assuming that all users
     can do this, regardless of what their token is but I will follow this up
@@ -302,20 +293,6 @@ def run_channel_join():
     )
 
     return dumps(return_value)
-
-
-def send_code(email, code):
-    try:
-        with APP.app_context():
-            msg = Message(subject = "Your slacky reset code",
-                sender="deadthundersquirrels@gmail.com",
-                recipients=[email],
-                body = 'hello')
-            msg.body = "your reset code is " + code
-            mail.send(msg)
-            return {}
-    except Exception as e:
-        return (str(e))
 
 
 @APP.route('/channel/addowner', methods=["POST"])
@@ -347,8 +324,8 @@ def run_message_sendlater():
     return_value = message.message_sendlater(
         request_data["token"],
         int(request_data["channel_id"]),
-        int(request_data["message"]),
-        datetime.utcfromtimestamp(request_data["time_sent"])
+        request_data["message"],
+        datetime.utcfromtimestamp(int(request_data["time_sent"]) / 1000)
     )
 
     return dumps(return_value)
@@ -411,7 +388,9 @@ def run_standup_start():
 @APP.route('/standup/send', methods=["POST"])
 def run_standup_send():
     request_data = request.form
-    return_value = standup_send.standup_send(
+    return_value = {}
+
+    standup_send.standup_send(
         request_data["token"],
         int(request_data["channel_id"]),
         request_data["message"],
@@ -432,13 +411,25 @@ def run_search():
 @APP.route('/admin/userpermission/change', methods=["POST"])
 def run_admin_userpermission_change():
     request_data = request.form
-    return_value = admin_userpermission_change.admin_userpermission_change(
+    return_value = {}
+
+    admin_userpermission_change.admin_userpermission_change(
         request_data["token"],
         int(request_data["u_id"]),
-        int(request_data["permission_id"]),
-    )
+        int(request_data["permission_id"]))
 
     return dumps(return_value)
+
+@APP.route('/users/all', methods=["GET"])
+def run_users_all():
+    # to suppress errors just return an empty list
+    return dumps({"users" : []})
+
+
+@APP.route('/standup/active', methods=["GET"])
+def run_standup_active():
+    # to suppress errors just always return an inactive standup
+    return dumps({"is_active" : False, "time_finish" : None})
 
 if __name__ == '__main__':
     database.clear_data()

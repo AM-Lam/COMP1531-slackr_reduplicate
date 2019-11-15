@@ -104,7 +104,7 @@ def standup_active(token, channel_id):
     Description: For a given channel, return whether a standup is active in it, and what time the standup finishes. If no standup is active, then time_finish returns None
     """
 
-    dict = {"is_active" : None, "time_finish" : None)
+    dict = {"is_active" : None, "time_finish" : None}
 
     # check if the token is valid and decode it
     u_id = check_valid_token(token)

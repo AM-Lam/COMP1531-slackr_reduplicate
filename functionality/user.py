@@ -2,18 +2,21 @@
 Functions that relate to the creation, modification and deletion of users.
 """
 
+# pylint: disable=R0913
+# pylint: disable=W0613
+
 import urllib
 import jwt
-from .database import *
-from .access_error import *
 from PIL import Image
-
+from .database import (is_email_valid, check_email_database, check_valid_token,
+                       get_data, get_user, is_handle_in_use)
+from .access_error import AccessError, Value_Error
 
 def user_profile_setemail(token, email):
     """
     user_profile_setemail(token, email);
     return {}
-    Exception: ValueError when:
+    Exception: Value_Error when:
         - Email entered is not a valid email,
         - Email address is already being used by another user
     Description: Update the authorised user's email address
@@ -35,14 +38,14 @@ def user_profile_sethandle(token, handle_str):
     """
     user_profile_sethandle(token, handle_str);
     return void
-    Exception: ValueError when:
+    Exception: Value_Error when:
         - handle_str is no more than 20 characters
     Description: Update the authorised user's handle (i.e. display name)
     """
 
     # check if the handle passes length requirements
     if not 0 < len(handle_str) < 20:
-        raise ValueError(description="Handles must be between 0 and 20\
+        raise Value_Error(description="Handles must be between 0 and 20\
                          characters (exclusive)")
 
     # check the database for handles in use
@@ -69,12 +72,12 @@ def user_profile_setname(token, name_first, name_last):
 
     # check if the first name passes length requirements
     if not 0 < len(name_first) < 50:
-        raise ValueError(description="First name must be between 0 and 50\
+        raise Value_Error(description="First name must be between 0 and 50\
                          characters (exclusive)")
 
     # check if the last name passes length requirements
     if not 0 <= len(name_last) < 50:
-        raise ValueError(description="Last name must be between 0 and 50\
+        raise Value_Error(description="Last name must be between 0 and 50\
                          characters (inclusive)")
 
     # check if the token is valid and decode it
@@ -90,33 +93,32 @@ def user_profile_setname(token, name_first, name_last):
     return {}
 
 def user_profile(token, u_id):
+    """
+    Taking a u_id return the user data of its associated user, if the
+    user does not exist raise a Value_Error
+    """
+
     server_data = get_data()
 
     # not a valid token
     if not server_data["tokens"].get(token, False):
-        raise AccessError 
-    
-    for info in server_data['users']:
-        if info.get_u_id() == u_id:
-            email = info.get_email()
-            first_name = info.get_first_name()
-            last_name = info.get_last_name()
-            handle = info.get_handle()
-            
-            return { 
-                'email': email,
-                'name_first': first_name,
-                'name_last': last_name,
-                'handle_str': handle 
-            }
-    
-    raise ValueError(description="User cannot be found")
+        raise AccessError
 
-######################################################################################
+    if u_id in server_data["users"]:
+        user = server_data["users"][u_id]
 
-def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end):
+        return {
+            "email" : user.get_email(),
+            "name_first" : user.get_first_name(),
+            "name_last" : user.get_last_name(),
+            "handle_str" : user.get_handle()
+        }
+
+    raise Value_Error(description="User cannot be found")
+
+def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     """
-    user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end);
+    user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end);
     return {}
     Exception: ValueError when:
         - img_url is returns an HTTP status other than 200,
@@ -166,3 +168,25 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,     y_end
     get_user(u_id).set_profile_img_url(cropped)
     
     return {}
+
+def users_all():
+    permissionGranted = 0
+    users_id = check_valid_token(token)
+    # if the user exists then return a list of all the users!
+    datab = get_data()["users"]
+    # only the global admins should be able to get this data.
+    peep = datab[users_id]
+    if peep.is_global_admin() == True:
+            permissionGranted = 1
+            return datab["users"]
+
+    '''
+    for i in datab["users"]:
+        if users_id == i.get_u_id():
+            if i._global_admin == True:
+                permissionGranted = 1
+                return datab["users"]
+    '''
+
+    if permissionGranted == 0:
+        raise ValueError("you dont have clearance to access the user details")
