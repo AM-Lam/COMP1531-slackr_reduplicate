@@ -1,12 +1,16 @@
-import pytest
+# pylint: disable=C0114
+# pylint: disable=C0116
+
+
 import threading
 from datetime import timedelta, datetime
+import pytest
 from .standup_send import standup_send
 from .standup_start import standup_start
 from .auth import auth_register
-from .database import clear_data, get_data
+from .database import clear_data
 from .channel import channels_create
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def test_standup_send():
@@ -24,17 +28,17 @@ def test_standup_send():
     threading.Thread(target=standup_start, args=(user["token"], channel["channel_id"])).start()
 
     # this test should pass with no issue
-    assert standup_send(user["token"], channel["channel_id"], "message") == None
+    assert standup_send(user["token"], channel["channel_id"], "message") is None
 
-    # raises a ValueError if channel does not exist
-    pytest.raises(ValueError, standup_send, user["token"], "not_a_real_channel", "message")
+    # raises a Value_Error if channel does not exist
+    pytest.raises(Value_Error, standup_send, user["token"], "not_a_real_channel", "message")
 
     # raises an AccessError if the user does not have perms
     pytest.raises(AccessError, standup_send, user2["token"], channel["channel_id"], "message")
 
-    # raises a ValueError if the message is too long
-    pytest.raises(ValueError, standup_send, user["token"], channel["channel_id"], "a" * 1001)
-    
+    # raises a Value_Error if the message is too long
+    pytest.raises(Value_Error, standup_send, user["token"], channel["channel_id"], "a" * 1001)
+
     # if standup time has stopped
     while datetime.now() <= predicted_finish:
         continue
