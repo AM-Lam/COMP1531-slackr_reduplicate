@@ -34,7 +34,7 @@ def standup_start(token, channel_id, length):
     get_channel(channel_id)
 
     # if the user is not a member of this channel, raise an AccessError
-    if !is_user_member(u_id, channel_id):
+    if not is_user_member(u_id, channel_id):
         raise AccessError(description="You are not a member of this channel.")
 
     # check if there is an active standup session
@@ -79,7 +79,7 @@ def standup_send(token, channel_id, message):
     get_channel(channel_id)
 
     # if the user is not a member of this channel, raise an AccessError
-    if !is_user_member(u_id, channel_id):
+    if not is_user_member(u_id, channel_id):
         raise AccessError(description="You are not a member of this channel.")
 
     # check if the message meets length requirements

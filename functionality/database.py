@@ -17,7 +17,7 @@ SECRET = "AVENGERS_SOCKS"
 
 
 class User:
-    def __init__(self, u_id, first_name, last_name, password, email, global_admin=False, profile_img_url):
+    def __init__(self, u_id, first_name, last_name, password, email, global_admin=False, profile_img_url=None):
         self._u_id = u_id
         self._first_name = first_name
         self._last_name = last_name
@@ -26,7 +26,7 @@ class User:
         self._handle = first_name + last_name
         self._global_admin = global_admin
         self._slackr_owner = False
-        self._profile_img_url = default.com/200x200.jpg
+        self._profile_img_url = None
 
     def get_user_data(self):
         return {
