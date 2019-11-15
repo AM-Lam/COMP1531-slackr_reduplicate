@@ -167,6 +167,9 @@ def test_message_edit():
     pytest.raises(Value_Error, message_edit, user1["token"], 10101,
                   "Hello There")
 
+    # # non-existent channel
+    # pytest.raises(Value_Error, message_edit, user1["token"], message1['message_id'], "Message")
+
     # try to edit a message we do not own as a global admin
     user2_obj.set_global_admin(True)
 
@@ -192,6 +195,7 @@ def test_message_pin():
 
     assert message_pin(user1["token"], message_1['message_id']) == {}
 
+    pytest.raises(Value_Error, message_pin, user1["token"], message_1['message_id'])
 
 #######################################################################
 ###  MESSAGE_UNPIN TESTS HERE #########################################
@@ -200,10 +204,14 @@ def test_message_pin():
 def test_message_unpin():
     set_up = list(setup())
     user1 = set_up[0]
+    user2 = set_up[1]
     channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
+
+    # the message cannot be unpin if it is not pinned
+    pytest.raises(Value_Error, message_unpin, user1["token"], message_1['message_id'])
 
     # check that the message exists
     assert message_1 is not None
@@ -252,6 +260,7 @@ def test_message_unreact():
 def test_message_sendlater():
     set_up = list(setup())
     user1 = set_up[0]
+    user2 = set_up[1]
     channel1 = set_up[2]
 
     server_data = get_data()
@@ -264,6 +273,10 @@ def test_message_sendlater():
     pytest.raises(Value_Error, message_sendlater, user1["token"],
                   channel1["channel_id"], "X" * 1001,
                   datetime.now() + timedelta(minutes=1))
+
+    # user is not a member in the channel
+    pytest.raises(AccessError, message_sendlater, user2["token"],
+                   channel1["channel_id"], "Message", datetime.now() + timedelta(minutes=1))
 
     # time sent is in the past
     pytest.raises(Value_Error, message_sendlater, user1["token"],
