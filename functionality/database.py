@@ -260,8 +260,16 @@ class Messages:
     def get_time_sent(self):
         return self._time_sent
 
-    def get_reacts(self):
-        return self._reacts
+    def get_reacts_frontend(self, u_id):
+        # build react list with the right format
+        react_list = []
+        for react in self._reacts:
+            react_list.append({
+                "react_id" : react["react_id"],
+                "u_id" : u_id,
+                "is_this_user_reacted" : u_id in react["u_ids"]
+            })
+        return react_list
 
     def set_pinned(self, pinned):
         self._pinned = pinned
@@ -424,7 +432,7 @@ def get_message_list(channel, start, end):
             "u_id" : message.get_u_id(),
             "message" : message.get_text(),
             "time_created" : message.get_time_sent().timestamp(),
-            "reacts" : [], # message.get_reacts(),
+            "reacts" :  message.get_reacts_frontend(message.get_u_id()),
             "is_pinned" : message.is_pinned()
         })
 
