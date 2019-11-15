@@ -1,13 +1,20 @@
+# pylint: disable=C0114
+# pylint: disable=C0116
+# pylint: disable=W0611
+
+
 import pytest
-from .user import user_profile_setemail, user_profile_sethandle, user_profile_setname, user_profile, user_profiles_uploadphoto
+from .user import (user_profile_setemail, user_profile_sethandle,
+                   user_profile_setname, user_profile,
+                   user_profiles_uploadphoto)
 from .auth import auth_register
-from .database import clear_data, get_data
-from .access_error import AccessError, Value_Error
+from .database import clear_data
+from .access_error import Value_Error
 
 
-############################################################################################################################
-###  USER_PROFILE_SETEMAIL TESTS HERE ######################################################################################
-############################################################################################################################
+#######################################################################
+###  USER_PROFILE_SETEMAIL TESTS HERE #################################
+#######################################################################
 
 def test_user_profile_setemail():
     clear_data()
@@ -24,9 +31,9 @@ def test_user_profile_setemail():
     pytest.raises(Value_Error, user_profile_setemail, user2["token"], "z1234567@cse.unsw.edu.au")
 
 
-############################################################################################################################
-###  USER_PROFILE_SETHANDLE TESTS HERE #####################################################################################
-############################################################################################################################
+#######################################################################
+###  USER_PROFILE_SETHANDLE TESTS HERE ################################
+#######################################################################
 
 def test_user_profile_sethandle():
     clear_data()
@@ -43,9 +50,9 @@ def test_user_profile_sethandle():
     pytest.raises(Value_Error, user_profile_sethandle, user2["token"], "handle")
 
 
-############################################################################################################################
-###  USER_PROFILE_SETNAME TESTS HERE #######################################################################################
-############################################################################################################################
+#######################################################################
+###  USER_PROFILE_SETNAME TESTS HERE ##################################
+#######################################################################
 
 def test_user_profile_setname():
     clear_data()
@@ -60,7 +67,7 @@ def test_user_profile_setname():
 
     # trying to input a last name longer than 50 characters
     pytest.raises(Value_Error, user_profile_setname, user["token"],
-                 "Jane", "a" * 51)
+                  "Jane", "a" * 51)
 
     # assuming we allow mononymous names, at least one value needs to be filled
     assert user_profile_setname(user["token"], "Plato", "") == {}
@@ -69,9 +76,9 @@ def test_user_profile_setname():
     pytest.raises(Value_Error, user_profile_setname, user["token"], "", "")
 
 
-############################################################################################################################
-###  USER_PROFILE TESTS HERE ###############################################################################################
-############################################################################################################################
+#######################################################################
+###  USER_PROFILE TESTS HERE ##########################################
+#######################################################################
 
 def verify_info1(user_obj, correct_data):
     clear_data()
@@ -91,16 +98,21 @@ def test_user_profile1():
     assert profile is not None
 
     # check that the database was correctly updated
-    assert profile == {'email': "valid@email.com", 'name_first': "Bob", 'name_last': "Jones", 'handle_str': "BobJones"}
+    assert profile == {
+        'email': "valid@email.com",
+        'name_first': "Bob",
+        'name_last': "Jones",
+        'handle_str': "BobJones"
+        }
 
 
-############################################################################################################################
-###  USER_PROFILE_UPLOAD_PHOTO TESTS HERE ##################################################################################
-############################################################################################################################
+#######################################################################
+###  USER_PROFILE_UPLOAD_PHOTO TESTS HERE #############################
+#######################################################################
 
 def test_user_profiles_uploadphoto():
     clear_data()
-    
+
     user = auth_register("valid@email.com", "1234567890", "John", "Doe")
     assert user is not None
 

@@ -1,9 +1,14 @@
+# pylint: disable=C0114
+# pylint: disable=C0116
+
 import pytest
-import jwt
 from .auth import auth_register
 from .message import message_send
-from .channel import channels_create, channel_addowner, channel_join, channel_details, channel_invite, channel_leave, channel_messages, channel_removeowner, channels_list, channels_listall
-from .database import *
+from .channel import (channels_create, channel_addowner, channel_join,
+                      channel_details, channel_invite, channel_leave,
+                      channel_messages, channel_removeowner, channels_list,
+                      channels_listall)
+from .database import clear_data, get_channel, is_user_member, get_user
 from .access_error import AccessError, Value_Error
 
 
@@ -72,10 +77,10 @@ def test_channel_addowner():
     
     # try to add a user as an owner to a channel we do not own, as a slackr 
     # owner
-    
+
     # somehow make user2 an owner of the slackr, commented until we add global
     # admins
-    # assert channel_addowner(user2["token"], channel2["channel_id"], 
+    # assert channel_addowner(user2["token"], channel2["channel_id"],
     #                         user3["u_id"]) == {}
 
 
@@ -87,7 +92,7 @@ def test_channel_addowner():
 def test_channel_details():
     # what if the channel does not exist?
     invalid_channel = 999
-    with pytest.raises(Value_Error , match=r"*"):
+    with pytest.raises(Value_Error, match=r"*"):
         get_channel(invalid_channel)
 
     # user2 is not a part of the channel
@@ -101,21 +106,21 @@ def test_channel_details():
     assert detaildict['name'] == "unswchannel"
     assert detaildict['owner_members'] == [
         {'u_id': 1, 'name_first': 'user', 'name_last': 'a'}]
-    
+
     assert detaildict['all_members'] == [
         {'u_id': 1, 'name_first': 'user', 'name_last': 'a'},
         {'u_id': 2, 'name_first': 'ussr', 'name_last': 'b'}]
-    
+
     # add user 3
     channel_join(user3["token"], unswchannelid)
-    
+
     # search details
     detaildict2 = channel_details(token2, unswchannelid)
     assert detaildict2['name'] == "unswchannel"
-    
+
     assert detaildict2['owner_members'] == [
         {'u_id': 1, 'name_first': 'user', 'name_last': 'a'}]
-    
+
     assert detaildict2['all_members'] == [
         {'u_id': 1, 'name_first': 'user', 'name_last': 'a'},
         {'u_id': 2, 'name_first': 'ussr', 'name_last': 'b'},
@@ -191,11 +196,11 @@ def test_channel_leave():
     # now try to leave a private channel
     assert channel_leave(user_1["token"], channel_2a["channel_id"]) == {}
 
-    # now check that attempting to leave a non-existent channel raises an 
+    # now check that attempting to leave a non-existent channel raises an
     # exception
     pytest.raises(Value_Error, channel_leave, user_1["token"], 404)
 
-    # try to leave a channel the user is not a part of - this should fail 
+    # try to leave a channel the user is not a part of - this should fail
     # quietely (see assumptions.md)
     assert channel_leave(user_1["token"], channel_3["channel_id"]) == {}
 
@@ -326,31 +331,31 @@ def test_channels_list():
     # boilerplate user/channel creation code
     user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
     user2 = auth_register("new@email.com", "987654321", "Doug", "Jones")
-    
+
     channel1 = channels_create(user1["token"], "Channel 1", True)
-    
+
     # try to see the channels of a user with no channels
     assert channels_list(user2["token"]) == {"channels" : []}
-    
+
     # try to see the channels of a user that owns one public channel
-    assert channels_list(user1["token"]) == { "channels" : [{
+    assert channels_list(user1["token"]) == {"channels" : [{
         "channel_id" : channel1["channel_id"],
         "name" : "Channel 1"
     }]}
-    
+
     # add user2 to channel1 and check that we can list it as belonging to that
     # channel
     channel_join(user2["token"], channel1["channel_id"])
-    assert channels_list(user2["token"]) == { "channels" : [
+    assert channels_list(user2["token"]) == {"channels" : [
         {
             "channel_id" : channel1["channel_id"],
             "name" : "Channel 1"
         }
     ]}
-    
+
     # create a new channel, test that multiple channels are shown
     channel2 = channels_create(user1["token"], "Channel 2", True)
-    assert channels_list(user1["token"]) == { "channels" : [
+    assert channels_list(user1["token"]) == {"channels" : [
         {
             "channel_id" : channel1["channel_id"],
             "name" : "Channel 1"
@@ -360,10 +365,10 @@ def test_channels_list():
             "name" : "Channel 2"
         },
     ]}
-    
+
     # create a private channel, test that it is shown in the list
     channel3 = channels_create(user1["token"], "Channel 3", False)
-    assert channels_list(user1["token"]) == { "channels" : [
+    assert channels_list(user1["token"]) == {"channels" : [
         {
             "channel_id" : channel1["channel_id"],
             "name" : "Channel 1"
@@ -377,12 +382,12 @@ def test_channels_list():
             "name" : "Channel 3"
         },
     ]}
-    
+
     # test that if a channel only has one channel, and it is private, that it
     # is shown in the list
     channel_leave(user1["token"], channel1["channel_id"])
     channel_leave(user1["token"], channel2["channel_id"])
-    assert channels_list(user1["token"]) == { "channels" : [
+    assert channels_list(user1["token"]) == {"channels" : [
         {
             "channel_id" : channel3["channel_id"],
             "name" : "Channel 3"
@@ -397,17 +402,17 @@ def test_channels_list():
 # did not use the decorator here because the tests progress as the database builds up!
 def test_channels_listall():
     clear_data()
-    
+
     # create some users and channels for testing, commented for now
     # until auth_register works
     user1 = auth_register("valid@email.com", "0123456789", "Bob", "Jones")
     user2 = auth_register("good@email.com", "9876543210", "Jone", "Bobs")
-    
+
     # ensure that if there are no channels that none are shown
     assert channels_listall(user1["token"]) == {"channels" : []}
-    
+
     channel1 = channels_create(user1["token"], "Channel 1", True)
-    
+
     # ensure that channels_listall shows channels you belong to
     assert channels_listall(user1["token"]) == {"channels" : [
         {
@@ -415,7 +420,7 @@ def test_channels_listall():
             "name" : "Channel 1"
         }
     ]}
-    
+
     # ensure that channels_listall shows channels you do not belong to
     assert channels_listall(user2["token"]) == {"channels" : [
         {
@@ -423,11 +428,11 @@ def test_channels_listall():
             "name" : "Channel 1"
         }
     ]}
-    
+
     # create a new channel and repeat the above tests to make sure that multiple
     # channels are listed
     channel2 = channels_create(user1["token"], "Channel 2", True)
-    
+
     assert channels_listall(user1["token"]) == {"channels" : [
         {
             "channel_id" : channel1["channel_id"],
@@ -438,7 +443,7 @@ def test_channels_listall():
             "name" : "Channel 2"
         }
     ]}
-    
+
     assert channels_listall(user2["token"]) == {"channels" : [
         {
             "channel_id" : channel1["channel_id"],
@@ -449,11 +454,10 @@ def test_channels_listall():
             "name" : "Channel 2"
         }
     ]}
-    
-    
+
     # ensure that channels_listall shows private channels you belong to
     channel3 = channels_create(user1["token"], "Channel 3", False)
-    
+
     assert channels_listall(user1["token"]) == {"channels" : [
         {
             "channel_id" : channel1["channel_id"],
@@ -468,10 +472,9 @@ def test_channels_listall():
             "name" : "Channel 3"
         }
     ]}
-    
+
     # ensure that channels_listall shows private channels that you do not belong
     # to
-    
     assert channels_listall(user2["token"]) == {"channels" : [
         {
             "channel_id" : channel1["channel_id"],
@@ -486,6 +489,6 @@ def test_channels_listall():
             "name" : "Channel 3"
         }
     ]}
-    
+
     # seems to be all the testing I can think of right now, might return to this
     # if I can think of more tests
