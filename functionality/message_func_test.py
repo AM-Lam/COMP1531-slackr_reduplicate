@@ -13,7 +13,6 @@ from .message import (message_edit, message_send, message_remove, message_pin,
 from .access_error import AccessError, Value_Error
 from .decorators import setup_data
 
-
 # Helper Functions
 
 def get_message_text(channel_id, m_id):

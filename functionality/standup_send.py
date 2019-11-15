@@ -52,7 +52,6 @@ def check_valid_standup_time(channel_id):
             return True
     except TypeError:
         raise AccessError(description="The standup time has finished.")
-    raise Value_Error(description="Channel does not exist or cannot be found.")
 
 
 def send_message(u_id, message):
