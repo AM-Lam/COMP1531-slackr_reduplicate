@@ -4,7 +4,7 @@ Functions that relate to the creation, modification and deletion of channels.
 from .database import (get_data, check_valid_token, get_channel, get_user,
                        is_user_member, is_user_owner, get_message_list,
                        is_valid_u_id, message_count, Channel)
-from .access_error import *
+from .access_error import AccessError, Value_Error
 
 
 def channel_addowner(token, channel_id, u_id):
@@ -12,38 +12,64 @@ def channel_addowner(token, channel_id, u_id):
     Select a user by u_id and add them to the channel owners of this channel
     """
 
+    # get the u_id of the requesting user and the channel object
+    owner_u_id = check_valid_token(token)
+    calling_user = get_user(owner_u_id)
+
+    to_add = get_channel(channel_id)
+
+    if is_user_owner(u_id, channel_id):
+        raise Value_Error(description="The user is already an owner in this channel")
+
+    # now make sure the calling user has the permissions to make this
+    # change
+    if not is_user_owner(owner_u_id, channel_id) and not \
+       (calling_user.is_global_admin() or calling_user.is_slackr_owner()):
+        raise AccessError(description="Lack permissions to add owner to this channel")
+
+    # finally set u_id to be an owner of the channel requested, if they
+    # are not already a member of this channel add them as one as well
+    to_add.get_owners().append(u_id)
+    if not is_user_member(u_id, channel_id):
+        to_add.get_members().append(u_id)
+
+    return {}
+
+
+
+def channel_details(token, channel_id):
+    """
+    Select a channel by id and return its details.
+    """
+    u_id = check_valid_token(token)
+
     if not is_user_member(u_id, channel_id):
         raise AccessError(description='You do not have permission to do this')
 
     channel = get_channel(channel_id)
     channel_members = channel.get_members()
 
-    if not is_user_member(u_id, channel_id) and not is_user_owner(u_id, channel_id):
-        raise AccessError(description='You do not have permission to do this')
-    
-    # TODO: Rewrite this to not be awful, will likely require
-    # rethinking our data structures
-
     # convert the channel_members list to a form the frontend can read
+    users = get_data()["users"]
+
     channel_members = [{
-        "u_id" : user.get_u_id(),
-        "name_first" : user.get_first_name(),
-        "name_last" : user.get_last_name(),
-        "profile_image" : ""
-    } for user in get_data()["users"] if user.get_u_id() in channel_members]
+        "u_id" : users[u_id].get_u_id(),
+        "name_first" : users[u_id].get_first_name(),
+        "name_last" : users[u_id].get_last_name()
+    } for u_id in channel_members]
 
     # do the same thing with the channel owners
     channel_owners = channel.get_owners()
     channel_owners = [{
-        "u_id" : user.get_u_id(),
-        "name_first" : user.get_first_name(),
-        "name_last" : user.get_last_name(),
-        "profile_image" : ""
-    } for user in get_data()["users"] if user.get_u_id() in channel_owners]
+        "u_id" : users[u_id].get_u_id(),
+        "name_first" : users[u_id].get_first_name(),
+        "name_last" : users[u_id].get_last_name()
+    } for u_id in channel_owners]
 
     return {"name" : channel.get_name(),
             "owner_members" : channel_owners,
             "all_members" : channel_members}
+
 
 
 def channel_invite(token, channel_id, u_id):
@@ -59,7 +85,7 @@ def channel_invite(token, channel_id, u_id):
         raise Value_Error(description="u_id is not a real user")
 
     if is_user_member(u_id, channel_id):
-        raise ValueError(description="User is already a member of this channel")
+        raise Value_Error(description="User is already a member of this channel")
 
     if not is_user_owner(inviter_id, channel_id):
         raise AccessError(description="You do not have permission to do this")
@@ -105,12 +131,13 @@ def channel_leave(token, channel_id):
     # owner of the channel remove them from tha list as well
     if is_user_member(u_id, channel_id):
         channel.get_members().remove(u_id)
-    
+
     if is_user_owner(u_id, channel_id):
         channel.get_owners().remove(u_id)
-    
+
     # always return an empty dictionary
     return {}
+
 
 def channel_messages(token, channel_id, start):
     """
@@ -149,7 +176,7 @@ def channel_removeowner(token, channel_id, u_id):
     """
     Select a channel by id and a user by id then, if we have the perms,
     remove that user from the list of channel owners. If the user is
-    not an owner raise a ValueError and if we do not have permissions
+    not an owner raise a Value_Error and if we do not have permissions
     to do this raise an AccessError.
     """
 
@@ -200,7 +227,7 @@ def channels_create(token, name, is_public):
     new_channel = Channel(channel_id, name, [], [u_id], is_public)
 
     # add the channel to the server database
-    server_data["channels"].append(new_channel)
+    server_data["channels"][channel_id] = new_channel
 
     # return the new channel's id
     return {"channel_id" : channel_id}
@@ -213,14 +240,15 @@ def channels_list(token):
     """
 
     # this is pretty simple, just grab the "database"
-    database = get_data()
+    channels_raw = get_data()["channels"]
 
     u_id = check_valid_token(token)
 
     # use a quick list comprehension to get the channels that this u_id
     # is listed as a member of
     channels = [
-        c.frontend_format() for c in database["channels"] if u_id in c.get_members()
+        channels_raw[c_id].frontend_format() for c_id in channels_raw if u_id
+        in channels_raw[c_id].get_members()
     ]
 
     # quick little list comprehension to return the channels in the
@@ -234,11 +262,15 @@ def channels_listall(token):
     """
 
     # this is pretty simple, just grab the "database"
-    database = get_data()
+    channels_raw = get_data()["channels"]
 
     # make sure the token is valid
     check_valid_token(token)
 
+    channels = [
+        channels_raw[c_id].frontend_format() for c_id in channels_raw
+    ]
+
     # quick little list comprehension to return the channels in the
     # format we need
-    return {"channels" : [c.frontend_format() for c in database["channels"]]}
+    return {"channels" : channels}

@@ -1,16 +1,21 @@
 """Flask server"""
+
+# pylint: disable=C0116
+
 import sys
 import atexit
-from flask_cors import CORS
+from datetime import datetime
 from json import dumps
-from flask import Flask, request, jsonify
+from flask_cors import CORS
+from flask import Flask, request
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
-from datetime import datetime
-from functionality import auth, user, database, channel, message, admin_userpermission_change, standup_send, standup_start
+from functionality import (auth, user, database, channel, message,
+                           admin_userpermission_change, standup_send,
+                           standup_start, access_error)
 
 
-def defaultHandler(err):
+def default_handler(err):
     response = err.get_response()
 
     response.data = dumps({
@@ -26,17 +31,17 @@ def defaultHandler(err):
 
 APP = Flask(__name__)
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
-APP.register_error_handler(HTTPException, defaultHandler)
+APP.register_error_handler(HTTPException, default_handler)
 CORS(APP)
-mail = Mail(APP)
+MAIL = Mail(APP)
 
 
 APP.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=465,
     MAIL_USE_SSL=True,
-    MAIL_USERNAME = 'deadthundersquirrels@gmail.com',
-    MAIL_PASSWORD = "passnew%1"
+    MAIL_USERNAME='deadthundersquirrels@gmail.com',
+    MAIL_PASSWORD="passnew%1"
 )
 
 
@@ -124,7 +129,7 @@ def run_channels_create():
 
 @APP.route('/message/send', methods=["POST"])
 def run_message_send():
-    """ 
+    """
         run the message_send function to send a message and
         add it to the  server database
     """
@@ -138,7 +143,7 @@ def run_message_send():
 
 @APP.route('/message/remove', methods=["DELETE"])
 def run_message_remove():
-    """ 
+    """
         run the message_remove function to remove a message and
         update the server database
     """
@@ -151,7 +156,7 @@ def run_message_remove():
 
 @APP.route('/message/edit', methods=["PUT"])
 def run_message_edit():
-    """ 
+    """
         run the message_edit function to edit a message and
         update the server database
     """
@@ -165,7 +170,7 @@ def run_message_edit():
 
 @APP.route('/message/react', methods=["POST"])
 def run_message_react():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
@@ -179,7 +184,7 @@ def run_message_react():
 
 @APP.route('/message/unreact', methods=["POST"])
 def run_message_unreact():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
@@ -193,7 +198,7 @@ def run_message_unreact():
 
 @APP.route('/message/pin', methods=["POST"])
 def run_message_pin():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
@@ -201,13 +206,13 @@ def run_message_pin():
     return_value = message.message_pin(request_data["token"],
                                        int(request_data["message_id"]))
 
-    
+
     return dumps(return_value)
 
 
 @APP.route('/message/unpin', methods=["POST"])
 def run_message_unpin():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
@@ -221,7 +226,7 @@ def run_message_unpin():
 
 @APP.route('/user/profile', methods=["GET"])
 def run_user_profile():
-    """ 
+    """
         run the message_react function to react a message and
         add it to the server database
     """
@@ -243,7 +248,7 @@ def run_channel_leave():
 
 @APP.route('/channels/listall', methods=["GET"])
 def run_channels_listall():
-    """
+    """s
     Retrieve a list of all the channels that have been created and return
     as a list of dictionaries. At the moment we are assuming that all users
     can do this, regardless of what their token is but I will follow this up
@@ -277,15 +282,17 @@ def run_channel_join():
 def send_code(email, code):
     try:
         with APP.app_context():
-            msg = Message(subject = "Your slacky reset code",
-                sender="deadthundersquirrels@gmail.com",
-                recipients=[email],
-                body = 'hello')
+            msg = Message(subject="Your slacky reset code",
+                          sender="deadthundersquirrels@gmail.com",
+                          recipients=[email],
+                          body='hello')
             msg.body = "your reset code is " + code
-            mail.send(msg)
+            MAIL.send(msg)
             return {}
-    except Exception as e:
-        return (str(e))
+    except access_error.Value_Error as err:
+        return str(err)
+    except access_error.AccessError as err:
+        return str(err)
 
 
 @APP.route('/channel/addowner', methods=["POST"])
@@ -389,7 +396,7 @@ def run_standup_start():
 def run_standup_send():
     request_data = request.form
     return_value = {}
-    
+
     standup_send.standup_send(
         request_data["token"],
         int(request_data["channel_id"]),
@@ -414,7 +421,7 @@ def run_search():
 def run_admin_userpermission_change():
     request_data = request.form
     return_value = {}
-    
+
     admin_userpermission_change.admin_userpermission_change(
         request_data["token"],
         int(request_data["u_id"]),
