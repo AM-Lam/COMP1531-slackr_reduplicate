@@ -112,10 +112,12 @@ def user_profile(token, u_id):
         user = server_data["users"][u_id]
 
         return {
+            "u_id" : u_id,
             "email" : user.get_email(),
             "name_first" : user.get_first_name(),
             "name_last" : user.get_last_name(),
-            "handle_str" : user.get_handle()
+            "handle_str" : user.get_handle(),
+            "profile_img_url" : user.get_profile_img_url()
         }
 
     raise Value_Error(description="User cannot be found")
@@ -152,11 +154,8 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     # image's own dimensions
     img_limit = min(image_object.size)
 
-    print(img_limit)
-    print((x_start, x_end))
-    print((y_start, y_end))
-
-    if image_object.format.lower() != "jpeg" and image_object.format.lower() != "jpg":
+    if image_object.format.lower() != "jpeg" and \
+       image_object.format.lower() != "jpg":
         raise Value_Error(description="Invalid file type.")
 
     # check if the start co-ordinates are valid
@@ -174,6 +173,7 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     # check if the image selection is a square
     side1 = x_end - x_start
     side2 = y_end - y_start
+    
     if side1 != side2:
         raise Value_Error(description="Co-ordinate selection is not a square.")
 
@@ -187,24 +187,15 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     return {}
 
 
+
 def users_all(token):
-    permissionGranted = 0
-    users_id = check_valid_token(token)
-    # if the user exists then return a list of all the users!
-    datab = get_data()["users"]
-    # only the global admins should be able to get this data.
-    peep = datab[users_id]
-    if peep.is_global_admin() == True:
-            permissionGranted = 1
-            return datab["users"]
+    # ensure that this is a valid token, we don't need the u_id as
+    # all users can access this
+    check_valid_token(token)
 
-    '''
-    for i in datab["users"]:
-        if users_id == i.get_u_id():
-            if i._global_admin == True:
-                permissionGranted = 1
-                return datab["users"]
-    '''
-
-    if permissionGranted == 0:
-        raise Value_Error("you dont have clearance to access the user details")
+    user_list = []
+    for u_id in get_data()["users"]:
+        user_list.append(user_profile(token, u_id))
+    
+    print(user_list)
+    return {"users" : user_list}

@@ -6,10 +6,10 @@
 import pytest
 from .user import (user_profile_setemail, user_profile_sethandle,
                    user_profile_setname, user_profile,
-                   user_profiles_uploadphoto)
+                   user_profiles_uploadphoto, users_all)
 from .auth import auth_register
-from .database import clear_data
-from .access_error import Value_Error
+from .database import clear_data, get_user
+from .access_error import Value_Error, AccessError
 
 
 #######################################################################
@@ -80,13 +80,6 @@ def test_user_profile_setname():
 ###  USER_PROFILE TESTS HERE ##########################################
 #######################################################################
 
-def verify_info1(user_obj, correct_data):
-    clear_data()
-    # print(message_obj.__dict__)
-    if user_obj.__dict__ == correct_data:
-        return True
-    return False
-
 def test_user_profile1():
     clear_data()
     user1 = auth_register("valid@email.com", "1234567", "Bob", "Jones")
@@ -94,16 +87,20 @@ def test_user_profile1():
     # try to create a valid message
     profile = user_profile(user1["token"], 1)
 
-    # check that the user exists
-    assert profile is not None
-
     # check that the database was correctly updated
     assert profile == {
+        'u_id' : user1["u_id"],
         'email': "valid@email.com",
         'name_first': "Bob",
         'name_last': "Jones",
-        'handle_str': "BobJones"
-        }
+        'handle_str': "BobJones",
+        "profile_img_url" : ""}
+    
+    # try to get the data of a user that does not exist
+    pytest.raises(Value_Error, user_profile, user1["token"], 589)
+
+    # try to get the data of a user with an invalid token
+    pytest.raises(AccessError, user_profile, 589, user1["token"])
 
 
 #######################################################################
@@ -115,24 +112,35 @@ def test_user_profiles_uploadphoto():
 
     user = auth_register("valid@email.com", "1234567890", "John", "Doe")
 
-    # NOTE: for an image with width 200, end co-ordinates must be 199
     sample = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/16x16%2BR.jpg/256px-16x16%2BR.jpg"
 
     # checking for invalid URL
-    pytest.raises(ValueError, user_profiles_uploadphoto, user["token"], "cseunsw.edu.au", 0, 0, 199, 199)
+    pytest.raises(ValueError, user_profiles_uploadphoto, user["token"],
+                  "cseunsw.edu.au", 0, 0, 199, 199)
 
     # checking if coordinates are valid
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, -1, -1, 200, 200)
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, -1, -1, 200, 200)
 
     # checking if cropping area is too big for the image
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 0, 0, 300, 300)
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, 0, 0, 300, 300)
 
     # checking sequentialism
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 20, 20, 10, 10)
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, 20, 20, 10, 10)
 
     # checking if selection is a square
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 0, 0, 199, 179)
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 50, 0, 199, 199)
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, 0, 0, 199, 179)
+    
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, 50, 0, 199, 199)
+    
+    # try to load an image with an invalid type
+    invalid_img = "https://upload.wikimedia.org/wikipedia/commons/1/1b/Square_200x200.png"
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  invalid_img, 0, 0, 199, 199)
 
     # this test should pass with no issue
     assert user_profiles_uploadphoto(user["token"], sample, 0, 0, 199, 199) == {}
@@ -144,7 +152,24 @@ def test_user_profiles_uploadphoto():
 def test_users_all():
     clear_data()
     user1 = auth_register("valid@email.com", "1234567", "Bob", "Jones")
-    user2 = auth_register("valid1@email.com", "11221122", "Sally", "Salmon")
+    auth_register("valid1@email.com", "11221122", "Sally", "Salmon")
 
+    # testing good functionality:
+    assert users_all(user1['token']) == {'users': [
+        {'u_id': 1,
+        'email': 'valid@email.com',
+        'name_first': 'Bob',
+        'name_last': 'Jones',
+        'handle_str': 'BobJones',
+        "profile_img_url" : ""},
+        {'u_id': 2,
+        'email': 'valid1@email.com',
+        'name_first': 'Sally',
+        'name_last': 'Salmon',
+        'handle_str': 'SallySalmon',
+        "profile_img_url" : ""}]}
+    
+    # invalid token test:
+    pytest.raises(Value_Error, users_all, 'fjngnbfdk')
     
 
