@@ -153,6 +153,7 @@ def auth_register(email, password, first_name, last_name):
 
     return {"u_id": u_id, "token": token}
 
+
 def admin_userpermission_change(token, u_id, p_id):
     """
     admin_userpermission_change(token, u_id, permission_id);

@@ -26,7 +26,7 @@ class User:
         self._handle = first_name + last_name
         self._global_admin = global_admin
         self._slackr_owner = False
-        self._profile_img_url = ""
+        self._profile_img_url = "static/profile_images/default.jpg"
 
     def get_user_data(self):
         return {
