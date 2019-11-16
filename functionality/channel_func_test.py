@@ -468,8 +468,8 @@ def test_channels_listall():
         }
     ]}
 
-    # ensure that channels_listall shows private channels that you do not belong
-    # to
+    # ensure that channels_listall does not show private channels that
+    # you do not belong to
     assert channels_listall(user2["token"]) == {"channels" : [
         {
             "channel_id" : channel1["channel_id"],
@@ -478,10 +478,6 @@ def test_channels_listall():
         {
             "channel_id" : channel2["channel_id"],
             "name" : "Channel 2"
-        },
-        {
-            "channel_id" : channel3["channel_id"],
-            "name" : "Channel 3"
         }
     ]}
 
