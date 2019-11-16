@@ -131,4 +131,4 @@ frontend/prebundle/config.js
 db_dump.p
 
 # ignore files in the profile images folder
-/profile_images/*.jpg
+static/profile_images/*.jpg

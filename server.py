@@ -28,6 +28,7 @@ def default_handler(err):
     return response
 
 
+PORT = 5000
 APP = Flask(__name__)
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(HTTPException, default_handler)
@@ -85,6 +86,7 @@ def user_logout():
     dumpstring = auth.auth_logout(token)
     return dumps(dumpstring)
 
+
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
     email = request.form.get('email')
@@ -93,6 +95,7 @@ def email_request():
     email_status = send_code(email, reset_code)
 
     return dumps(email_status)
+
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
 def email_reset():
@@ -105,8 +108,8 @@ def email_reset():
 @APP.route('/channel/invite', methods=['POST'])
 def channel_invite_e():
     token = request.form.get('token')
-    channel_id = request.form.get('channel_id')
-    u_id = request.form.get('u_id')
+    channel_id = int(request.form.get('channel_id'))
+    u_id = int(request.form.get('u_id'))
     dumpstring = channel.channel_invite(token, channel_id, u_id)
     return dumps(dumpstring)
 
@@ -116,7 +119,7 @@ def channel_details_e():
     token = request.args.get('token')
     channel_id = int(request.args.get('channel_id'))
     print(token, channel_id)
-    dumpstring = channel.channel_details(token, channel_id)
+    dumpstring = channel.channel_details(token, channel_id, live_str=f"http://localhost:{PORT}/")
     return dumps(dumpstring)
 
 
@@ -247,7 +250,8 @@ def run_user_profile():
     """
     request_data = request.args
     return_value = user.user_profile(request_data["token"],
-                                     int(request_data["u_id"]))
+                                     int(request_data["u_id"]),
+                                     live_str=f"http://localhost:{PORT}/")
 
     return dumps(return_value)
 
@@ -365,9 +369,10 @@ def run_profile_sethandle():
     return dumps(return_value)
 
 
-@APP.route('/user/profile/uploadphoto', methods=["POST"])
+@APP.route('/user/profiles/uploadphoto', methods=["POST"])
 def run_profile_uploadphoto():
     request_data = request.form
+
     return_value = user.user_profiles_uploadphoto(
         request_data["token"],
         request_data["img_url"],
@@ -428,29 +433,24 @@ def run_admin_userpermission_change():
     return dumps(return_value)
 
 
-@APP.route('/users/all', methods=["GET"])
-def run_users_all():
-    request_data = request.args
-    return_value = user.users_all(request_data["token"])
-    
-    return dumps(return_value)
-
-
 @APP.route('/standup/active', methods=["GET"])
 def run_standup_active():
     # to suppress errors just always return an inactive standup
     return dumps({"is_active" : False, "time_finish" : None})
 
+
 @APP.route('/users/all', methods=['GET'])
 def run_users_all():
     token = request.args.get('token')
-    dumpstring = user.users_all(token)
+    dumpstring = user.users_all(token, live_str=f"http://localhost:{PORT}/")
     return dumps(dumpstring)
+
 
 if __name__ == '__main__':
     database.clear_data()
 
-    APP.run(port=(sys.argv[1] if len(sys.argv) > 1 else 5000))
+    PORT = sys.argv[1] if len(sys.argv) > 1 else 5000
+    APP.run(port=PORT)
 
     # when the server exists dump the current database into a file
     atexit.register(database.save_data)

@@ -96,10 +96,12 @@ def user_profile_setname(token, name_first, name_last):
     return {}
 
 
-def user_profile(token, u_id):
+def user_profile(token, u_id, live_str=""):
     """
     Taking a u_id return the user data of its associated user, if the
-    user does not exist raise a Value_Error
+    user does not exist raise a Value_Error. live_str is a string repre
+    -senting the localhost when we are live, during testing it should
+    not be touched
     """
 
     server_data = get_data()
@@ -117,7 +119,7 @@ def user_profile(token, u_id):
             "name_first" : user.get_first_name(),
             "name_last" : user.get_last_name(),
             "handle_str" : user.get_handle(),
-            "profile_img_url" : user.get_profile_img_url()
+            "profile_img_url" : live_str + user.get_profile_img_url()
         }
 
     raise Value_Error(description="User cannot be found")
@@ -179,7 +181,7 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
 
     cropped = image_object.crop((x_start, y_start, x_end, y_end))
 
-    img_url = f'profile_images/{u_id}.jpg'
+    img_url = f'static/profile_images/{u_id}.jpg'
     cropped.save(img_url, "JPEG")
 
     get_user(u_id).set_profile_img_url(img_url)
@@ -188,14 +190,17 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
 
 
 
-def users_all(token):
+def users_all(token, live_str=""):
+    # live_str is a string that represents the path to the server
+    # when live, during testing it should be blank
+
     # ensure that this is a valid token, we don't need the u_id as
     # all users can access this
     check_valid_token(token)
 
     user_list = []
     for u_id in get_data()["users"]:
-        user_list.append(user_profile(token, u_id))
+        user_list.append(user_profile(token, u_id, live_str))
     
     print(user_list)
     return {"users" : user_list}
