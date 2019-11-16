@@ -12,6 +12,7 @@ from .database import (is_email_valid, check_email_database, check_valid_token,
                        get_data, get_user, is_handle_in_use)
 from .access_error import AccessError, Value_Error
 
+
 def user_profile_setemail(token, email):
     """
     user_profile_setemail(token, email);
@@ -34,6 +35,7 @@ def user_profile_setemail(token, email):
 
     return {}
 
+
 def user_profile_sethandle(token, handle_str):
     """
     user_profile_sethandle(token, handle_str);
@@ -50,7 +52,7 @@ def user_profile_sethandle(token, handle_str):
 
     # check the database for handles in use
     if is_handle_in_use(handle_str):
-        raise ValueError(description="Handle is already in use.")
+        raise Value_Error(description="Handle is already in use.")
 
     # check if the token is valid and decode it
     u_id = check_valid_token(token)
@@ -60,11 +62,12 @@ def user_profile_sethandle(token, handle_str):
 
     return {}
 
+
 def user_profile_setname(token, name_first, name_last):
     """
     user_profile_setname(token, name_first, name_last);
     return {}
-    Exception: ValueError when:
+    Exception: Value_Error when:
         - name_first is more than 50 characters,
         - name_last is more than 50 characters
     Description: Update the authorised user's first and last name
@@ -92,6 +95,7 @@ def user_profile_setname(token, name_first, name_last):
 
     return {}
 
+
 def user_profile(token, u_id):
     """
     Taking a u_id return the user data of its associated user, if the
@@ -116,60 +120,74 @@ def user_profile(token, u_id):
 
     raise Value_Error(description="User cannot be found")
 
+
 def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     """
-    user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end);
+    user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,
+                              y_end);
     return {}
-    Exception: ValueError when:
+    Exception: Value_Error when:
         - img_url is returns an HTTP status other than 200,
-        - x_start, y_start, x_end, y_end are all within the                   dimensions of the image at the URL.
-    Description: Given a URL of an image on the internet, crops the image within bounds (x_start, y_start) and (x_end, y_end). Position (0,0) is the top left.
+        - x_start, y_start, x_end, y_end are all within the dimensions
+          of the image at the URL.
+    Description: Given a URL of an image on the internet, crops the
+        image within bounds (x_start, y_start) and (x_end, y_end).
+        Position (0,0) is the top left.
     """
 
     # check if the token is valid and decode it
     u_id = check_valid_token(token)
 
-    # just to suppress the error form pylint
+    # just to suppress the error from pylint
     assert u_id is not None
 
     # check that the URL is actually open for reading
     if urllib.request.urlopen(img_url).getcode() != 200:
-        raise ValueError(description="The URL is not working at the moment!")
+        raise Value_Error(description="The URL is not working at the moment!")
 
-    local_filename, headers = urllib.request.urlretrieve(img_url)
-    imageObject = Image.open(local_filename)
-    IMG_LIMIT = min(imageObject.size)
+    local_filename, _ = urllib.request.urlretrieve(img_url)
+    image_object = Image.open(local_filename)
 
-    # TODO: Check if the image is a valid file
-    if imageObject.info["filetype"] != JPEG:
-        raise ValueError(description="Invalid file type.")
+    # set the max size of the image to the smaller of the
+    # image's own dimensions
+    img_limit = min(image_object.size)
+
+    print(img_limit)
+    print((x_start, x_end))
+    print((y_start, y_end))
+
+    if image_object.format.lower() != "jpeg" and image_object.format.lower() != "jpg":
+        raise Value_Error(description="Invalid file type.")
 
     # check if the start co-ordinates are valid
-    if x_start < 0 or y_start < 0 or x_start >= IMG_LIMIT or y_start >= IMG_LIMIT:
-        raise ValueError(description="Start co-ordinates out of bounds.")
+    if not 0 <= x_start < img_limit or not 0 <= y_start < img_limit:
+        raise Value_Error(description="Start co-ordinates out of bounds.")
 
     # check if the end co-ordinates are valid
-    if x_end <= 0 or y_end <= 0 and x_end > IMG_LIMIT and y_end > IMG_LIMIT:
-        raise ValueError(description="End co-ordinates out of bounds.")
+    if not 0 < x_end <= img_limit or not 0 < y_end <= img_limit:
+        raise Value_Error(description="End co-ordinates out of bounds.")
 
     # check if co-ordinates are sequential
-    if x_start >= x_end or x_end <= x_start or y_start >= y_end or y_end <= y_start:
-        raise ValueError(description="Co-ordinates are not sequential.")
+    if x_start >= x_end or y_start >= y_end:
+        raise Value_Error(description="Co-ordinates are not sequential.")
 
     # check if the image selection is a square
     side1 = x_end - x_start
     side2 = y_end - y_start
     if side1 != side2:
-        raise ValueError(description="Co-ordinate selection is not a square.")
+        raise Value_Error(description="Co-ordinate selection is not a square.")
 
-    cropped = imageObject.crop(x_start, y_start, x_end, y_end)
-    cropped.save(u_id + ".jpg", "JPEG")
+    cropped = image_object.crop((x_start, y_start, x_end, y_end))
 
-    get_user(u_id).set_profile_img_url(cropped)
+    img_url = f'profile_images/{u_id}.jpg'
+    cropped.save(img_url, "JPEG")
+
+    get_user(u_id).set_profile_img_url(img_url)
     
     return {}
 
-def users_all():
+
+def users_all(token):
     permissionGranted = 0
     users_id = check_valid_token(token)
     # if the user exists then return a list of all the users!
@@ -189,4 +207,4 @@ def users_all():
     '''
 
     if permissionGranted == 0:
-        raise ValueError("you dont have clearance to access the user details")
+        raise Value_Error("you dont have clearance to access the user details")

@@ -303,13 +303,12 @@ def search(token, query_str):
     search(token, query_str);
     return {messages}
     Exception: N/A
-    Description: Given a query string, return a collection of messages that match the query
+    Description: Given a query string, return a collection of messages
+    that match the query
     """
-    # call the database
-    server_data = get_data()
-
     # check if the token is valid and decode it
     u_id = check_valid_token(token)
+    user = get_user(u_id)
 
     # suppress pylint error
     assert u_id is not None
@@ -326,7 +325,14 @@ def search(token, query_str):
         channel = get_channel(channel_id)
 
         for message in channel.get_messages():
-            if query_str in message:
-                message_match["messages"].append(message)
+            if query_str in message.get_text():
+                message_match["messages"].append({
+                    "message_id" : message.get_m_id(),
+                    "u_id" : message.get_u_id(),
+                    "message" : message.get_text(),
+                    "time_created" : message.get_time_sent(),
+                    "reacts" : message.get_reacts_frontend(u_id),
+                    "is_pinned" : message.is_pinned()
+                })
 
     return message_match

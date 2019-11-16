@@ -26,22 +26,23 @@ def test_standup_start():
     dev_time = 5
 
     predicted_finish_time = datetime.now() + timedelta(seconds=dev_time)
-    finish_time = standup_start(user["token"], channel["channel_id"])
+    finish_time = standup_start(user["token"], channel["channel_id"], dev_time)
 
     assert predicted_finish_time - finish_time <= timedelta(6)
 
     # returns a Value_Error if the channel doesn't exist
-    pytest.raises(Value_Error, standup_start, user["token"], "not_a_real_channel")
+    pytest.raises(Value_Error, standup_start, user["token"],
+                  "not_a_real_channel", dev_time)
 
     # returns an AccessError if the user does not have perms
-    pytest.raises(AccessError, standup_start, user2["token"], channel["channel_id"])
+    pytest.raises(AccessError, standup_start, user2["token"],
+                  channel["channel_id"], dev_time)
 
 #######################################################################
 ###  STANDUP_SEND TESTS HERE ##########################################
 #######################################################################
 
 def test_standup_send():
-
     clear_data()
 
     dev_time = 5
@@ -54,10 +55,11 @@ def test_standup_send():
     predicted_finish = datetime.now() + timedelta(seconds=dev_time + 1)
 
     # start the standup
-    threading.Thread(target=standup_start, args=(user["token"], channel["channel_id"])).start()
+    threading.Thread(target=standup_start, args=(user["token"],
+                     channel["channel_id"], dev_time)).start()
 
     # this test should pass with no issue
-    assert standup_send(user["token"], channel["channel_id"], "message") is None
+    assert standup_send(user["token"], channel["channel_id"], "message") == {}
 
     # raises a Value_Error if channel does not exist
     pytest.raises(Value_Error, standup_send, user["token"], "not_a_real_channel", "message")
@@ -90,11 +92,13 @@ def test_standup_active():
     predicted_finish = datetime.now() + timedelta(seconds=dev_time + 1)
 
     # start the standup
-    threading.Thread(target=standup_start, args=(user["token"], channel["channel_id"])).start()
+    threading.Thread(target=standup_start, args=(user["token"],
+                     channel["channel_id"], dev_time)).start()
 
     # this test should pass with no issue
-    assert standup_active(user["token"], channel["channel_id"]) == \
-    {"is_active" : True, "time_finish" : predicted_finish}
+    new_standup = standup_active(user["token"], channel["channel_id"])
+    assert new_standup["is_active"]
+    assert new_standup["time_finish"] - predicted_finish <= timedelta(seconds=1)
 
     # raises a Value_Error if channel does not exist
     pytest.raises(Value_Error, standup_active, user["token"], "not_a_real_channel")
@@ -104,4 +108,4 @@ def test_standup_active():
         continue
 
     assert standup_active(user["token"], channel["channel_id"]) == \
-    {"is_active" : None, "time_finish" : None}
+    {"is_active" : False, "time_finish" : None}

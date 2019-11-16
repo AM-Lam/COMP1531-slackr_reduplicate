@@ -27,6 +27,7 @@ def get_message_text(channel_id, m_id):
     message = channel.get_message(m_id)
     return message.get_text()
 
+
 # put all the setup like create account and channel for the test in this function
 def setup():
     clear_data()
@@ -299,33 +300,43 @@ def test_search_basic():
 
     user1 = auth_register("valid@email.com", "1234567890", "John", "Doe")
     user2 = auth_register("valid2@email.com", "0123456789", "John", "Bobs")
+    user3 = auth_register("valid3@email.com", "0123456789", "Bob", "Daniels")
 
     # public channel for testing
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+    channel1 = channels_create(user1["token"], "Channel 1", True)
     # private channel for testing
-    channel_id = channels_create(user2["token"], "Channel 2", False)
+    channel2 = channels_create(user2["token"], "Channel 2", False)
 
     # try to create a valid message
-    message_1 = message_send(user1["token"], "Channel 1", "hello there")
+    message_send(user1["token"], channel1["channel_id"], "hello there")
+    
     # try to create a message in a private chat
-    message_2 = message_send(user2["token"], "Channel 2", "whats this")
+    message_send(user2["token"], channel2["channel_id"], "whats this")
 
+
+    # just checking for message length right now because it's faster
     # find all the matching messages
-    assert search(user1["token"], "hello") == {"messages": [message_1]}
+    assert len(search(user1["token"], "hello")["messages"]) == 1
 
-    # user1 does not have access so they can't access the messages
-    assert search(user1["token"], "this") == {}
+    # user3 does not have access so they can't access the messages,
+    # (user1 does as they are a global admin)
+    assert len(search(user3["token"], "this")["messages"]) == 0
 
     # but user2 can access those messages
-    assert search(user2["token"], "this") == {"messages": [message_2]}
+    assert len(search(user2["token"], "this")["messages"]) == 1
 
-    # return nothing if the query string is nothing
-    assert search(user1["token"], "") == {}
+    # return nothing if the query string is in no messages
+    assert len(search(user1["token"], "xxx")["messages"]) == 0
 
     # if query string is a space, return almost anything
-    assert search(user2["token"], " ") == {"messages": [message_1, message_2]}
+    assert len(search(user2["token"], " ")["messages"]) == 1
+
+    # check that a global admin can access messages in all channels
+    assert len(search(user1["token"], " ")["messages"]) == 2
+
 
 # common test case applied to more than one fucntion
+
 
 def test_no_message():
     set_up = list(setup())

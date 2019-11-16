@@ -4,18 +4,19 @@ Functions that relate to standup functionality.
 
 import jwt
 import time
-from datetime import *
-from .message import *
-from .database import *
-from .access_error import *
+from datetime import datetime, timedelta
+from .message import message_send
+from .database import get_channel, check_valid_token, is_user_member
+from .access_error import AccessError, Value_Error
 
 MESSAGE_STANDUP = ""
+
 
 def standup_start(token, channel_id, length):
     """
     standup_start(token, channel_id, length);
     return {time_finish}
-    Exception: ValueError when:
+    Exception: Value_Error when:
         - Channel (based on ID) does not exist,
         - An active standup is currently running in this channel
     AccessError when:
@@ -51,6 +52,7 @@ def standup_start(token, channel_id, length):
     # wait until the standup finishes, then send the message
     while datetime.now() <= time_finish:
         time.sleep(1)
+    
     get_channel(channel_id).set_standup(None)
     message_send(token, channel_id, MESSAGE_STANDUP)
 
@@ -63,7 +65,7 @@ def standup_send(token, channel_id, message):
     """
     standup_send(token, channel_id, message);
     return {}
-    Exception: ValueError when:
+    Exception: Value_Error when:
         - Channel (based on ID) does not exist,
         - Message is more than 1000 characters,
     AccessError when:
@@ -71,6 +73,8 @@ def standup_send(token, channel_id, message):
         - If the standup time has stopped
     Description: Sending a message to get buffered in the standup queue, assuming a standup is currently active
     """
+
+    global MESSAGE_STANDUP
 
     # check if the token is valid and decode it
     u_id = check_valid_token(token)
@@ -84,22 +88,23 @@ def standup_send(token, channel_id, message):
 
     # check if the message meets length requirements
     if len(message) > 1000:
-        raise ValueError(description="Message is too long.")
+        raise Value_Error(description="Message is too long.")
 
     # check if there is an active standup session
     if get_channel(channel_id).get_standup() == None:
         raise AccessError(description="There are no active standups.")
 
     # TODO: check if this works
-    MESSAGE_STANDUP += str(u_id), ": ", str(message)
+    MESSAGE_STANDUP += f'{u_id} : {message}'
 
     return {}
+
 
 def standup_active(token, channel_id):
     """
     standup/active(token, channel_id);
     return { is_active, time_finish }
-    Exception: ValueError when:
+    Exception: Value_Error when:
         - Channel ID is not a valid channel
     Description: For a given channel, return whether a standup is active in it, and what time the standup finishes. If no standup is active, then time_finish returns None
     """

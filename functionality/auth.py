@@ -12,8 +12,9 @@ import string
 import jwt
 from .database import (is_email_valid, get_data, check_email_database,
                        get_secret, User, u_id_from_email, get_user,
-                       u_id_from_email_reset, check_reset_code)
-from .access_error import Value_Error
+                       u_id_from_email_reset, check_reset_code,
+                       check_valid_token)
+from .access_error import AccessError, Value_Error
 
 
 def auth_login(email, password):
@@ -150,11 +151,13 @@ def auth_register(email, password, first_name, last_name):
     # adding the person to the user dictionary.
     update_data['users'][u_id] = person
 
+    return {"u_id": u_id, "token": token}
+
 def admin_userpermission_change(token, u_id, p_id):
     """
     admin_userpermission_change(token, u_id, permission_id);
     return {}
-    Exception: ValueError when:
+    Exception: Value_Error when:
         - u_id does not refer to a valid user,
         - permission_id does not refer to a value permission,
     AccessError when:
@@ -177,19 +180,19 @@ def admin_userpermission_change(token, u_id, p_id):
         if u.get_u_id() == request_u_id:
             request_user = u
 
-    # raise a ValueError if either user can't be found
+    # raise a Value_Error if either user can't be found
     if user == None:
-        raise ValueError(description="u_id does not refer to a real user")
+        raise Value_Error(description="u_id does not refer to a real user")
     elif request_user == None:
-        raise ValueError(description="Request does not come from a real user")
+        raise Value_Error(description="Request does not come from a real user")
 
     # raise an AccessError if the requesting user cannot use this function
     if not (request_user.is_global_admin() or request_user.is_slackr_owner()):
         raise AccessError(description="You do not have permissions to do this")
 
-    # raise a ValueError if the given permission ID is not valid
+    # raise a Value_Error if the given permission ID is not valid
     if not (1 <= p_id <= 3):
-        raise ValueError(description=f"{p_id} is not a valid permission id")
+        raise Value_Error(description=f"{p_id} is not a valid permission id")
     
     # global admins cannot change the perms of slackr owners
     if not request_user.is_slackr_owner() and user.is_slackr_owner():
