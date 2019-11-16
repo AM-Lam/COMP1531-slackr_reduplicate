@@ -129,3 +129,6 @@ frontend/prebundle/config.js
 
 # database dump
 db_dump.p
+
+# ignore files in the profile images folder
+/profile_images/*.jpg

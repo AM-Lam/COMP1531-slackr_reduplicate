@@ -17,7 +17,7 @@ SECRET = "AVENGERS_SOCKS"
 
 
 class User:
-    def __init__(self, u_id, first_name, last_name, password, email, global_admin=False):
+    def __init__(self, u_id, first_name, last_name, password, email, global_admin=False, profile_img_url=None):
         self._u_id = u_id
         self._first_name = first_name
         self._last_name = last_name
@@ -26,7 +26,7 @@ class User:
         self._handle = first_name + last_name
         self._global_admin = global_admin
         self._slackr_owner = False
-
+        self._profile_img_url = None
 
     def get_user_data(self):
         return {
@@ -36,6 +36,7 @@ class User:
             "password" : self._password,
             "email" : self._email,
             "handle" : self._handle,
+            "profile_img_url" : self._profile_img_url
         }
 
     def update_id(self, new_id):
@@ -59,9 +60,12 @@ class User:
     def set_global_admin(self, admin):
         self._global_admin = admin
 
+    def set_profile_img_url(self, img_url):
+        self._profile_img_url = img_url
+
     def set_slackr_owner(self, owner):
         self._slackr_owner = owner
-
+        
     def get_u_id(self):
         return self._u_id
 
@@ -158,6 +162,9 @@ class Channel:
 
     def get_m_id(self):
         return self._message_id_max
+
+    def get_standup(self):
+        return self._standup
 
     def get_pins(self):
         return self._pinned_messages
