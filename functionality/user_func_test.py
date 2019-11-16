@@ -73,12 +73,6 @@ def test_user_profile_setname(users, channels):
 ###  USER_PROFILE TESTS HERE ##########################################
 #######################################################################
 
-def verify_info1(user_obj, correct_data):
-    clear_data()
-    # print(message_obj.__dict__)
-    if user_obj.__dict__ == correct_data:
-        return True
-    return False
 
 @setup_data(user_num=1)
 def test_user_profile1(users, channels):
