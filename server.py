@@ -119,7 +119,7 @@ def channel_details_e():
     token = request.args.get('token')
     channel_id = int(request.args.get('channel_id'))
     print(token, channel_id)
-    dumpstring = channel.channel_details(token, channel_id)
+    dumpstring = channel.channel_details(token, channel_id, live_str=f"http://localhost:{PORT}/")
     return dumps(dumpstring)
 
 

@@ -37,9 +37,11 @@ def channel_addowner(token, channel_id, u_id):
 
 
 
-def channel_details(token, channel_id):
+def channel_details(token, channel_id, live_str=""):
     """
-    Select a channel by id and return its details.
+    Select a channel by id and return its details. live_str is only
+    supplied when the server is running and provides a path to the
+    directory where images are held.
     """
     u_id = check_valid_token(token)
 
@@ -55,7 +57,8 @@ def channel_details(token, channel_id):
     channel_members = [{
         "u_id" : users[u_id].get_u_id(),
         "name_first" : users[u_id].get_first_name(),
-        "name_last" : users[u_id].get_last_name()
+        "name_last" : users[u_id].get_last_name(),
+        "profile_img_url" : live_str + users[u_id].get_profile_img_url()
     } for u_id in channel_members]
 
     # do the same thing with the channel owners
@@ -63,7 +66,8 @@ def channel_details(token, channel_id):
     channel_owners = [{
         "u_id" : users[u_id].get_u_id(),
         "name_first" : users[u_id].get_first_name(),
-        "name_last" : users[u_id].get_last_name()
+        "name_last" : users[u_id].get_last_name(),
+        "profile_img_url" : live_str + users[u_id].get_profile_img_url()
     } for u_id in channel_owners]
 
     return {"name" : channel.get_name(),
