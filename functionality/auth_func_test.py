@@ -1,10 +1,13 @@
-import pytest
+# pylint: disable=C0114
+# pylint: disable=C0116
+
+
 import hashlib
-import re
+import pytest
 from .database import clear_data, get_data, get_user
 from .auth import (auth_login, auth_register, auth_logout,
                    auth_passwordreset_request, auth_passwordreset_reset)
-from .access_error import AccessError, Value_Error
+from .access_error import Value_Error
 
 
 ############################################################################################################################
@@ -44,20 +47,22 @@ def test_auth_logout2():
 
 @boiler_setup
 def test_auth_logout3():
+    # pylint: disable=W0612
+
     # invalid token test should fail
     tokenlog = "invalid"
     pytest.raises(Value_Error, auth_logout, tokenlog)
 
 
-############################################################################################################################
-###  LOGIN TESTS HERE ######################################################################################################
-############################################################################################################################
+###############################################################################
+###  LOGIN TESTS HERE #########################################################
+###############################################################################
 
 @boiler_setup
 def test_login1():
     # simple test to make sure login works overall
     # what if the email and password combo is valid? -->
-    dictio = auth_login('user1@domain.com' ,'passew@321')
+    dictio = auth_login('user1@domain.com', 'passew@321')
     assert dictio['token'] is not None
     assert dictio['u_id'] is not None
 
@@ -78,18 +83,22 @@ def test_login2():
 def test_login3():
     # test should fail if password is wrong or not of correct length!
     # what if the password does not have Enough characters? -->
-    pytest.raises(Value_Error, auth_login, 'user1@domain.com' , 'pas31')
+    pytest.raises(Value_Error, auth_login, 'user1@domain.com', 'pas31')
     # what if the password field was just left empty> -->
-    pytest.raises(Value_Error, auth_login, 'user1@domain.com' , '')
+    pytest.raises(Value_Error, auth_login, 'user1@domain.com', '')
     # what is password has a valid length but is incorrect? -->
     pytest.raises(Value_Error, auth_login, 'user1@domain.com' , 'passwordisthis')
     # what if the password exists on the server but is not correctly matched to the provided email -->
     pytest.raises(Value_Error, auth_login, 'user3@domain.com.au' , 'passew@321')
 
+    # what if the password exists on the server but is not correctly
+    # matched to the provided email
+    pytest.raises(Value_Error, auth_login, 'user3@domain.com', 'passew@321')
 
-############################################################################################################################
-###  REGISTER TESTS HERE ###################################################################################################
-############################################################################################################################
+
+###############################################################################
+###  REGISTER TESTS HERE ######################################################
+###############################################################################
 
 @boiler_setup
 def test_register1():
@@ -118,31 +127,31 @@ def test_register4():
     pytest.raises(Value_Error, auth_register, 'user7@domain.com', 'pew', 'user', 'a')
 
 
-############################################################################################################################
-### PASSWORD RESET REQUEST TESTS HERE ######################################################################################
-############################################################################################################################
+###############################################################################
+### PASSWORD RESET REQUEST TESTS HERE #########################################
+###############################################################################
 
 @boiler_setup
 def test_reset_request():
     # testing if the code is generated and stored successfully!
     ## cant test email send since send email send code has been moved to server.py i.e. flask.
     update_data = get_data()
-    reset_code = auth_passwordreset_request('user1@domain.com')
-    assert(update_data["reset"][reset_code]) == 'user1@domain.com'
+    reset_code = auth_passwordreset_request('deadthundersquirrels@gmail.com')
+    assert(update_data["reset"][reset_code]) == 'deadthundersquirrels@gmail.com'
 
 
-############################################################################################################################
-### PASSWORD RESET RESET TESTS HERE ########################################################################################
-############################################################################################################################
+###############################################################################
+### PASSWORD RESET RESET TESTS HERE ###########################################
+###############################################################################
 
 @boiler_setup
 def test_reset_reset1():
     # raise errors if the reset code is incorrect.
     auth_passwordreset_request('user1@domain.com')
     #-> invalid codes being passed in!
-    pytest.raises(Value_Error, auth_passwordreset_reset, "INVALID-CODE" , 'abcdefgh')
+    pytest.raises(Value_Error, auth_passwordreset_reset, "INVALID-CODE", 'abcdefgh')
     #->password not strong
-    pytest.raises(Value_Error, auth_passwordreset_reset, "123@!@" , 'ab')
+    pytest.raises(Value_Error, auth_passwordreset_reset, "123@!@", 'ab')
 
 @boiler_setup
 def test_reset_reset2():
@@ -152,11 +161,10 @@ def test_reset_reset2():
     # now reset the password.
     auth_passwordreset_reset(reset_code, 'abcdefgh')
     hashed_pass = (hashlib.sha256('abcdefgh'.encode()).hexdigest())
-    
+
     all_users = get_data()["users"]
     for u_id in all_users:
         user = get_user(u_id)
         if user.get_email() == 'user1@domain.com':
             assert user.get_password() == hashed_pass
             break
-
