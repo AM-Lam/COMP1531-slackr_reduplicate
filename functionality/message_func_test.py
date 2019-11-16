@@ -7,12 +7,12 @@ import pytest
 from .database import get_data, clear_data, get_channel, get_user
 from .decorators import setup_data
 from .auth import auth_register
-from .channel import channel_join, channels_create
+from .channel import channel_join, channels_create, channel_removeowner
 from .message import (message_edit, message_send, message_remove, message_pin,
                       message_react, message_sendlater, message_unpin,
                       message_unreact, search)
 from .access_error import AccessError, Value_Error
-
+from .decorators import setup_data
 
 # Helper Functions
 def verify_message(message_obj, correct_data):
@@ -26,7 +26,6 @@ def get_message_text(channel_id, m_id):
     message = channel.get_message(m_id)
     return message.get_text()
 
-
 #######################################################################
 ###  MESSAGE_SEND TESTS HERE #########################################
 #######################################################################
@@ -37,9 +36,6 @@ def test_message_send_basic(users, channels):
     # try to create a valid message
     message_1 = message_send(users[0]["token"], channels[0]["channel_id"],
                              "Hello")
-
-    # check that the database was correctly updated
-    assert verify_message(message_1, {"message_id" : 1})
 
     # the user is not a member in the group
     pytest.raises(AccessError, message_send, users[1]["token"],
@@ -56,7 +52,6 @@ def test_message_send_basic(users, channels):
 #######################################################################
 ###  MESSAGE_REMOVE TESTS HERE ########################################
 #######################################################################
-
 
 @setup_data(user_num=1, channel_num=1)
 def test_message_remove(users, channels):
@@ -131,6 +126,9 @@ def test_message_edit(users, channels):
     pytest.raises(Value_Error, message_edit, users[0]["token"], 10101,
                   "Hello There")
 
+    # # non-existent channel
+    # pytest.raises(Value_Error, message_edit, user1["token"], message1['message_id'], "Message")
+
     # try to edit a message we do not own as a global admin
     user2_obj.set_global_admin(True)
 
@@ -166,10 +164,18 @@ def test_message_pin(users, channels):
     pytest.raises(Value_Error, message_pin, users[1]["token"],
                   message2["message_id"])
 
+    # the message is pinned
+    pytest.raises(Value_Error, message_pin, user1, message_1['message_id'])
 
 #######################################################################
 ###  MESSAGE_UNPIN TESTS HERE #########################################
 #######################################################################
+# check if the basic functionality of message_unpin works or not
+@setup_data(user_num=2, channel_num=1)
+def test_message_unpin_basic(users, channels):
+    user1 = users[0]["token"]
+    user2 = users[1]["token"]
+    channel_id = channels[0]["channel_id"]
 
 
 @setup_data(user_num=2, channel_num=1)
@@ -196,6 +202,9 @@ def test_message_unpin(users, channels):
 #######################################################################
 ###  MESSAGE_REACT TESTS HERE #########################################
 #######################################################################
+# check if the basic functionality of message_react works or not
+@setup_data(user_num=1, channel_num=1)
+def test_message_react_basic(users, channels):
 
 
 @setup_data(user_num=2, channel_num=1)
@@ -267,6 +276,10 @@ def test_message_sendlater(users, channels):
     pytest.raises(Value_Error, message_sendlater, users[0]["token"],
                   channels[0]["channel_id"], "X" * 1001,
                   datetime.now() + timedelta(minutes=1))
+
+    # user is not a member in the channel
+    pytest.raises(AccessError, message_sendlater, user2,
+                   channel, "Message", datetime.now() + timedelta(minutes=1))
 
     # time sent is in the past
     pytest.raises(Value_Error, message_sendlater, users[0]["token"],
