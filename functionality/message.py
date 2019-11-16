@@ -100,6 +100,9 @@ def message_edit(token, message_id, message):
         except Value_Error:
             continue
 
+    if channel is None:
+        raise Value_Error(description="Channel does not exist")
+
     if to_edit is None:
         raise Value_Error(description="Message does not exist")
 
@@ -134,6 +137,9 @@ def message_remove(token, message_id):
         except Value_Error:
             continue
 
+    if channel is None:
+        raise Value_Error(description="Channel does not exist")
+
     if message is None:
         raise Value_Error(description="Message does not exist")
 
@@ -166,6 +172,9 @@ def message_pin(token, message_id):
             break
         except Value_Error:
             continue
+
+    if channel is None:
+        raise Value_Error(description="Channel does not exist")
 
     if message is None:
         raise Value_Error(description="Message does not exist")
@@ -203,6 +212,9 @@ def message_unpin(token, message_id):
         except Value_Error:
             continue
 
+    if channel is None:
+        raise Value_Error(description="Channel does not exist")
+
     if message is None:
         raise Value_Error(description="Message does not exist")
 
@@ -234,6 +246,9 @@ def message_react(token, message_id, react_id):
             break
         except Value_Error:
             continue
+
+    if channel is None:
+        raise Value_Error(description="Channel does not exist")
 
     if message is None:
         raise Value_Error(description="Message does not exist")
@@ -267,6 +282,9 @@ def message_unreact(token, message_id, react_id):
             break
         except Value_Error:
             continue
+
+    if channel is None:
+        raise Value_Error(description="Channel does not exist")
 
     if message is None:
         raise Value_Error(description="Message does not exist")
