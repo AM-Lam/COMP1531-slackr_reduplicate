@@ -85,9 +85,6 @@ def test_user_profile1(users, channels):
     # try to create a valid message
     profile = user_profile(users[0]["token"], 1)
 
-    # check that the user exists
-    assert profile is not None
-
     # check that the database was correctly updated
     assert profile == {
         'email': "user1@valid.com",

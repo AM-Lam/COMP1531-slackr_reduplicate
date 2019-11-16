@@ -53,7 +53,7 @@ def test_channel_addowner(users, channels):
 ###  CHANNEL_DETAILS TESTS HERE ###############################################
 ###############################################################################
 
-@setup_data(user_num=3, channel_num=1)
+@setup_data(user_num=4, channel_num=1)
 def test_channel_details(users, channels):
     # what if the channel does not exist?
     invalid_channel = 999
@@ -90,13 +90,17 @@ def test_channel_details(users, channels):
         {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1'},
         {'u_id': 2, 'name_first': 'user2', 'name_last': 'last2'},
         {'u_id': 3, 'name_first': 'user3', 'name_last': 'last3'}]
+    
+    # try to get the details of a channel we do not have access to
+    pytest.raises(AccessError, channel_details, users[3]["token"],
+                  channels[0]["channel_id"])
 
 
 ###############################################################################
 ###  CHANNEL_INVITE TESTS HERE ################################################
 ###############################################################################
 
-@setup_data(user_num=2, channel_num=1)
+@setup_data(user_num=3, channel_num=1)
 def test_channel_invite(users, channels):
     # test if the user is invalid.
     with pytest.raises(Value_Error , match=r"*"):
@@ -126,6 +130,10 @@ def test_channel_invite(users, channels):
     # Value_Error
     with pytest.raises(Value_Error , match=r"*"):
         channel_invite(users[0]["token"], "does not exist", users[1]["u_id"])
+    
+    # try to invite a user to a channel that we are not an owner of
+    pytest.raises(AccessError, channel_invite, users[1]["token"],
+                  channels[0]["channel_id"], users[2]["u_id"])
 
 
 ###############################################################################

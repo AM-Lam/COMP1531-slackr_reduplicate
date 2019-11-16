@@ -26,7 +26,7 @@ class User:
         self._handle = first_name + last_name
         self._global_admin = global_admin
         self._slackr_owner = False
-        self._profile_img_url = None
+        self._profile_img_url = ""
 
     def get_user_data(self):
         return {
@@ -35,7 +35,7 @@ class User:
             "last_name" : self._last_name,
             "password" : self._password,
             "email" : self._email,
-            "handle" : self._handle,
+            "handle_str" : self._handle,
             "profile_img_url" : self._profile_img_url
         }
 
@@ -89,6 +89,9 @@ class User:
 
     def is_slackr_owner(self):
         return self._slackr_owner
+    
+    def get_profile_img_url(self):
+        return self._profile_img_url
 
 
 class Channel:
