@@ -86,7 +86,6 @@ def message_edit(token, message_id, message):
     request_user = get_user(u_id)
 
     message_user = None
-    channel = None
     to_edit = None
 
     for channel_id in channels:
@@ -102,9 +101,6 @@ def message_edit(token, message_id, message):
 
     if to_edit is None:
         raise Value_Error(description="Message does not exist")
-
-    if channel is None:
-        raise Value_Error(description="Channel does not exist")
 
     # if user is not the poster or admin
     if request_user != message_user and not request_user.is_global_admin():
@@ -140,9 +136,6 @@ def message_remove(token, message_id):
     if message is None:
         raise Value_Error(description="Message does not exist")
 
-    if channel is None:
-        raise Value_Error(description="Channel does not exist")
-
     # if user is not the poster or admin
     if request_user != message_user and not request_user.is_global_admin():
         raise AccessError(description="You do not have permission to edit this message")
@@ -175,9 +168,6 @@ def message_pin(token, message_id):
 
     if message is None:
         raise Value_Error(description="Message does not exist")
-
-    if channel is None:
-        raise Value_Error(description="Channel does not exist")
 
     if not user.is_global_admin() and not is_user_owner(u_id, channel.get_id()):
         raise Value_Error(description="Only admins and owners can pin messages!")
@@ -215,9 +205,6 @@ def message_unpin(token, message_id):
 
     if message is None:
         raise Value_Error(description="Message does not exist")
-
-    if channel is None:
-        raise Value_Error(description="Channel does not exist")
 
     if not user.is_global_admin() and not is_user_owner(u_id, channel.get_id()):
         raise Value_Error(description="Only admins and owners can unpin messages!")
@@ -294,9 +281,10 @@ def message_unreact(token, message_id, react_id):
                 raise Value_Error(description="You have not reacted to this\
                                   message with this react")
             react["u_ids"].remove(u_id)
-            break
+            
+            return {}
 
-    return {}
+    raise Value_Error(description="Not a valid react id")
 
 def search(token, query_str):
     """

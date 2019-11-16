@@ -70,11 +70,14 @@ def test_channel_details(users, channels):
     detaildict = channel_details(users[1]["token"], channels[0]["channel_id"])
     assert detaildict['name'] == "Channel 1"
     assert detaildict['owner_members'] == [
-        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1'}]
+        {'u_id': 1,'name_first': 'user1', 'name_last': 'last1',
+         'profile_img_url': 'static/profile_images/default.jpg'}]
 
     assert detaildict['all_members'] == [
-        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1'},
-        {'u_id': 2, 'name_first': 'user2', 'name_last': 'last2'}]
+        {'u_id': 1,'name_first': 'user1', 'name_last': 'last1',
+         'profile_img_url': 'static/profile_images/default.jpg'},
+        {'u_id': 2,'name_first': 'user2', 'name_last': 'last2',
+         'profile_img_url': 'static/profile_images/default.jpg'}]
 
     # add user 3
     channel_join(users[2]["token"], channels[0]["channel_id"])
@@ -84,12 +87,16 @@ def test_channel_details(users, channels):
     assert detaildict2['name'] == "Channel 1"
 
     assert detaildict2['owner_members'] == [
-        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1'}]
+        {'u_id': 1,'name_first': 'user1', 'name_last': 'last1',
+         'profile_img_url': 'static/profile_images/default.jpg'}]
 
     assert detaildict2['all_members'] == [
-        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1'},
-        {'u_id': 2, 'name_first': 'user2', 'name_last': 'last2'},
-        {'u_id': 3, 'name_first': 'user3', 'name_last': 'last3'}]
+        {'u_id': 1,'name_first': 'user1', 'name_last': 'last1',
+         'profile_img_url': 'static/profile_images/default.jpg'},
+        {'u_id': 2,'name_first': 'user2', 'name_last': 'last2',
+         'profile_img_url': 'static/profile_images/default.jpg'},
+        {'u_id': 3,'name_first': 'user3', 'name_last': 'last3',
+         'profile_img_url': 'static/profile_images/default.jpg'}]
     
     # try to get the details of a channel we do not have access to
     pytest.raises(AccessError, channel_details, users[3]["token"],

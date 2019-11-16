@@ -156,8 +156,7 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     # image's own dimensions
     img_limit = min(image_object.size)
 
-    if image_object.format.lower() != "jpeg" and \
-       image_object.format.lower() != "jpg":
+    if image_object.format.lower() not in ["jpeg", "jpg"]:
         raise Value_Error(description="Invalid file type.")
 
     # check if the start co-ordinates are valid

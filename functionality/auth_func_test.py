@@ -6,8 +6,9 @@ import hashlib
 import pytest
 from .database import clear_data, get_data, get_user
 from .auth import (auth_login, auth_register, auth_logout,
-                   auth_passwordreset_request, auth_passwordreset_reset)
-from .access_error import Value_Error
+                   auth_passwordreset_request, auth_passwordreset_reset,
+                   admin_userpermission_change)
+from .access_error import AccessError, Value_Error
 from .decorators import setup_data
 
 
@@ -102,22 +103,26 @@ def test_register2(users, channels):
     # raise error if user tries to register more than once
     assert users[0]['token'] is not None
     assert users[0]['u_id'] is not None
-    pytest.raises(Value_Error, auth_register, 'user1@valid.com', 'passew@321', 'user', 'a')
+    pytest.raises(Value_Error, auth_register, 'user1@valid.com', 'passew@321',
+                  'user', 'a')
 
 
 @setup_data()
 def test_register3(users, channels):
     # raise an error if user tries to register with a very long name
     #-> first name too long
-    pytest.raises(Value_Error, auth_register, 'user5@valid.com', 'passew@321', 'userdhksfbskhdbfkhsdbvhkfsbvhfbvhkdbfvhkbdfkhbvhkdfbvkhdfbvhkdfbvhkdfbvkhdbfvhkbdfkhbvdfhkb', 'o')
+    pytest.raises(Value_Error, auth_register, 'user5@valid.com',
+                  'passew@321', 'x' * 100, 'o')
     #-> last name too long
-    pytest.raises(Value_Error, auth_register, 'user6@valid.com', 'passew@321', 'o', 'userdhksfbskhdbfkhsdbvhkfsbvhfbvhkdbfvhkbdfkhbvhkdfbvkhdfbvhkdfbvhkdfbvkhdbfvhkbdfkhbvdfhkb')
+    pytest.raises(Value_Error, auth_register, 'user6@valid.com',
+                  'passew@321', 'o', 'x' * 100)
 
 
 @setup_data()
 def test_register4(users, channels):
     # raise error if password is weak!
-    pytest.raises(Value_Error, auth_register, 'user7@valid.com', 'pew', 'user', 'a')
+    pytest.raises(Value_Error, auth_register, 'user7@valid.com', 'pew', 'user',
+                  'a')
 
 
 ###############################################################################
@@ -140,15 +145,26 @@ def test_reset_request(users, channels):
 ### PASSWORD RESET RESET TESTS HERE ###########################################
 ###############################################################################
 
-@setup_data(user_num=1)
+
+@setup_data(user_num=2)
 def test_reset_reset1(users, channels):
-    # raise errors if the reset code is incorrect.
-    auth_passwordreset_request('user1@valid.com')
-    #-> invalid codes being passed in!
+    # raise errors if the reset code is incorrect, use the 2nd user to
+    # test that the email is sent to the correct user if there is more
+    # than one character
+    code = auth_passwordreset_request('user2@valid.com')
+
+    # invalid codes being passed in!
     pytest.raises(Value_Error, auth_passwordreset_reset, "INVALID-CODE",
                   'abcdefgh')
-    #->password not strong
-    pytest.raises(Value_Error, auth_passwordreset_reset, "123@!@", 'ab')
+
+    # password not strong
+    pytest.raises(Value_Error, auth_passwordreset_reset, code, 'ab')
+
+    # remove the user from the database then attempt to reset their data
+    get_data()["users"].pop(users[1]["u_id"])
+
+    pytest.raises(Value_Error, auth_passwordreset_reset, code, '222222')
+
 
 @setup_data(user_num=1)
 def test_reset_reset2(users, channels):
@@ -165,3 +181,52 @@ def test_reset_reset2(users, channels):
         if user.get_email() == 'user1@valid.com':
             assert user.get_password() == hashed_pass
             break
+
+
+@setup_data(user_num=4)
+def test_admin_userpermission_change(users, channels):
+    # as a slackr owner attempt to make a member an admin
+    assert admin_userpermission_change(users[0]["token"],
+                                       users[1]["u_id"], 2) == {}
+
+    # as an admin attempt to make a member an admin
+    assert admin_userpermission_change(users[1]["token"],
+                                       users[2]["u_id"], 2) == {}
+
+    # as an admin try to make a slackr owner a member, this should fail
+    pytest.raises(AccessError, admin_userpermission_change, users[1]["token"],
+                  users[0]["u_id"], 3)
+
+    # as an admin try to make an admin a slackr owner, this should fail
+    pytest.raises(AccessError, admin_userpermission_change, users[1]["token"],
+                  users[2]["u_id"], 1)
+
+    # as a regular member try to change somebody's perms, this should fail
+    pytest.raises(AccessError, admin_userpermission_change, users[3]["token"],
+                  users[2]["u_id"], 3)
+
+    # try to run with an invalid token
+    pytest.raises(Value_Error, admin_userpermission_change, 000,
+                  users[2]["u_id"], 1)
+
+    # try to change the permissions of a user that does not exist
+    pytest.raises(Value_Error, admin_userpermission_change, users[1]["token"],
+                  666, 3)
+
+    # try to change to a permision_id that is invalid (too low), this should
+    # fail
+    pytest.raises(Value_Error, admin_userpermission_change, users[1]["token"],
+                  users[3]["u_id"], 0)
+
+    # try to change to a permision_id that is invalid (too high), this should
+    # fail
+    pytest.raises(Value_Error, admin_userpermission_change, users[1]["token"],
+                  users[3]["u_id"], 4)
+    
+    # as a slackr owner make another user a slackr owner
+    assert admin_userpermission_change(users[0]["token"],
+                                       users[1]["u_id"], 1) == {}
+    
+    # as a slackr owner make a user a regular user
+    assert admin_userpermission_change(users[0]["token"],
+                                       users[1]["u_id"], 3) == {}

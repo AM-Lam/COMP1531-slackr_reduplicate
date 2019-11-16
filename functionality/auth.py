@@ -77,8 +77,6 @@ def auth_passwordreset_request(email):
 
 
 def auth_passwordreset_reset(reset_code, new_password):
-    update_data = get_data()
-
     # check if the reset code is valid and retrive the email
     email = check_reset_code(reset_code)
 
@@ -87,7 +85,7 @@ def auth_passwordreset_reset(reset_code, new_password):
                          in length")
 
     # find the user in the list of users
-    for u_id in update_data['users']:
+    for u_id in get_data()['users']:
         # looking for the user in the users list in the database.
         user = get_user(u_id)
         if user.get_email() == email:
@@ -98,9 +96,13 @@ def auth_passwordreset_reset(reset_code, new_password):
             user.update_password(hashed_pass)
 
             # once the password is updated, delete the reset code
-            del update_data["reset"][reset_code]
+            del get_data()["reset"][reset_code]
 
-    return {}
+            return {}
+    
+    # make an assumption that if, somehow, a user manages to get a valid reset
+    # code but the associated email no longer exists an error is raised
+    raise Value_Error(description="The user does not exist")
 
 
 def auth_register(email, password, first_name, last_name):
@@ -163,29 +165,14 @@ def admin_userpermission_change(token, u_id, p_id):
         - permission_id does not refer to a value permission,
     AccessError when:
         - The authorised user is not an admin or owner
-    Description: Given a User by their user ID, set their permissions to new permissions described by permission_id
+    Description: Given a User by their user ID, set their permissions
+    to new permissions described by permission_id
     """
-
-    # call the database
-    server_data = get_data()
-
     # check if the token is valid and decode it
     request_u_id = check_valid_token(token)
+    request_user = get_user(request_u_id)
 
-    # attempt to find valid users for both the people giving and receiving perms
-    request_user = None
-    user = None
-    for u in server_data["users"]:
-        if u.get_u_id() == u_id:
-            user = u
-        if u.get_u_id() == request_u_id:
-            request_user = u
-
-    # raise a Value_Error if either user can't be found
-    if user == None:
-        raise Value_Error(description="u_id does not refer to a real user")
-    elif request_user == None:
-        raise Value_Error(description="Request does not come from a real user")
+    user = get_user(u_id)
 
     # raise an AccessError if the requesting user cannot use this function
     if not (request_user.is_global_admin() or request_user.is_slackr_owner()):
@@ -201,20 +188,22 @@ def admin_userpermission_change(token, u_id, p_id):
 
     # handle the perm changes
     if p_id == 1:
-        # make the user a slackr owner, only other slackr owners can do this
+        # make the user a slackr owner, only other slackr owners can
+        # do this
         if not request_user.is_slackr_owner():
-            raise AccessError(description="You do not have permissions to do this")
-        user._slackr_owner = True
+            raise AccessError(description="You do not have permissions to do\
+                              this")
+        user.set_slackr_owner(True)
         user.set_global_admin(True)
     elif p_id == 2:
-        # make the user a global admin, this should always be possible if we
-        # reach this point
-        user._slackr_owner = False
+        # make the user a global admin, this should always be possible
+        # if we reach this point
+        user.set_slackr_owner(False)
         user.set_global_admin(True)
     else:
-        # make the user a regular member, this should also always be possible
-        # if we reach this point
-        user._slackr_owner = False
+        # make the user a regular member, this should also always be
+        # possible if we reach this point
+        user.set_slackr_owner(False)
         user.set_global_admin(False)
     
     return {}
