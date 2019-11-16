@@ -114,14 +114,32 @@ def test_user_profiles_uploadphoto():
     clear_data()
 
     user = auth_register("valid@email.com", "1234567890", "John", "Doe")
-    assert user is not None
 
-    # tests will go here in iteration 3
+    # NOTE: for an image with width 200, end co-ordinates must be 199
+    sample = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/16x16%2BR.jpg/256px-16x16%2BR.jpg"
 
+    # checking for invalid URL
+    pytest.raises(ValueError, user_profiles_uploadphoto, user["token"], "cseunsw.edu.au", 0, 0, 199, 199)
 
-############################################################################################################################
-###  USER_PROFILE_UPLOAD_PHOTO TESTS HERE ##################################################################################
-############################################################################################################################
+    # checking if coordinates are valid
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, -1, -1, 200, 200)
+
+    # checking if cropping area is too big for the image
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 0, 0, 300, 300)
+
+    # checking sequentialism
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 20, 20, 10, 10)
+
+    # checking if selection is a square
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 0, 0, 199, 179)
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 50, 0, 199, 199)
+
+    # this test should pass with no issue
+    assert user_profiles_uploadphoto(user["token"], sample, 0, 0, 199, 199) == {}
+
+#######################################################################
+###  USERS_ALL TESTS HERE #############################################
+#######################################################################
 
 def test_users_all():
     clear_data()
