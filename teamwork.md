@@ -38,5 +38,8 @@ We work as a group more often since we review and modify codes more often. Refac
 We encounter more merge conflict since we modify each others code more often and refactoring also means that our original codes got move around quite a lot. 
 We told our teammates in messenger so that they will pull the latest version and solve the conflict as soon as possible.
 
+## Distance/Remote Communication
+Due to the locations of some of our members, it was difficult to have as many person-to-person interactions and meetups as we would have liked, which would likely have hindered how well our individual code interacts. It also limited the effectiveness of pair programming. A lot of our communication was through the internet.
+
 # What we can improve next time
 We should talk over the whole thing before we started the project. It will make our life easier if we realise how many overlapping between our functions are and made the public helper fucntions earlier. 

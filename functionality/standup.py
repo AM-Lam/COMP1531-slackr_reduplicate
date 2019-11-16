@@ -48,16 +48,8 @@ def standup_start(token, channel_id, length):
     # give the channel this new standup time
     get_channel(channel_id).set_standup(time_finish)
 
-    # TODO: check the functionality of the below code
-    # wait until the standup finishes, then send the message
-    while datetime.now() <= time_finish:
-        time.sleep(1)
-    
-    get_channel(channel_id).set_standup(None)
-    message_send(token, channel_id, MESSAGE_STANDUP)
-
     # return the finish time for the standup
-    return time_finish
+    return {time_finish}
 
 ######################################################################################
 
@@ -86,19 +78,18 @@ def standup_send(token, channel_id, message):
     if not is_user_member(u_id, channel_id):
         raise AccessError(description="You are not a member of this channel.")
 
-    # check if the message meets length requirements
-    if len(message) > 1000:
-        raise Value_Error(description="Message is too long.")
-
     # check if there is an active standup session
     if get_channel(channel_id).get_standup() == None:
         raise AccessError(description="There are no active standups.")
 
-    # TODO: check if this works
+    # check if the message meets length requirements
+    if len(message) > 1000:
+        raise Value_Error(description="Message is too long.")
+
+    # append the message to MESSAGE_STANDUP
     MESSAGE_STANDUP += f'{u_id} : {message}'
 
     return {}
-
 
 def standup_active(token, channel_id):
     """
@@ -109,17 +100,25 @@ def standup_active(token, channel_id):
     Description: For a given channel, return whether a standup is active in it, and what time the standup finishes. If no standup is active, then time_finish returns None
     """
 
-    dict = {"is_active" : None, "time_finish" : None}
+    global MESSAGE_STANDUP
 
     # check if the token is valid and decode it
     u_id = check_valid_token(token)
 
-    dict["time_finish"] = get_channel(channel_id).get_standup()
+    # assign default values to dict (initally assuming standup is active)
+    dict = {"is_active" : True, "time_finish" : get_channel(channel_id).get_standup()}
 
-    # check if there is an active standup session
-    if get_channel(channel_id).get_standup() != None:
-        dict["is_active"] = True
-    else:
+    # if the standup time is over
+    if dict["time_finish"] >= datetime.now():
+        # set the channel's standup to None
+        get_channel(channel_id).get_standup() = None
+        dict["time_finish"] = None
+        # send the full message
+        message_send(token, channel_id, MESSAGE_STANDUP)
+        MESSAGE_STANDUP = ""
+
+    # if time_finish is equal to None
+    if dict["time_finish"] == None:
         dict["is_active"] = False
 
     return dict
