@@ -78,6 +78,41 @@ def message_sendlater(token, channel_id, message, time_sent):
 
     return {"message_id" : message_id}
 
+def message_remove(token, message_id):
+    channels = get_data()["channels"]
+
+    u_id = check_valid_token(token)
+    request_user = get_user(u_id)
+
+    message_user = None
+    channel = None
+    message = None
+
+    for channel_id in channels:
+        potential_channel = get_channel(channel_id)
+
+        try:
+            message = potential_channel.get_message(message_id)
+            channel = potential_channel
+            message_user = get_user(message.get_u_id())
+            break
+        except Value_Error:
+            continue
+
+    if channel is None:
+        raise Value_Error(description="Channel does not exist")
+
+    if message is None:
+        raise Value_Error(description="Message does not exist")
+
+    # if user is not the poster or admin
+    if request_user != message_user and not request_user.is_global_admin():
+        raise AccessError(description="You do not have permission to edit this message")
+
+    # remove the message to the server database
+    channel.remove_message(message)
+
+    return {}
 
 def message_edit(token, message_id, message):
     channels = get_data()["channels"]
@@ -112,43 +147,6 @@ def message_edit(token, message_id, message):
 
     # update the database with new message
     to_edit.edit_text(message)
-
-    return {}
-
-
-def message_remove(token, message_id):
-    channels = get_data()["channels"]
-
-    u_id = check_valid_token(token)
-    request_user = get_user(u_id)
-
-    message_user = None
-    channel = None
-    message = None
-
-    for channel_id in channels:
-        potential_channel = get_channel(channel_id)
-
-        try:
-            message = potential_channel.get_message(message_id)
-            channel = potential_channel
-            message_user = get_user(message.get_u_id())
-            break
-        except Value_Error:
-            continue
-
-    if channel is None:
-        raise Value_Error(description="Channel does not exist")
-
-    if message is None:
-        raise Value_Error(description="Message does not exist")
-
-    # if user is not the poster or admin
-    if request_user != message_user and not request_user.is_global_admin():
-        raise AccessError(description="You do not have permission to edit this message")
-
-    # remove the message to the server database
-    channel.remove_message(message)
 
     return {}
 
