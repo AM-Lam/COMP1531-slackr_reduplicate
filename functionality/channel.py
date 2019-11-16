@@ -260,15 +260,21 @@ def channels_listall(token):
     Return a list of all channels in the slackr.
     """
 
-    # this is pretty simple, just grab the "database"
-    channels_raw = get_data()["channels"]
-
     # make sure the token is valid
-    check_valid_token(token)
+    u_id = check_valid_token(token)
+    user = get_user(u_id)
 
-    channels = [
-        channels_raw[c_id].frontend_format() for c_id in channels_raw
-    ]
+    channels = []
+    for channel_id in get_data()["channels"]:
+        channel = get_channel(channel_id)
+
+        # if the channel is private do not add it if we are a regular
+        # user who is not a member of it
+        print(f'Channel {channel_id} is public? {channel.is_public()}')
+        if not channel.is_public() and not user.is_global_admin() and not user.is_slackr_owner() and not is_user_member(u_id, channel_id):
+            continue
+        
+        channels.append(channel.frontend_format())
 
     # quick little list comprehension to return the channels in the
     # format we need
