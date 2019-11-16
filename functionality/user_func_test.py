@@ -6,9 +6,9 @@
 import pytest
 from .user import (user_profile_setemail, user_profile_sethandle,
                    user_profile_setname, user_profile,
-                   user_profiles_uploadphoto)
+                   user_profiles_uploadphoto, users_all)
 from .auth import auth_register
-from .database import clear_data
+from .database import clear_data, get_user
 from .access_error import Value_Error
 
 
