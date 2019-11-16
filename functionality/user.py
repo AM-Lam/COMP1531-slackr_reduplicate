@@ -92,6 +92,7 @@ def user_profile(token, u_id):
         user = server_data["users"][u_id]
 
         return {
+            "u_id" : u_id,
             "email" : user.get_email(),
             "name_first" : user.get_first_name(),
             "name_last" : user.get_last_name(),
@@ -187,24 +188,15 @@ def change_photo(img_url, x_start, y_start, x_end, y_end):
     # change the photo in the database (which doesn't exist)
     pass
 
-def users_all():
-    permissionGranted = 0
-    users_id = check_valid_token(token)
-    # if the user exists then return a list of all the users!
-    datab = get_data()["users"]
-    # only the global admins should be able to get this data.
-    peep = datab[users_id]
-    if peep.is_global_admin() == True:
-            permissionGranted = 1
-            return datab["users"]
 
-    '''
-    for i in datab["users"]:
-        if users_id == i.get_u_id():
-            if i._global_admin == True:
-                permissionGranted = 1
-                return datab["users"]
-    '''
+def users_all(token):
+    # ensure that this is a valid token, we don't need the u_id as
+    # all users can access this
+    check_valid_token(token)
 
-    if permissionGranted == 0:
-        raise ValueError("you dont have clearance to access the user details")
+    user_list = []
+    for u_id in get_data()["users"]:
+        user_list.append(user_profile(token, u_id))
+    
+    print(user_list)
+    return {"users" : user_list}

@@ -9,7 +9,7 @@ from .user import (user_profile_setemail, user_profile_sethandle,
                    user_profiles_uploadphoto)
 from .auth import auth_register
 from .database import clear_data
-from .access_error import Value_Error
+from .access_error import Value_Error, AccessError
 
 
 #######################################################################
@@ -80,13 +80,6 @@ def test_user_profile_setname():
 ###  USER_PROFILE TESTS HERE ##########################################
 #######################################################################
 
-def verify_info1(user_obj, correct_data):
-    clear_data()
-    # print(message_obj.__dict__)
-    if user_obj.__dict__ == correct_data:
-        return True
-    return False
-
 def test_user_profile1():
     clear_data()
     user1 = auth_register("valid@email.com", "1234567", "Bob", "Jones")
@@ -104,6 +97,12 @@ def test_user_profile1():
         'name_last': "Jones",
         'handle_str': "BobJones"
         }
+    
+    # try to get the data of a user that does not exist
+    pytest.raises(Value_Error, user_profile, user1["token"], 589)
+
+    # try to get the data of a user with an invalid token
+    pytest.raises(AccessError, user_profile, 589, user1["token"])
 
 
 #######################################################################

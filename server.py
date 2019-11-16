@@ -435,8 +435,10 @@ def run_admin_userpermission_change():
 
 @APP.route('/users/all', methods=["GET"])
 def run_users_all():
-    # to suppress errors just return an empty list
-    return dumps({"users" : []})
+    request_data = request.args
+    return_value = user.users_all(request_data["token"])
+    
+    return dumps(return_value)
 
 
 @APP.route('/standup/active', methods=["GET"])
