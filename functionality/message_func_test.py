@@ -145,13 +145,26 @@ def test_message_edit(users, channels):
 #######################################################################
 
 
-@setup_data(user_num=1, channel_num=1)
+@setup_data(user_num=2, channel_num=1)
 def test_message_pin(users, channels):
-    # try to create a valid message
-    message_1 = message_send(users[0]["token"], channels[0]["channel_id"],
-                             "Hello")
+    channel_join(users[1]["token"], channels[0]["channel_id"])
 
-    assert message_pin(users[0]["token"], message_1['message_id']) == {}
+    # try to create a valid message
+    message1 = message_send(users[0]["token"], channels[0]["channel_id"],
+                             "Hello")
+    
+    message2 = message_send(users[1]["token"], channels[0]["channel_id"],
+                             "Hi")
+
+    assert message_pin(users[0]["token"], message1['message_id']) == {}
+
+    # try to pin a message that is already pinned
+    pytest.raises(Value_Error, message_pin, users[0]["token"],
+                  message1["message_id"])
+    
+    # try to pin a message as a regular user
+    pytest.raises(Value_Error, message_pin, users[1]["token"],
+                  message2["message_id"])
 
 
 #######################################################################
@@ -159,29 +172,56 @@ def test_message_pin(users, channels):
 #######################################################################
 
 
-@setup_data(user_num=1, channel_num=1)
+@setup_data(user_num=2, channel_num=1)
 def test_message_unpin(users, channels):
-    # try to create a valid message
-    message_1 = message_send(users[0]["token"], channels[0]["channel_id"],
+    channel_join(users[1]["token"], channels[0]["channel_id"])
+    
+    message1 = message_send(users[0]["token"], channels[0]["channel_id"],
                              "Hello")
-    message_pin(users[0]["token"], message_1['message_id'])
 
-    assert message_unpin(users[0]["token"], message_1['message_id']) == {}
+    message_pin(users[0]["token"], message1['message_id'])
+    
+    assert message_unpin(users[0]["token"], message1['message_id']) == {}
+
+    # try to unpin a message that is not pinned
+    pytest.raises(Value_Error, message_unpin, users[0]["token"],
+                  message1["message_id"])
+
+    message_pin(users[0]["token"], message1['message_id'])
+    
+    # try to unpin a pinned message as a regular user
+    pytest.raises(Value_Error, message_unpin, users[1]["token"],
+                  message1["message_id"])
 
 #######################################################################
 ###  MESSAGE_REACT TESTS HERE #########################################
 #######################################################################
 
 
-@setup_data(user_num=1, channel_num=1)
+@setup_data(user_num=2, channel_num=1)
 def test_message_react(users, channels):
+    channel_join(users[1]["token"], channels[0]["channel_id"])
+
     # try to create a valid message
-    message_1 = message_send(users[0]["token"], channels[0]["channel_id"],
+    message1 = message_send(users[0]["token"], channels[0]["channel_id"],
                              "Hello")
     react_id = 1
     
-    assert message_react(users[0]["token"], message_1['message_id'],
+    assert message_react(users[0]["token"], message1['message_id'],
                          react_id) == {}
+    
+    # add the same react to the same message from a different user
+    assert message_react(users[1]["token"], message1['message_id'],
+                         react_id) == {}
+    
+    # add a different react to the same message
+    assert message_react(users[1]["token"], message1['message_id'],
+                         2) == {}
+    
+    # try to react to a message that we have already reacted to, with
+    # the same react
+    pytest.raises(Value_Error, message_react, users[1]["token"],
+                  message1['message_id'], react_id)
 
 
 #######################################################################
@@ -196,9 +236,20 @@ def test_message_unreact(users, channels):
                              "Hello")
     react_id = 1
     
-    message_react(users[0]["token"], message_1['message_id'], react_id)
+    message_react(users[0]["token"], message_1['message_id'], 2)
+    message_react(users[0]["token"], message_1['message_id'], 3)
+    message_react(users[0]["token"], message_1['message_id'], 1)    
+    
     assert message_unreact(users[0]["token"], message_1['message_id'],
                            react_id) == {}
+    
+    # try to unreact a message that we have not reacted to
+    pytest.raises(Value_Error, message_unreact, users[0]["token"],
+                  message_1['message_id'], react_id)
+    
+    # try to unreact from a message that does not exist
+    pytest.raises(Value_Error, message_unreact, users[0]["token"],
+                  message_1['message_id'], 4)
 
 
 #######################################################################
@@ -206,7 +257,7 @@ def test_message_unreact(users, channels):
 #######################################################################
 
 
-@setup_data(user_num=1, channel_num=1)
+@setup_data(user_num=2, channel_num=1)
 def test_message_sendlater(users, channels):
     # get the channel object, we need this to check if messages were sent
     channel_obj = get_channel(channels[0]["channel_id"])
@@ -242,6 +293,9 @@ def test_message_sendlater(users, channels):
     assert len(channel_obj.get_messages()) == 1
 
     # try to send a message in a channel we do not have access to
+    time_sent = datetime.utcnow() + timedelta(seconds=5)
+    pytest.raises(AccessError, message_sendlater, users[1]["token"],
+                  channels[0]["channel_id"], "message", time_sent)
 
 
 #######################################################################
