@@ -85,6 +85,7 @@ def user_logout():
     dumpstring = auth.auth_logout(token)
     return dumps(dumpstring)
 
+
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
     email = request.form.get('email')
@@ -93,6 +94,7 @@ def email_request():
     email_status = send_code(email, reset_code)
 
     return dumps(email_status)
+
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
 def email_reset():
@@ -105,8 +107,8 @@ def email_reset():
 @APP.route('/channel/invite', methods=['POST'])
 def channel_invite_e():
     token = request.form.get('token')
-    channel_id = request.form.get('channel_id')
-    u_id = request.form.get('u_id')
+    channel_id = int(request.form.get('channel_id'))
+    u_id = int(request.form.get('u_id'))
     dumpstring = channel.channel_invite(token, channel_id, u_id)
     return dumps(dumpstring)
 
@@ -428,24 +430,18 @@ def run_admin_userpermission_change():
     return dumps(return_value)
 
 
-@APP.route('/users/all', methods=["GET"])
-def run_users_all():
-    request_data = request.args
-    return_value = user.users_all(request_data["token"])
-    
-    return dumps(return_value)
-
-
 @APP.route('/standup/active', methods=["GET"])
 def run_standup_active():
     # to suppress errors just always return an inactive standup
     return dumps({"is_active" : False, "time_finish" : None})
+
 
 @APP.route('/users/all', methods=['GET'])
 def run_users_all():
     token = request.args.get('token')
     dumpstring = user.users_all(token)
     return dumps(dumpstring)
+
 
 if __name__ == '__main__':
     database.clear_data()
