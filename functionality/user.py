@@ -150,24 +150,17 @@ def change_photo(img_url, x_start, y_start, x_end, y_end):
     # change the photo in the database (which doesn't exist)
     pass
 
-def users_all():
-    permissionGranted = 0
+def users_all(token):
+    userlist = []
     users_id = check_valid_token(token)
     # if the user exists then return a list of all the users!
     datab = get_data()["users"]
-    # only the global admins should be able to get this data.
+    # A value error will be raised if the user does not exist within the helper 
+    # function.
+    # All users need to be able to access this data to be able to invite other users.
     peep = datab[users_id]
-    if peep.is_global_admin() == True:
-            permissionGranted = 1
-            return datab["users"]
+    for key, value in datab.items():
+        name_h = value.get_handle()
+        userlist.append(name_h)
 
-    '''
-    for i in datab["users"]:
-        if users_id == i.get_u_id():
-            if i._global_admin == True:
-                permissionGranted = 1
-                return datab["users"]
-    '''
-
-    if permissionGranted == 0:
-        raise ValueError("you dont have clearance to access the user details")
+    return {'users':userlist}
