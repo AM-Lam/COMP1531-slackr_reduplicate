@@ -17,7 +17,7 @@ SECRET = "AVENGERS_SOCKS"
 
 
 class User:
-    def __init__(self, u_id, first_name, last_name, password, email, global_admin=False):
+    def __init__(self, u_id, first_name, last_name, password, email, global_admin=False, profile_img_url=None):
         self._u_id = u_id
         self._first_name = first_name
         self._last_name = last_name
@@ -26,7 +26,7 @@ class User:
         self._handle = first_name + last_name
         self._global_admin = global_admin
         self._slackr_owner = False
-
+        self._profile_img_url = None
 
     def get_user_data(self):
         return {
@@ -36,6 +36,7 @@ class User:
             "password" : self._password,
             "email" : self._email,
             "handle" : self._handle,
+            "profile_img_url" : self._profile_img_url
         }
 
     def update_id(self, new_id):
@@ -59,9 +60,12 @@ class User:
     def set_global_admin(self, admin):
         self._global_admin = admin
 
+    def set_profile_img_url(self, img_url):
+        self._profile_img_url = img_url
+
     def set_slackr_owner(self, owner):
         self._slackr_owner = owner
-
+        
     def get_u_id(self):
         return self._u_id
 
@@ -158,6 +162,9 @@ class Channel:
 
     def get_m_id(self):
         return self._message_id_max
+
+    def get_standup(self):
+        return self._standup
 
     def get_pins(self):
         return self._pinned_messages
@@ -259,9 +266,20 @@ class Messages:
 
     def get_time_sent(self):
         return self._time_sent
-
+    
     def get_reacts(self):
         return self._reacts
+
+    def get_reacts_frontend(self, u_id):
+        # build react list with the right format
+        react_list = []
+        for react in self.get_reacts():
+            react_list.append({
+                "react_id" : react["react_id"],
+                "u_ids" : react["u_ids"],
+                "is_this_user_reacted" : u_id in react["u_ids"]
+            })
+        return react_list
 
     def set_pinned(self, pinned):
         self._pinned = pinned
@@ -407,7 +425,7 @@ def message_count(channel):
     return len(channel.get_messages())
 
 
-def get_message_list(channel, start, end):
+def get_message_list(channel, start, end, u_id):
     """
     Taking a Channel, a start and an end return a list of the messages
     in that channel in the order they appeared
@@ -424,7 +442,7 @@ def get_message_list(channel, start, end):
             "u_id" : message.get_u_id(),
             "message" : message.get_text(),
             "time_created" : message.get_time_sent().timestamp(),
-            "reacts" : [], # message.get_reacts(),
+            "reacts" :  message.get_reacts_frontend(u_id),
             "is_pinned" : message.is_pinned()
         })
 

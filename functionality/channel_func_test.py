@@ -9,70 +9,35 @@ from .channel import (channels_create, channel_addowner, channel_join,
                       channel_messages, channel_removeowner, channels_list,
                       channels_listall)
 from .database import clear_data, get_channel, is_user_member, get_user
+from .decorators import setup_data
 from .access_error import AccessError, Value_Error
-
-
-###############################################################################
-###  BOILER PLATE SETUP #######################################################
-###############################################################################
-
-def boiler_setup(function):
-    clear_data()
-    server_data = get_data()
-    user_1 = auth_register('user1@domain.com' , 'passew@321' , 'user' , 'a')
-    user_2 = auth_register('user2@domain.com' , 'vscod231343' , 'ussr' , 'b')
-    user_3 = auth_register('user3@domain.com.au' , 'vsdco23111' , 'person' , 'c')
-    assert user_1 is not None
-    assert user_2 is not None
-    assert user_3 is not None
-
-    token_1 = user_1['token']
-    token_2 = user_2['token']
-    token_3 = user_3['token']
-
-    uid_1 = user_1['u_id']
-    uid_2 = user_2['u_id']
-    uid_3 = user_3['u_id']
-
-
-    channel_1 = channels_create(user_1["token"], "Channel 1", True)
-    channel_2 = channels_create(user_1["token"], "Channel 2", True)
-    channel_2a = channels_create(user_1["token"], "Channel 2a", False)
-    channel_3 = channels_create(user_1["token"], "Good 'Ol Channel", True)
-    unswchannel = channels_create(token_1, 'unswchannel', True)
-    usydchannel = channels_create(token_1, 'usydchannel', True)
-    yeetchannel = channels_create(token_1, 'yeetchannel', True)
-    unichannel = channels_create(token_1, 'unichannel', True)
-   
-    unichannelid = unichannel['channel_id']
-    yeetchannelid = yeetchannel['channel_id']
-    usydchannelid = usydchannel['channel_id']
-    unswchannelid = unswchannel['channel_id']
-    def wrapper():
-        return function
-    return wrapper
 
 
 ###############################################################################
 ###  CHANNEL_ADDOWNER TESTS HERE ##############################################
 ###############################################################################
 
-@boiler_setup
-def test_channel_addowner():
+
+@setup_data(user_num=3, channel_num=2)
+def test_channel_addowner(users, channels):
     # first add a user as an owner to a channel we own
-    assert channel_addowner(user_1["token"], channel_1["channel_id"], user_2["u_id"]) == {}
+    assert channel_addowner(users[0]["token"], channels[0]["channel_id"],
+                            users[1]["u_id"]) == {}
     
     # now ensure that we can add a user to a channel as an owner after we have
     # been added to it as an owner ourselves (ensure the adding is actually
     # working properly)
-    assert channel_addowner(user_2["token"], channel_1["channel_id"], user_3["u_id"]) == {}
+    assert channel_addowner(users[1]["token"], channels[0]["channel_id"],
+                            users[2]["u_id"]) == {}
     
     # try to add a user as an owner to a channel they are already an owner
     # on
-    pytest.raises(Value_Error, channel_addowner, user_1["token"], channel_1["channel_id"], user_2["u_id"])
+    pytest.raises(Value_Error, channel_addowner, users[0]["token"],
+                  channels[0]["channel_id"], users[1]["u_id"])
     
     # try to add a user as an owner to a channel we do not own
-    pytest.raises(AccessError, channel_addowner, user_2["token"], channel_2["channel_id"], user_3["u_id"])
+    pytest.raises(AccessError, channel_addowner, users[1]["token"],
+                  channels[1]["channel_id"], users[2]["u_id"])
     
     
     # try to add a user as an owner to a channel we do not own, as a slackr 
@@ -88,179 +53,193 @@ def test_channel_addowner():
 ###  CHANNEL_DETAILS TESTS HERE ###############################################
 ###############################################################################
 
-@boiler_setup
-def test_channel_details():
+@setup_data(user_num=3, channel_num=1)
+def test_channel_details(users, channels):
     # what if the channel does not exist?
     invalid_channel = 999
     with pytest.raises(Value_Error, match=r"*"):
         get_channel(invalid_channel)
 
     # user2 is not a part of the channel
-    assert is_user_member(user_2["u_id"], unswchannel["channel_id"]) == False
+    assert is_user_member(users[1]["u_id"], channels[0]["channel_id"]) == False
 
     # adding user 2 to the channel
-    channel_join(user_2["token"], unswchannelid)
+    channel_join(users[1]["token"], channels[0]["channel_id"])
     
     # search details
-    detaildict = channel_details(token_2, unswchannelid)
-    assert detaildict['name'] == "unswchannel"
+    detaildict = channel_details(users[1]["token"], channels[0]["channel_id"])
+    assert detaildict['name'] == "Channel 1"
     assert detaildict['owner_members'] == [
-        {'u_id': 1, 'name_first': 'user', 'name_last': 'a'}]
+        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1'}]
 
     assert detaildict['all_members'] == [
-        {'u_id': 1, 'name_first': 'user', 'name_last': 'a'},
-        {'u_id': 2, 'name_first': 'ussr', 'name_last': 'b'}]
+        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1'},
+        {'u_id': 2, 'name_first': 'user2', 'name_last': 'last2'}]
 
     # add user 3
-    channel_join(user3["token"], unswchannelid)
+    channel_join(users[2]["token"], channels[0]["channel_id"])
 
     # search details
-    detaildict2 = channel_details(token2, unswchannelid)
-    assert detaildict2['name'] == "unswchannel"
+    detaildict2 = channel_details(users[1]["token"], channels[0]["channel_id"])
+    assert detaildict2['name'] == "Channel 1"
 
     assert detaildict2['owner_members'] == [
-        {'u_id': 1, 'name_first': 'user', 'name_last': 'a'}]
+        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1'}]
 
     assert detaildict2['all_members'] == [
-        {'u_id': 1, 'name_first': 'user', 'name_last': 'a'},
-        {'u_id': 2, 'name_first': 'ussr', 'name_last': 'b'},
-        {'u_id': 3, 'name_first': 'person', 'name_last': 'c'}]
+        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1'},
+        {'u_id': 2, 'name_first': 'user2', 'name_last': 'last2'},
+        {'u_id': 3, 'name_first': 'user3', 'name_last': 'last3'}]
 
 
 ###############################################################################
 ###  CHANNEL_INVITE TESTS HERE ################################################
 ###############################################################################
 
-@boiler_setup
-def test_channel_invite():
-    # lets create an invalid non existant user id
-    uidfaux = 999999999999999999999999999999999999999999999999999999999999999999
-
-    # test if the user is valid.
+@setup_data(user_num=2, channel_num=1)
+def test_channel_invite(users, channels):
+    # test if the user is invalid.
     with pytest.raises(Value_Error , match=r"*"):
-        channel_invite('3131313133', unswchannelid, uid_2)
+        channel_invite('3131313133', channels[0]["channel_id"],
+                       users[0]["u_id"])
 
     # test if user does not exist on application database
     with pytest.raises(Value_Error , match=r"*"):
-        channel_invite(token_1, unswchannelid, 'jl mackie')
+        channel_invite(users[0]["token"], channels[0]["channel_id"],
+                       'jl mackie')
 
-    # user exists but is already a part of that channel then invite should raise Value_Error
+    # user exists but is already a part of that channel then invite
+    # should raise Value_Error
     with pytest.raises(Value_Error , match=r"*"):
-        channel_invite(token_1, unswchannelid, uid_1)
+        channel_invite(users[0]["token"], channels[0]["channel_id"],
+                       users[0]["u_id"])
 
     # what if the channel does not exist?
     with pytest.raises(Value_Error , match=r"*"):
-        channel_invite(token_1, "this channel does not exist", uid_2)
+        channel_invite(users[0]["token"], "does not exist",
+                       users[0]["u_id"])
 
     # add user 2 to the channel (invitee -> user 1)
-    channel_invite(token_1, unswchannelid, uid_2)
-    # user 2 is already a part of that channel the invite should raise Value_Error
+    channel_invite(users[0]["token"], channels[0]["channel_id"], users[1]["u_id"])
+
+    # user 2 is already a part of that channel the invite should raise
+    # Value_Error
     with pytest.raises(Value_Error , match=r"*"):
-        channel_invite(token_1, unswchannelid, uid_2)
+        channel_invite(users[0]["token"], "does not exist", users[1]["u_id"])
 
 
 ###############################################################################
 ###  CHANNEL_JOIN TESTS HERE ##################################################
 ###############################################################################
 
-@boiler_setup
-def test_channel_join():
+@setup_data(user_num=2, channel_num=2, public=[True, False])
+def test_channel_join(users, channels):
 
     # first try to join a public server that exists
-    assert channel_join(user_2['token'], channel_1['channel_id']) == {}
+    assert channel_join(users[1]['token'], channels[0]['channel_id']) == {}
     
     # now try to join a server that does not exist, this should fail with an
     # access error
-    pytest.raises(Value_Error, channel_join, user_2['token'], 404)
+    pytest.raises(Value_Error, channel_join, users[1]['token'], 404)
     
     # try to join a server that exists, but is private as a regular user
-    pytest.raises(AccessError, channel_join, user_2['token'], 
-                  channel_2a['channel_id'])
+    pytest.raises(AccessError, channel_join, users[1]['token'], 
+                  channels[1]['channel_id'])
     
     # try to join a server that exists, but is private as an admin
     # first we'll have to make the second user an admin, not sure how this will
     # work yet
-    pytest.raises(AccessError, channel_join, user_2['token'], 
-                  channel_2a['channel_id'])
+    user2 = get_user(users[1]["u_id"])
+    user2.set_global_admin(True)
+
+    assert channel_join(users[1]['token'], channels[1]['channel_id']) == {}
 
 
 ###############################################################################
 ###  CHANNEL_LEAVE TESTS HERE #################################################
 ###############################################################################
 
-@boiler_setup
-def test_channel_leave():
+@setup_data(user_num=2, channel_num=3, public=[True, False, True], creators=[0, 0, 1])
+def test_channel_leave(users, channels):
     # first check the simplest case, if the user can leave a channel they are in
-    assert channel_leave(user_1["token"], channel_1["channel_id"]) == {}
+    assert channel_leave(users[0]["token"], channels[0]["channel_id"]) == {}
 
     # now try to leave a private channel
-    assert channel_leave(user_1["token"], channel_2a["channel_id"]) == {}
+    assert channel_leave(users[0]["token"], channels[1]["channel_id"]) == {}
 
     # now check that attempting to leave a non-existent channel raises an
     # exception
-    pytest.raises(Value_Error, channel_leave, user_1["token"], 404)
+    pytest.raises(Value_Error, channel_leave, users[0]["token"], 404)
 
     # try to leave a channel the user is not a part of - this should fail
     # quietely (see assumptions.md)
-    assert channel_leave(user_1["token"], channel_3["channel_id"]) == {}
+    assert channel_leave(users[0]["token"], channels[2]["channel_id"]) == {}
 
 
 ###############################################################################
 ###  CHANNEL_MESSAGES TESTS HERE ##############################################
 ###############################################################################
 
-@boiler_setup
-def test_channel_messages():
-    # start greater than the total number of messages#########
+@setup_data(user_num=3, channel_num=4)
+def test_channel_messages(users, channels):
+    # start greater than the total number of messages
     # adding user 2 and 3 to the unsw channel
-    channel_invite(token_1, unswchannelid, uid_2)
-    channel_invite(token_1, unswchannelid, uid_3)
+    channel_invite(users[0]["token"], channels[0]["channel_id"], users[1]["u_id"])
+    channel_invite(users[0]["token"], channels[0]["channel_id"], users[2]["u_id"])
+
     # lets send 70 messages.......
     initmessage = 'lots of'
-    for i in range(0, 70):
+    for _ in range(0, 70):
         messageloop = initmessage + ' aa'
-        message_send(token_1, unswchannelid, messageloop)
+        message_send(users[0]["token"], channels[0]["channel_id"], messageloop)
+
     # now lets call channel messages...
     with pytest.raises(Value_Error, match=r"*"):
-        channel_messages(token_1, unswchannelid, 93)
+        channel_messages(users[0]["token"], channels[0]["channel_id"], 93)
 
-    # INVALID USER TEST###################
+    # INVALID USER TEST
     # adding  ONLY user 2 to the channel
-    channel_invite(token_1, usydchannelid, uid_2)
-    # lets send 70 messages.......
+    channel_invite(users[0]["token"], channels[1]["channel_id"], users[1]["u_id"])
+
+    # lets send 70 messages...
     initmessage = 'lots of'
-    for i in range(0, 70):
+    for _ in range(0, 70):
         messageloop = initmessage + ' aa'
-        message_send(token_1, usydchannelid, messageloop)
+        message_send(users[0]["token"], channels[1]["channel_id"], messageloop)
+
     # now lets call channel messages...
     with pytest.raises(AccessError, match=r"*"):
-        channel_messages(token_3, usydchannelid, 2)
+        channel_messages(users[2]["token"], channels[1]["channel_id"], 2)
 
-    # END SHOULD BE -1 AS THE LEAST RECENT MESSAGE WAS SENT OUT######
+    # END SHOULD BE -1 AS THE LEAST RECENT MESSAGE WAS SENT OUT
     # adding user 2 and 3 to the channel
-    channel_invite(token_1, yeetchannelid, uid_2)
-    channel_invite(token_1, yeetchannelid, uid_3)
-    # lets send 70 messages.......
+    channel_invite(users[0]["token"], channels[2]["channel_id"], users[1]["u_id"])
+    channel_invite(users[0]["token"], channels[2]["channel_id"], users[2]["u_id"])
+
+    # lets send 70 messages...
     initmessage = 'lots of'
-    for i in range(0, 70):
+    for _ in range(0, 70):
         messageloop = initmessage + ' aa'
-        message_send(token_1, yeetchannelid, messageloop)
+        message_send(users[0]["token"], channels[2]["channel_id"], messageloop)
+
     # now lets call channel messages...
-    mesdict = channel_messages(token_1, yeetchannelid, 40)
+    mesdict = channel_messages(users[0]["token"], channels[2]["channel_id"], 40)
     assert mesdict['start'] == 40
     assert mesdict['end'] == -1
 
     # SOME IN BETWEEN INTERVAL TESTING
     # adding user 2 and 3 to the channel
-    channel_invite(token_1, unichannelid, uid_2)
-    channel_invite(token_1, unichannelid, uid_3)
-    # lets send 70 messages.......
+    channel_invite(users[0]["token"], channels[3]["channel_id"], users[1]["u_id"])
+    channel_invite(users[0]["token"], channels[3]["channel_id"], users[2]["u_id"])
+
+    # lets send 70 messages...
     initmessage = 'lots of'
-    for i in range(0, 70):
+    for _ in range(0, 70):
         messageloop = initmessage + ' aa'
-        message_send(token_1, unichannelid, messageloop)
+        message_send(users[0]["token"], channels[3]["channel_id"], messageloop)
+
     # now lets call channel messages...
-    mesdict1 = channel_messages(token_1, unichannelid, 10)
+    mesdict1 = channel_messages(users[0]["token"], channels[3]["channel_id"], 10)
     assert mesdict1['start'] == 10
     assert mesdict1['end'] == 60
 
@@ -269,54 +248,53 @@ def test_channel_messages():
 ###  CHANNEL_REMOVEOWNER TESTS HERE ###########################################
 ###############################################################################
 
-@boiler_setup
-def test_channel_removeowner():
-    user3_obj = get_user(user_3["u_id"])
+@setup_data(user_num=3, channel_num=1)
+def test_channel_removeowner(users, channels):
+    user3_obj = get_user(users[2]["u_id"])
 
     # now add user2 as an owner to channel1
-    channel_addowner(user_1["token"], channel_1["channel_id"], user_2["u_id"])
+    channel_addowner(users[0]["token"], channels[0]["channel_id"], users[1]["u_id"])
     
     # test removing user2 as an owner
-    assert channel_removeowner(user_1["token"], channel_1["channel_id"],
-                               user_2["u_id"]) == {}
+    assert channel_removeowner(users[0]["token"], channels[0]["channel_id"],
+                               users[1]["u_id"]) == {}
     
     # test removing user2 when they are not an owner
-    pytest.raises(Value_Error, channel_removeowner, user_1["token"],
-                  channel_1["channel_id"], user_2["u_id"])
+    pytest.raises(Value_Error, channel_removeowner, users[0]["token"],
+                  channels[0]["channel_id"], users[1]["u_id"])
     
     # add user2 as an owner to channel1 again
-    channel_addowner(user_1["token"], channel_1["channel_id"], user_2["u_id"])
+    channel_addowner(users[0]["token"], channels[0]["channel_id"], users[1]["u_id"])
     
     # attempt to remove user2 from channel1 as a user that does not have permis
     # -sions to do so
-    pytest.raises(AccessError, channel_removeowner, user_3["token"], 
-                  channel_1["channel_id"], user_2["u_id"])
+    pytest.raises(AccessError, channel_removeowner, users[2]["token"], 
+                  channels[0]["channel_id"], users[1]["u_id"])
     
     # test removing user2 from channel1 as a slackr owner
     user3_obj.set_global_admin(True)
-    assert channel_removeowner(user_3["token"], channel_1["channel_id"],
-                               user_2["u_id"]) == {}
+    assert channel_removeowner(users[2]["token"], channels[0]["channel_id"],
+                               users[1]["u_id"]) == {}
     
     # try to remove an owner from a channel that does not exist
-    pytest.raises(Value_Error, channel_removeowner, user_1["token"], 128,
-                  user_2["u_id"])
+    pytest.raises(Value_Error, channel_removeowner, users[0]["token"], 128,
+                  users[1]["u_id"])
 
 
 ###############################################################################
 ###  CHANNEL_CREATE TESTS HERE ################################################
 ###############################################################################
 
-@boiler_setup
-def test_channels_create():
-
+@setup_data(user_num=1)
+def test_channels_create(users, channels):
     # try to create a valid, public channel
-    assert channels_create(user_1["token"], "Channel 1", True) == {"channel_id" : 1}
+    assert channels_create(users[0]["token"], "Channel 1", True) == {"channel_id" : 1}
 
     # try to create a valid, private channel
-    assert channels_create(user_1["token"], "Channel 1", True) == {"channel_id" : 2}
+    assert channels_create(users[0]["token"], "Channel 1", True) == {"channel_id" : 2}
     
     # try to create a channel with an invalid name
-    pytest.raises(Value_Error, channels_create, user_1["token"], 
+    pytest.raises(Value_Error, channels_create, users[0]["token"], 
                   "123456789012345678901", False)
 
 
@@ -324,7 +302,8 @@ def test_channels_create():
 ###  CHANNEL_LIST TESTS HERE ##################################################
 ###############################################################################
 
-# did not use the decorator here because the tests progress as the database builds up!
+# did not use the decorator here because the tests progress as the
+# database builds up!
 def test_channels_list():
     clear_data()
 
@@ -399,7 +378,8 @@ def test_channels_list():
 ###  CHANNEL_LISTALL TESTS HERE ###############################################
 ###############################################################################
 
-# did not use the decorator here because the tests progress as the database builds up!
+# did not use the decorator here because the tests progress as the
+# database builds up!
 def test_channels_listall():
     clear_data()
 

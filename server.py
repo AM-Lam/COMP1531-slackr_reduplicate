@@ -11,8 +11,7 @@ from flask import Flask, request
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
 from functionality import (auth, user, database, channel, message,
-                           admin_userpermission_change, standup_send,
-                           standup_start, access_error)
+                           standup, access_error)
 
 
 def default_handler(err):
@@ -86,7 +85,6 @@ def user_logout():
     dumpstring = auth.auth_logout(token)
     return dumps(dumpstring)
 
-
 @APP.route('/auth/passwordreset/request', methods=['POST'])
 def email_request():
     email = request.form.get('email')
@@ -95,7 +93,6 @@ def email_request():
     email_status = send_code(email, reset_code)
 
     return dumps(email_status)
-
 
 @APP.route('/auth/passwordreset/reset', methods=['POST'])
 def email_reset():
@@ -224,7 +221,6 @@ def run_message_pin():
     request_data = request.form
     return_value = message.message_pin(request_data["token"],
                                        int(request_data["message_id"]))
-
 
     return dumps(return_value)
 
@@ -387,9 +383,10 @@ def run_profile_uploadphoto():
 @APP.route('/standup/start', methods=["POST"])
 def run_standup_start():
     request_data = request.form
-    return_value = standup_start.standup_start(
+    return_value = standup.standup_start(
         request_data["token"],
         int(request_data["channel_id"]),
+        int(request_data["length"] / 1000)
     )
 
     return dumps(return_value)
@@ -400,14 +397,13 @@ def run_standup_send():
     request_data = request.form
     return_value = {}
 
-    standup_send.standup_send(
+    standup.standup_send(
         request_data["token"],
         int(request_data["channel_id"]),
         request_data["message"],
     )
 
     return dumps(return_value)
-
 
 @APP.route('/search', methods=["GET"])
 def run_search():
@@ -419,13 +415,12 @@ def run_search():
 
     return dumps(return_value)
 
-
 @APP.route('/admin/userpermission/change', methods=["POST"])
 def run_admin_userpermission_change():
     request_data = request.form
     return_value = {}
 
-    admin_userpermission_change.admin_userpermission_change(
+    auth.admin_userpermission_change(
         request_data["token"],
         int(request_data["u_id"]),
         int(request_data["permission_id"]))

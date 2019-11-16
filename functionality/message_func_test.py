@@ -15,7 +15,7 @@ from .access_error import AccessError, Value_Error
 
 # Helper Functions
 
-
+# check if the message is valid
 def verify_message(message_obj, correct_data):
     if message_obj == correct_data:
         return True
@@ -28,22 +28,125 @@ def get_message_text(channel_id, m_id):
     return message.get_text()
 
 
+# put all the setup like create account and channel for the test in this function
+def setup():
+    clear_data()
+
+    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
+    user2 = auth_register("valid2@email.com", "0123456789", "John", "Bobs")
+    yield user1
+    yield user2
+
+    # create the channel we test with
+    channel_id = channels_create(user1["token"], "Channel 1", True)
+    yield channel_id
+
+#######################################################################
+###  MESSAGE_SEND TESTS HERE #########################################
+#######################################################################
+
+# check if the basic functionality of message_send works or not
+def test_message_send_basic():
+
+    set_up = list(setup())
+    user1 = set_up[0]
+    user2 = set_up[1]
+    channel_id = set_up[2]
+
+    # try to create a valid message
+    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
+
+    # check that the channel exists
+    assert message_1 is not None
+
+    # check that the database was correctly updated
+    assert verify_message(message_1, {"message_id" : 1})
+
+    # the user is not a member in the group
+    pytest.raises(AccessError, message_send, user2["token"],
+                  channel_id["channel_id"], "Hello")
+
+    # reset message_1
+    message_1 = None
+    # the message is over 1000 characters
+    pytest.raises(Value_Error, message_send, user1["token"],
+                  channel_id["channel_id"], "X" * 1001)
+
+
+#######################################################################
+###  MESSAGE_REMOVE TESTS HERE ########################################
+#######################################################################
+
+def test_message_remove():
+    clear_data()
+
+    setup1 = list(setup())
+    user1 = setup1[0]
+    channel_id = setup1[2]
+
+    # try to create a valid message
+    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
+
+    # check that the message exists
+    assert message_1 is not None
+
+    # check that the database was correctly updated
+    assert message_remove(user1["token"], message_1['message_id']) == {}
+
+
+def test_invalid_user():
+    
+    set_up = list(setup())
+    user1 = set_up[0]
+    user2 = set_up[1]
+    channel = set_up[2]
+
+    channel_join(user2["token"], channel["channel_id"])
+
+    message_1 = message_send(user1["token"], channel["channel_id"], "Hello")
+
+    # check that the message exists
+    assert message_1 is not None
+
+    # try to remove a message you did not send
+    pytest.raises(AccessError, message_remove, user2["token"], message_1['message_id'])
+
+
+def test_admin_user():
+    set_up = list(setup())
+    server_data = get_data()
+
+    user1 = set_up[0]
+    user2 = set_up[1]
+
+    user1_obj = server_data["users"][user1["u_id"]]
+    user1_obj.set_global_admin(True)
+
+    channel = channels_create(user2["token"], "Channel 1", True)
+
+    message_1 = message_send(user2["token"], channel["channel_id"], "Hello")
+
+    # check that the message exists
+    assert message_1 is not None
+
+    # delete the message
+    assert message_remove(user1["token"], message_1['message_id']) == {}
+
+
 #######################################################################
 ###  MESSAGE_EDIT TESTS HERE ##########################################
 #######################################################################
 
 
 def test_message_edit():
-    clear_data()
+    set_up = list(setup())
+    user1 = set_up[0]
+    user2 = set_up[1]
 
     server_data = get_data()
-
-    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
-    user2 = auth_register("valid2@email.com", "1234567890", "Bob", "Zones")
-
     user2_obj = server_data["users"][user2["u_id"]]
 
-    channel = channels_create(user1["token"], "Channel 1", True)
+    channel = set_up[2]
     channel_join(user2["token"], channel["channel_id"])
 
     message1 = message_send(user1["token"], channel["channel_id"], "Hello")
@@ -76,12 +179,12 @@ def test_message_edit():
 ###  MESSAGE_PIN TESTS HERE ###########################################
 #######################################################################
 
-def test_message_pin4():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
+def test_message_pin():
 
-    channel_id = channels_create(user1["token"], "Channel 1", True)
-
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
+    
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
 
@@ -91,30 +194,32 @@ def test_message_pin4():
     assert message_pin(user1["token"], message_1['message_id']) == {}
 
 
-def test_no_message15():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
+#######################################################################
+###  MESSAGE_UNPIN TESTS HERE #########################################
+#######################################################################
 
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+def test_message_unpin():
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-    # message is not existed anymore
-    message_remove(user1["token"], message_1['message_id'])
 
-    # the message does not exist
-    pytest.raises(Value_Error, message_pin, user1["token"], message_1['message_id'])
+    # check that the message exists
+    assert message_1 is not None
+    message_pin(user1["token"], message_1['message_id'])
 
+    assert message_unpin(user1["token"], message_1['message_id']) == {}
 
 #######################################################################
 ###  MESSAGE_REACT TESTS HERE #########################################
 #######################################################################
 
-def test_message_react6():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+def test_message_react():
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
@@ -123,144 +228,34 @@ def test_message_react6():
     assert message_react(user1["token"], message_1['message_id'], react_id) == {}
 
 
-def test_no_message7():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
+#######################################################################
+###  MESSAGE_UNREACT TESTS HERE #######################################
+#######################################################################
 
-    channel_id = channels_create(user1["token"], "Channel 1", True)
+def test_message_unreact():
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
 
     # try to create a valid message
     message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-    message_remove(user1["token"], message_1['message_id'])
 
     react_id = 1
-    # the message is not existed
-    pytest.raises(Value_Error, message_react, user1["token"],
-                  message_1['message_id'], react_id)
+    message_react(user1["token"], message_1['message_id'], react_id)
 
-
-#######################################################################
-###  MESSAGE_REMOVE TESTS HERE ########################################
-#######################################################################
-
-def test_message_remove8():
-    clear_data()
-
-    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
-    channel_id = channels_create(user1["token"], "Channel 1", True)
-
-    # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-
-    # check that the message exists
-    assert message_1 is not None
-
-    # check that the database was correctly updated
-    assert message_remove(user1["token"], message_1['message_id']) == {}
-
-def test_no_message9():
-    clear_data()
-
-    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
-    channel_id = channels_create(user1["token"], "Channel 1", True)
-
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-    assert message_1 is not None
-
-    # check that you can remove the message
-    assert message_remove(user1["token"], message_1['message_id']) == {}
-
-    # check that you cannot remove a message that no longer exists
-    pytest.raises(Value_Error, message_remove, user1["token"], message_1['message_id'])
-
-def test_invalid_user10():
-    clear_data()
-
-    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
-    user2 = auth_register("valid2@email.com", "0987654321", "James", "Bones")
-
-    # user1_obj = server_data["users"][0]
-    # user1_obj.set_global_admin(True)
-
-    channel = channels_create(user1["token"], "Channel 1", True)
-    channel_join(user2["token"], channel["channel_id"])
-
-    message_1 = message_send(user1["token"], channel["channel_id"], "Hello")
-
-    # check that the message exists
-    assert message_1 is not None
-
-    # try to remove a message you did not send
-    pytest.raises(AccessError, message_remove, user2["token"], message_1['message_id'])
-
-
-def test_admin_user11():
-    clear_data()
-
-    server_data = get_data()
-
-    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
-    user2 = auth_register("valid2@email.com", "0987654321", "James", "Bones")
-
-    user1_obj = server_data["users"][user1["u_id"]]
-    user1_obj.set_global_admin(True)
-
-    channel = channels_create(user2["token"], "Channel 1", True)
-    # channel_join(user2["token"], channel["channel_id"])
-
-    message_1 = message_send(user2["token"], channel["channel_id"], "Hello")
-
-    # check that the message exists
-    assert message_1 is not None
-
-    # delete the message
-    assert message_remove(user1["token"], message_1['message_id']) == {}
-
-
-#######################################################################
-###  MESSAGE_SEND TESTS HERE #########################################
-#######################################################################
-
-def test_message_send12():
-    clear_data()
-
-    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
-    user2 = auth_register("valid2@email.com", "0123456789", "John", "Bobs")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
-
-    # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-
-    # check that the channel exists
-    assert message_1 is not None
-
-    # check that the database was correctly updated
-    assert verify_message(message_1, {"message_id" : 1})
-
-    # the user is not a member in the group
-    pytest.raises(AccessError, message_send, user2["token"],
-                  channel_id["channel_id"], "Hello")
-
-    # reset message_1
-    message_1 = None
-    # the message is over 1000 characters
-    pytest.raises(Value_Error, message_send, user1["token"],
-                  channel_id["channel_id"], "X" * 1001)
+    assert message_unreact(user1["token"], message_1['message_id'], react_id) == {}
 
 
 #######################################################################
 ###  MESSAGE_SENDLATER TESTS HERE #####################################
 #######################################################################
 
-def test_message_sendlater13():
-    clear_data()
+def test_message_sendlater():
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel1 = set_up[2]
 
     server_data = get_data()
-    user1 = auth_register("valid@email.com", "123456789", "Bob", "Jones")
-
-    # create the channel we test with
-    channel1 = channels_create(user1["token"], "Channel 1", True)
 
     # get the channel object, we need this to check if messages were sent
     channel_obj = server_data["channels"][channel1["channel_id"]]
@@ -296,84 +291,78 @@ def test_message_sendlater13():
 
     assert len(channel_obj.get_messages()) == 1
 
-
-#######################################################################
-###  MESSAGE_UNPIN TESTS HERE #########################################
-#######################################################################
-
-def test_message_unpin14():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
-
-    # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-
-    # check that the message exists
-    assert message_1 is not None
-    message_pin(user1["token"], message_1['message_id'])
-
-    assert message_unpin(user1["token"], message_1['message_id']) == {}
-
-
-def test_no_message16():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
-    assert channel_id is not None
-
-    # try to remove a non-existent message
-    pytest.raises(Value_Error, message_unpin, user1["token"], 123)
-
-
-#######################################################################
-###  MESSAGE_UNREACT TESTS HERE #######################################
-#######################################################################
-
-def test_message_unreact16():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
-
-    # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-
-    react_id = 1
-    message_react(user1["token"], message_1['message_id'], react_id)
-
-    assert message_unreact(user1["token"], message_1['message_id'], react_id) == {}
-
-
-def test_no_message17():
-    clear_data()
-    user1 = auth_register("valid@email.com", "123465", "Bob", "Jones")
-
-    channel_id = channels_create(user1["token"], "Channel 1", True)
-
-    # try to create a valid message
-    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
-    message_remove(user1["token"], message_1['message_id'])
-
-    react_id = 1
-
-    # the message does not exist
-    pytest.raises(Value_Error, message_unreact, user1["token"], message_1['message_id'], react_id)
-
-
 #######################################################################
 ###  MESSAGE_SEARCH TESTS HERE ########################################
 #######################################################################
 
-def test_search18():
+def test_search_basic():
     clear_data()
 
-    user = auth_register("valid@email.com", "1234567890", "John", "Doe")
+    user1 = auth_register("valid@email.com", "1234567890", "John", "Doe")
+    user2 = auth_register("valid2@email.com", "0123456789", "John", "Bobs")
+    user3 = auth_register("valid3@email.com", "0123456789", "Bob", "Daniels")
 
-    # find all the matching messages (nothing)
-    assert search(user["token"], "hewwo") == []
+    # public channel for testing
+    channel1 = channels_create(user1["token"], "Channel 1", True)
+    # private channel for testing
+    channel2 = channels_create(user2["token"], "Channel 2", False)
 
-    # return nothing if the query string is nothing
-    assert search(user["token"], "") == []
+    # try to create a valid message
+    message_send(user1["token"], channel1["channel_id"], "hello there")
+    
+    # try to create a message in a private chat
+    message_send(user2["token"], channel2["channel_id"], "whats this")
+
+
+    # just checking for message length right now because it's faster
+    # find all the matching messages
+    assert len(search(user1["token"], "hello")["messages"]) == 1
+
+    # user3 does not have access so they can't access the messages,
+    # (user1 does as they are a global admin)
+    assert len(search(user3["token"], "this")["messages"]) == 0
+
+    # but user2 can access those messages
+    assert len(search(user2["token"], "this")["messages"]) == 1
+
+    # return nothing if the query string is in no messages
+    assert len(search(user1["token"], "xxx")["messages"]) == 0
+
+    # if query string is a space, return almost anything
+    assert len(search(user2["token"], " ")["messages"]) == 1
+
+    # check that a global admin can access messages in all channels
+    assert len(search(user1["token"], " ")["messages"]) == 2
+
+
+# common test case applied to more than one fucntion
+
+
+def test_no_message():
+    set_up = list(setup())
+    user1 = set_up[0]
+    channel_id = set_up[2]
+
+    # try to create a valid message
+    message_1 = message_send(user1["token"], channel_id["channel_id"], "Hello")
+    assert message_1 is not None
+
+    # check that you can remove the message
+    assert message_remove(user1["token"], message_1['message_id']) == {}
+
+    # check that you cannot remove a message that no longer exists
+    pytest.raises(Value_Error, message_remove, user1["token"], message_1['message_id'])
+
+    # check that you cannot pin a message that no longer exists
+    pytest.raises(Value_Error, message_pin, user1["token"], message_1['message_id'])
+
+    # try to unpin a non-existent message
+    pytest.raises(Value_Error, message_unpin, user1["token"], 123)
+
+    react_id = 1
+    # check that you cannot react a message that no longer exists
+    pytest.raises(Value_Error, message_react, user1["token"],
+                  message_1['message_id'], react_id)
+
+    # try to unreact a non-existent message
+    pytest.raises(Value_Error, message_unreact, user1["token"], message_1['message_id'], react_id)

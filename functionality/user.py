@@ -6,6 +6,8 @@ Functions that relate to the creation, modification and deletion of users.
 # pylint: disable=W0613
 
 import urllib
+import jwt
+from PIL import Image
 from .database import (is_email_valid, check_email_database, check_valid_token,
                        get_data, get_user, is_handle_in_use)
 from .access_error import AccessError, Value_Error
@@ -21,10 +23,14 @@ def user_profile_setemail(token, email):
     Description: Update the authorised user's email address
     """
 
+    # check if the email is valid and not already in use
     is_email_valid(email)
     check_email_database(email)
 
+    # check if the token is valid and decode it
     u_id = check_valid_token(token)
+
+    # call a database method that changes the profile email
     get_user(u_id).update_email(email)
 
     return {}
@@ -39,14 +45,19 @@ def user_profile_sethandle(token, handle_str):
     Description: Update the authorised user's handle (i.e. display name)
     """
 
+    # check if the handle passes length requirements
     if not 0 < len(handle_str) < 20:
         raise Value_Error(description="Handles must be between 0 and 20\
                          characters (exclusive)")
 
+    # check the database for handles in use
     if is_handle_in_use(handle_str):
-        raise Value_Error(description="Handle is already in use")
+        raise Value_Error(description="Handle is already in use.")
 
+    # check if the token is valid and decode it
     u_id = check_valid_token(token)
+
+    # call a database method that changes the profile handle
     get_user(u_id).update_handle(handle_str)
 
     return {}
@@ -54,22 +65,31 @@ def user_profile_sethandle(token, handle_str):
 
 def user_profile_setname(token, name_first, name_last):
     """
-    Taking a token, a first name and last name set the name values of
-    this user to the arguments passed in
+    user_profile_setname(token, name_first, name_last);
+    return {}
+    Exception: Value_Error when:
+        - name_first is more than 50 characters,
+        - name_last is more than 50 characters
+    Description: Update the authorised user's first and last name
     """
 
-
+    # check if the first name passes length requirements
     if not 0 < len(name_first) < 50:
         raise Value_Error(description="First name must be between 0 and 50\
                          characters (exclusive)")
 
+    # check if the last name passes length requirements
     if not 0 <= len(name_last) < 50:
         raise Value_Error(description="Last name must be between 0 and 50\
                          characters (inclusive)")
 
+    # check if the token is valid and decode it
     u_id = check_valid_token(token)
+
+    # grab the users details from the database
     user = get_user(u_id)
 
+    # call a database method that changes both profile names
     user.update_first_name(name_first)
     user.update_last_name(name_last)
 
@@ -103,89 +123,69 @@ def user_profile(token, u_id):
 
 def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     """
-    Find u_id associated with token (with non-existent database)
-    """
-    user_id = check_valid_token(token)
-
-    # just to suppress the error form pylint
-    assert user_id is not None
-
-    check_imgurl(img_url)
-    check_start_coords(x_start, y_start)
-    check_end_coords(x_end, y_end)
-    check_sequential(x_start, y_start, x_end, y_end)
-    check_square(x_start, y_start, x_end, y_end)
-    change_photo(img_url, x_start, y_start, x_end, y_end)
-
+    user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end,
+                              y_end);
     return {}
-
-
-def check_imgurl(img_url):
-    """
-    Assert that the url points to a valid image
-    """
-
-    if urllib.request.urlopen(img_url).getcode() == 200:
-        return True
-    raise Value_Error(description="The URL is not working at the moment!")
-
-
-def check_start_coords(x_start, y_start):
-    """
-    Check that the image start coordinates are within range
+    Exception: Value_Error when:
+        - img_url is returns an HTTP status other than 200,
+        - x_start, y_start, x_end, y_end are all within the dimensions
+          of the image at the URL.
+    Description: Given a URL of an image on the internet, crops the
+        image within bounds (x_start, y_start) and (x_end, y_end).
+        Position (0,0) is the top left.
     """
 
-    img_limit = 200
+    # check if the token is valid and decode it
+    u_id = check_valid_token(token)
 
-    if 0 >= x_start <= img_limit and 0 >= y_start <= img_limit:
-        return True
+    # just to suppress the error from pylint
+    assert u_id is not None
 
-    raise Value_Error(description="Co-ordinates out of bounds.")
+    # check that the URL is actually open for reading
+    if urllib.request.urlopen(img_url).getcode() != 200:
+        raise Value_Error(description="The URL is not working at the moment!")
 
+    local_filename, _ = urllib.request.urlretrieve(img_url)
+    image_object = Image.open(local_filename)
 
-def check_end_coords(x_end, y_end):
-    """
-    Check that the image end coordinates are within range
-    """
+    # set the max size of the image to the smaller of the
+    # image's own dimensions
+    img_limit = min(image_object.size)
 
-    img_limit = 200
+    print(img_limit)
+    print((x_start, x_end))
+    print((y_start, y_end))
 
-    if 0 >= x_end <= img_limit and 0 >= y_end <= img_limit:
-        return True
+    if image_object.format.lower() != "jpeg" and image_object.format.lower() != "jpg":
+        raise Value_Error(description="Invalid file type.")
 
-    raise Value_Error(description="Co-ordinates out of bounds.")
+    # check if the start co-ordinates are valid
+    if not 0 <= x_start < img_limit or not 0 <= y_start < img_limit:
+        raise Value_Error(description="Start co-ordinates out of bounds.")
 
+    # check if the end co-ordinates are valid
+    if not 0 < x_end <= img_limit or not 0 < y_end <= img_limit:
+        raise Value_Error(description="End co-ordinates out of bounds.")
 
-def check_sequential(x_start, y_start, x_end, y_end):
-    """
-    Check that the start coordinates are before the end coordinates
-    """
-
-    if x_start >= x_end or x_end <= x_start:
-        raise Value_Error(description="Co-ordinates are not sequential.")
-    if y_start >= y_end or y_end <= y_start:
+    # check if co-ordinates are sequential
+    if x_start >= x_end or y_start >= y_end:
         raise Value_Error(description="Co-ordinates are not sequential.")
 
-    return True
-
-
-def check_square(x_start, y_start, x_end, y_end):
-    """
-    Usually profile pictures need to be square so we check if the co-ordinates match
-    """
-
+    # check if the image selection is a square
     side1 = x_end - x_start
     side2 = y_end - y_start
-
     if side1 != side2:
         raise Value_Error(description="Co-ordinate selection is not a square.")
 
-    return True
+    cropped = image_object.crop((x_start, y_start, x_end, y_end))
 
+    img_url = f'profile_images/{u_id}.jpg'
+    cropped.save(img_url, "JPEG")
 
-def change_photo(img_url, x_start, y_start, x_end, y_end):
-    # change the photo in the database (which doesn't exist)
-    pass
+    get_user(u_id).set_profile_img_url(img_url)
+    
+    return {}
+
 
 def users_all(token):
     userlist = []
