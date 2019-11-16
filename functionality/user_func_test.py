@@ -87,16 +87,13 @@ def test_user_profile1():
     # try to create a valid message
     profile = user_profile(user1["token"], 1)
 
-    # check that the user exists
-    assert profile is not None
-
     # check that the database was correctly updated
     assert profile == {
+        'u_id' : user1["u_id"],
         'email': "valid@email.com",
         'name_first': "Bob",
         'name_last': "Jones",
-        'handle_str': "BobJones"
-        }
+        'handle_str': "BobJones"}
     
     # try to get the data of a user that does not exist
     pytest.raises(Value_Error, user_profile, user1["token"], 589)
@@ -114,24 +111,35 @@ def test_user_profiles_uploadphoto():
 
     user = auth_register("valid@email.com", "1234567890", "John", "Doe")
 
-    # NOTE: for an image with width 200, end co-ordinates must be 199
     sample = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/16x16%2BR.jpg/256px-16x16%2BR.jpg"
 
     # checking for invalid URL
-    pytest.raises(ValueError, user_profiles_uploadphoto, user["token"], "cseunsw.edu.au", 0, 0, 199, 199)
+    pytest.raises(ValueError, user_profiles_uploadphoto, user["token"],
+                  "cseunsw.edu.au", 0, 0, 199, 199)
 
     # checking if coordinates are valid
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, -1, -1, 200, 200)
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, -1, -1, 200, 200)
 
     # checking if cropping area is too big for the image
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 0, 0, 300, 300)
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, 0, 0, 300, 300)
 
     # checking sequentialism
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 20, 20, 10, 10)
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, 20, 20, 10, 10)
 
     # checking if selection is a square
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 0, 0, 199, 179)
-    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"], sample, 50, 0, 199, 199)
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, 0, 0, 199, 179)
+    
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  sample, 50, 0, 199, 199)
+    
+    # try to load an image with an invalid type
+    invalid_img = "https://upload.wikimedia.org/wikipedia/commons/1/1b/Square_200x200.png"
+    pytest.raises(Value_Error, user_profiles_uploadphoto, user["token"],
+                  invalid_img, 0, 0, 199, 199)
 
     # this test should pass with no issue
     assert user_profiles_uploadphoto(user["token"], sample, 0, 0, 199, 199) == {}

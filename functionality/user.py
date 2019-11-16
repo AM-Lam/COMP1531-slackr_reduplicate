@@ -157,7 +157,8 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     print((x_start, x_end))
     print((y_start, y_end))
 
-    if image_object.format.lower() != "jpeg" and image_object.format.lower() != "jpg":
+    if image_object.format.lower() != "jpeg" and \
+       image_object.format.lower() != "jpg":
         raise Value_Error(description="Invalid file type.")
 
     # check if the start co-ordinates are valid
@@ -175,6 +176,7 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     # check if the image selection is a square
     side1 = x_end - x_start
     side2 = y_end - y_start
+    
     if side1 != side2:
         raise Value_Error(description="Co-ordinate selection is not a square.")
 
