@@ -116,7 +116,8 @@ def user_profile(token, u_id):
             "email" : user.get_email(),
             "name_first" : user.get_first_name(),
             "name_last" : user.get_last_name(),
-            "handle_str" : user.get_handle()
+            "handle_str" : user.get_handle(),
+            "profile_img_url" : user.get_profile_img_url()
         }
 
     raise Value_Error(description="User cannot be found")
@@ -152,10 +153,6 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     # set the max size of the image to the smaller of the
     # image's own dimensions
     img_limit = min(image_object.size)
-
-    print(img_limit)
-    print((x_start, x_end))
-    print((y_start, y_end))
 
     if image_object.format.lower() != "jpeg" and \
        image_object.format.lower() != "jpg":

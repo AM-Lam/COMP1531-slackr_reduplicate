@@ -8,7 +8,7 @@ from .user import (user_profile_setemail, user_profile_sethandle,
                    user_profile_setname, user_profile,
                    user_profiles_uploadphoto, users_all)
 from .auth import auth_register
-from .database import clear_data
+from .database import clear_data, get_user
 from .access_error import Value_Error, AccessError
 
 
@@ -93,7 +93,8 @@ def test_user_profile1():
         'email': "valid@email.com",
         'name_first': "Bob",
         'name_last': "Jones",
-        'handle_str': "BobJones"}
+        'handle_str': "BobJones",
+        "profile_img_url" : ""}
     
     # try to get the data of a user that does not exist
     pytest.raises(Value_Error, user_profile, user1["token"], 589)
@@ -151,12 +152,23 @@ def test_user_profiles_uploadphoto():
 def test_users_all():
     clear_data()
     user1 = auth_register("valid@email.com", "1234567", "Bob", "Jones")
-    user2 = auth_register("valid1@email.com", "11221122", "Sally", "Salmon")
+    auth_register("valid1@email.com", "11221122", "Sally", "Salmon")
 
-    user_t = get_user(user1['u_id'])
-    user_u = get_user(user2['u_id'])
     # testing good functionality:
-    assert users_all(user1['token']) == {'users':['BobJones','SallySalmon']}
+    assert users_all(user1['token']) == {'users': [
+        {'u_id': 1,
+        'email': 'valid@email.com',
+        'name_first': 'Bob',
+        'name_last': 'Jones',
+        'handle_str': 'BobJones',
+        "profile_img_url" : ""},
+        {'u_id': 2,
+        'email': 'valid1@email.com',
+        'name_first': 'Sally',
+        'name_last': 'Salmon',
+        'handle_str': 'SallySalmon',
+        "profile_img_url" : ""}]}
+    
     # invalid token test:
     pytest.raises(Value_Error, users_all, 'fjngnbfdk')
     
