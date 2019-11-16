@@ -36,8 +36,8 @@ def test_standup_start(users, channels):
                   "not_a_real_channel", dev_time)
 
     # returns an AccessError if the user does not have perms
-    pytest.raises(AccessError, standup_start, user2["token"],
-                  channel["channel_id"], dev_time)
+    pytest.raises(AccessError, standup_start, users[1]["token"],
+                  channels[0]["channel_id"], dev_time)
 
 #######################################################################
 ###  STANDUP_SEND TESTS HERE ##########################################
@@ -64,16 +64,24 @@ def test_standup_send(users, channels):
     pytest.raises(Value_Error, standup_send, user1["token"], "not_a_real_channel", "message")
 
     # raises an AccessError if the user does not have perms
-    pytest.raises(AccessError, standup_send, user2["token"], channel["channel_id"], "message")
+    pytest.raises(AccessError, standup_send, users[1]["token"], channels[0]["channel_id"], "message")
 
     # raises a Value_Error if the message is too long
+<<<<<<< HEAD
     pytest.raises(Value_Error, standup_send, user1["token"], channel["channel_id"], "a" * 1001)
+=======
+    pytest.raises(Value_Error, standup_send, users[0]["token"], channels[0]["channel_id"], "a" * 1001)
+>>>>>>> master
 
     # if standup time has stopped
     while datetime.now() <= predicted_finish:
         continue
 
+<<<<<<< HEAD
     pytest.raises(AccessError, standup_send, user1["token"], channel["channel_id"], "message")
+=======
+    pytest.raises(AccessError, standup_send, users[0]["token"], channels[0]["channel_id"], "message")
+>>>>>>> master
 
 #######################################################################
 ###  STANDUP_ACTIVE TESTS HERE ########################################
