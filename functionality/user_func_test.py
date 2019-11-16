@@ -6,9 +6,9 @@
 import pytest
 from .user import (user_profile_setemail, user_profile_sethandle,
                    user_profile_setname, user_profile,
-                   user_profiles_uploadphoto)
+                   user_profiles_uploadphoto, users_all)
 from .auth import auth_register
-from .database import clear_data
+from .database import clear_data, get_user
 from .access_error import Value_Error
 
 
@@ -146,5 +146,11 @@ def test_users_all():
     user1 = auth_register("valid@email.com", "1234567", "Bob", "Jones")
     user2 = auth_register("valid1@email.com", "11221122", "Sally", "Salmon")
 
+    user_t = get_user(user1['u_id'])
+    user_u = get_user(user2['u_id'])
+    # testing good functionality:
+    assert users_all(user1['token']) == {'users':['BobJones','SallySalmon']}
+    # invalid token test:
+    pytest.raises(Value_Error, users_all, 'fjngnbfdk')
     
 
