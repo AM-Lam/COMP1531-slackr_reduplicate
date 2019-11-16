@@ -105,20 +105,20 @@ def standup_active(token, channel_id):
     # check if the token is valid and decode it
     u_id = check_valid_token(token)
 
-    # assign default values to dict (initally assuming standup is active)
-    dict = {"is_active" : True, "time_finish" : get_channel(channel_id).get_standup()}
+    # assign default values to status (initally assuming standup is active)
+    status = {"is_active" : True, "time_finish" : get_channel(channel_id).get_standup()}
 
     # if the standup time is over
-    if dict["time_finish"] >= datetime.now():
+    if status["time_finish"] >= datetime.now():
         # set the channel's standup to None
-        get_channel(channel_id).get_standup() = None
-        dict["time_finish"] = None
+        get_channel(channel_id).set_standup(None)
+        status["time_finish"] = None
         # send the full message
         message_send(token, channel_id, MESSAGE_STANDUP)
         MESSAGE_STANDUP = ""
 
     # if time_finish is equal to None
-    if dict["time_finish"] == None:
-        dict["is_active"] = False
+    if status["time_finish"] == None:
+        status["is_active"] = False
 
-    return dict
+    return status
