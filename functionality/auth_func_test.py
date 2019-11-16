@@ -222,3 +222,11 @@ def test_admin_userpermission_change(users, channels):
     # fail
     pytest.raises(Value_Error, admin_userpermission_change, users[1]["token"],
                   users[3]["u_id"], 4)
+    
+    # as a slackr owner make another user a slackr owner
+    assert admin_userpermission_change(users[0]["token"],
+                                       users[1]["u_id"], 1) == {}
+    
+    # as a slackr owner make a user a regular user
+    assert admin_userpermission_change(users[0]["token"],
+                                       users[1]["u_id"], 3) == {}
