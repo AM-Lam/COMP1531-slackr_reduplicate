@@ -16,7 +16,7 @@ class Value_Error(HTTPException):
     """
     Error raised when a value is missing or incorrect in some way.
     Renamed to Value_Error to avoid clashing with python's builtin
-    ValueError.
+    Value_Error.
     """
     code = 400
     message = "Incorrect value"

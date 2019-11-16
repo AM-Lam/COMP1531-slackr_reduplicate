@@ -11,8 +11,7 @@ from flask import Flask, request
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
 from functionality import (auth, user, database, channel, message,
-                           admin_userpermission_change, standup_send,
-                           standup_start, access_error)
+                           standup, access_error)
 
 
 def default_handler(err):
@@ -306,6 +305,7 @@ def run_channel_addowner():
 
     return dumps(return_value)
 
+
 @APP.route('/channel/removeowner', methods=["POST"])
 def run_channel_removeowner():
     request_data = request.form
@@ -330,6 +330,7 @@ def run_message_sendlater():
 
     return dumps(return_value)
 
+
 @APP.route('/user/profile/setname', methods=["PUT"])
 def run_profile_setname():
     request_data = request.form
@@ -341,6 +342,7 @@ def run_profile_setname():
 
     return dumps(return_value)
 
+
 @APP.route('/user/profile/setemail', methods=["PUT"])
 def run_profile_setemail():
     request_data = request.form
@@ -351,6 +353,7 @@ def run_profile_setemail():
 
     return dumps(return_value)
 
+
 @APP.route('/user/profile/sethandle', methods=["PUT"])
 def run_profile_sethandle():
     request_data = request.form
@@ -360,6 +363,7 @@ def run_profile_sethandle():
     )
 
     return dumps(return_value)
+
 
 @APP.route('/user/profile/uploadphoto', methods=["POST"])
 def run_profile_uploadphoto():
@@ -375,22 +379,25 @@ def run_profile_uploadphoto():
 
     return dumps(return_value)
 
+
 @APP.route('/standup/start', methods=["POST"])
 def run_standup_start():
     request_data = request.form
-    return_value = standup_start.standup_start(
+    return_value = standup.standup_start(
         request_data["token"],
         int(request_data["channel_id"]),
+        int(request_data["length"] / 1000)
     )
 
     return dumps(return_value)
+
 
 @APP.route('/standup/send', methods=["POST"])
 def run_standup_send():
     request_data = request.form
     return_value = {}
 
-    standup_send.standup_send(
+    standup.standup_send(
         request_data["token"],
         int(request_data["channel_id"]),
         request_data["message"],
@@ -413,12 +420,13 @@ def run_admin_userpermission_change():
     request_data = request.form
     return_value = {}
 
-    admin_userpermission_change.admin_userpermission_change(
+    auth.admin_userpermission_change(
         request_data["token"],
         int(request_data["u_id"]),
         int(request_data["permission_id"]))
 
     return dumps(return_value)
+
 
 @APP.route('/users/all', methods=["GET"])
 def run_users_all():
