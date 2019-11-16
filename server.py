@@ -313,7 +313,7 @@ def run_channel_addowner():
 @APP.route('/channel/removeowner', methods=["POST"])
 def run_channel_removeowner():
     request_data = request.form
-    return_value = channel.channel_addowner(
+    return_value = channel.channel_removeowner(
         request_data["token"],
         int(request_data["channel_id"]),
         int(request_data["u_id"])
@@ -329,7 +329,7 @@ def run_message_sendlater():
         request_data["token"],
         int(request_data["channel_id"]),
         request_data["message"],
-        datetime.utcfromtimestamp(int(request_data["time_sent"]) / 1000)
+        datetime.utcfromtimestamp(int(request_data["time_sent"]))
     )
 
     return dumps(return_value)

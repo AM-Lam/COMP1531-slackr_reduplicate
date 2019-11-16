@@ -36,7 +36,6 @@ def channel_addowner(token, channel_id, u_id):
     return {}
 
 
-
 def channel_details(token, channel_id, live_str=""):
     """
     Select a channel by id and return its details. live_str is only
@@ -73,7 +72,6 @@ def channel_details(token, channel_id, live_str=""):
     return {"name" : channel.get_name(),
             "owner_members" : channel_owners,
             "all_members" : channel_members}
-
 
 
 def channel_invite(token, channel_id, u_id):
@@ -121,14 +119,11 @@ def channel_join(token, channel_id):
 
 def channel_leave(token, channel_id):
     """
-    Take a channel by id and, if we are a member, leave the channe.
+    Take a channel by id and, if we are a member, leave the channel.
     Ensure that member's also lose their owner status, if the user is
     not a member fail silently.
     """
     u_id = check_valid_token(token)
-    channel = get_channel(channel_id)
-
-    # get the channel itself
     channel = get_channel(channel_id)
 
     # attempt to remove the user from the channel, if they are also an
