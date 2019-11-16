@@ -20,23 +20,6 @@ def get_message_text(channel_id, m_id):
     message = channel.get_message(m_id)
     return message.get_text()
 
-<<<<<<< HEAD
-=======
-
-# put all the setup like create account and channel for the test in this function
-def setup():
-    clear_data()
-
-    user1 = auth_register("valid@email.com", "1234567890", "Bob", "Jones")
-    user2 = auth_register("valid2@email.com", "0123456789", "John", "Bobs")
-    yield user1
-    yield user2
-
-    # create the channel we test with
-    channel_id = channels_create(user1["token"], "Channel 1", True)
-    yield channel_id
-
->>>>>>> master
 #######################################################################
 ###  MESSAGE_SEND TESTS HERE #########################################
 #######################################################################
@@ -323,11 +306,17 @@ def test_message_sendlater(users, channels):
 #######################################################################
 ###  MESSAGE_SEARCH TESTS HERE ########################################
 #######################################################################
-<<<<<<< HEAD
+
 # check if the basic functionality of message_send works or not
-@setup_data(user_num=1)
+@setup_data(user_num=3, channel_num=2)
 def test_search_basic(users, channels):
-    user = users[0]["token"]
+    user1 = users[0]["token"]
+    user2 = users[1]["token"]
+    user3 = users[2]["token"]
+
+    # public channel for testing
+    channel1 = channels[0]["channel_id"]
+    channel2 = channels[1]["channel_id"]
 
     # find all the matching messages (nothing)
     assert search(user, "hewwo") == []
@@ -335,28 +324,6 @@ def test_search_basic(users, channels):
     # return nothing if the query string is nothing
     assert search(user, "") == []
 
-# common test case applied to more than one fucntion
-@setup_data(user_num=1, channel_num=1)
-def test_no_message(users, channels):
-    user1 = users[0]["token"]
-    channel_id = channels[0]["channel_id"]
-=======
-
-def test_search_basic():
-    clear_data()
-
-    user1 = auth_register("valid@email.com", "1234567890", "John", "Doe")
-    user2 = auth_register("valid2@email.com", "0123456789", "John", "Bobs")
-    user3 = auth_register("valid3@email.com", "0123456789", "Bob", "Daniels")
-
-    # public channel for testing
-    channel1 = channels_create(user1["token"], "Channel 1", True)
-    # private channel for testing
-    channel2 = channels_create(user2["token"], "Channel 2", False)
-
-    # try to create a valid message
-    message_send(user1["token"], channel1["channel_id"], "hello there")
-    
     # try to create a message in a private chat
     message_send(user2["token"], channel2["channel_id"], "whats this")
 
@@ -389,7 +356,6 @@ def test_no_message():
     set_up = list(setup())
     user1 = set_up[0]
     channel_id = set_up[2]
->>>>>>> master
 
     # try to create a valid message
     message_1 = message_send(user1, channel_id, "Hello")
@@ -413,8 +379,4 @@ def test_no_message():
                   message_1['message_id'], react_id)
 
     # try to unreact a non-existent message
-<<<<<<< HEAD
     pytest.raises(Value_Error, message_unreact, user1, message_1['message_id'], react_id)
-=======
-    pytest.raises(Value_Error, message_unreact, user1["token"], message_1['message_id'], react_id)
->>>>>>> master
