@@ -9,7 +9,7 @@ from .user import (user_profile_setemail, user_profile_sethandle,
                    user_profiles_uploadphoto, users_all)
 from .auth import auth_register
 from .database import clear_data, get_user
-from .access_error import Value_Error
+from .access_error import AccessError, Value_Error
 from .decorators import setup_data
 
 
@@ -94,11 +94,18 @@ def test_user_profile1(users, channels):
         'handle_str': "user1last1",
         'profile_img_url': 'static/profile_images/default.jpg'
         }
+    
+    # try to get the data of a user that does not exist
+    pytest.raises(Value_Error, user_profile, users[0]["token"], 589)
+
+    # try to get the data of a user with an invalid token
+    pytest.raises(AccessError, user_profile, 589, users[0]["token"])
 
 
 #######################################################################
 ###  USER_PROFILE_UPLOAD_PHOTO TESTS HERE #############################
 #######################################################################
+
 
 @setup_data(user_num=1)
 def test_user_profiles_uploadphoto(users, channels):
@@ -123,12 +130,18 @@ def test_user_profiles_uploadphoto(users, channels):
     # checking if selection is a square
     pytest.raises(Value_Error, user_profiles_uploadphoto, users[0]["token"],
                   sample, 0, 0, 199, 179)
-
+    
     pytest.raises(Value_Error, user_profiles_uploadphoto, users[0]["token"],
                   sample, 50, 0, 199, 199)
+    
+    # try to load an image with an invalid type
+    invalid_img = "https://upload.wikimedia.org/wikipedia/commons/1/1b/Square_200x200.png"
+    pytest.raises(Value_Error, user_profiles_uploadphoto, users[0]["token"],
+                  invalid_img, 0, 0, 199, 199)
 
     # this test should pass with no issue
     assert user_profiles_uploadphoto(users[0]["token"], sample, 0, 0, 199, 199) == {}
+
 
 #######################################################################
 ###  USERS_ALL TESTS HERE #############################################
