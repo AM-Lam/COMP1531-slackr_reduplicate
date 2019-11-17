@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytest
 from .database import get_channel, get_user
 from .decorators import setup_data
-from .channel import channel_join, channels_create
+from .channel import channel_join
 from .message import (message_edit, message_send, message_remove, message_pin,
                       message_react, message_sendlater, message_unpin,
                       message_unreact, search)

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from threading import Timer
 from .message import send_message
 from .database import (get_channel, check_valid_token, is_user_member,
-                       get_user, Messages, get_data)
+                       get_user, Messages)
 from .access_error import AccessError, Value_Error
 
 
