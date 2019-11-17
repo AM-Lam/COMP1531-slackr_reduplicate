@@ -400,7 +400,6 @@ def run_standup_start():
 
 @APP.route('/standup/send', methods=["POST"])
 def run_standup_send():
-    print("blaaaaah")
     request_data = request.form
     return_value = {}
 
@@ -411,6 +410,7 @@ def run_standup_send():
     )
 
     return dumps(return_value)
+
 
 @APP.route('/standup/active', methods=["GET"])
 def run_standup_active():

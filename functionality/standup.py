@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from threading import Timer
 from .message import send_message
 from .database import (get_channel, check_valid_token, is_user_member,
-                       get_user, Messages)
+                       get_user, Messages, get_data)
 from .access_error import AccessError, Value_Error
 
 
@@ -34,8 +34,8 @@ def standup_end(channel):
     channel.set_standup({
         "time_finish" : None,
         "is_active" : False,
-        "start_user" : None,
-        "messages" : ""
+        "messages" : "",
+        "start_user" : None
     })
 
 
@@ -68,13 +68,13 @@ def standup_start(token, channel_id, length):
 
     # check if there is an active standup session
     if channel.get_standup()["is_active"]:
-        raise AccessError(description="There is already an active standup.")
+        raise Value_Error(description="There is already an active standup.")
 
     # set the standup end time to be X amount of time from now
     time_finish = datetime.now() + timedelta(seconds=length)
 
     # give the channel this new standup time
-    get_channel(channel_id).set_standup({
+    channel.set_standup({
         "time_finish" : time_finish,
         "is_active" : True,
         "messages" : "",
@@ -125,8 +125,6 @@ def standup_send(token, channel_id, message):
 
     # append the message to the standup message variable
     channel.get_standup()["messages"] += f'{user.get_handle()}: {message}\n'
-
-    print(channel.get_standup())
 
     return {}
 

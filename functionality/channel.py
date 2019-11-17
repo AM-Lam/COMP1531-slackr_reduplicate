@@ -29,9 +29,9 @@ def channel_addowner(token, channel_id, u_id):
 
     # finally set u_id to be an owner of the channel requested, if they
     # are not already a member of this channel add them as one as well
-    to_add.get_owners().append(u_id)
+    to_add.add_owner(u_id)
     if not is_user_member(u_id, channel_id):
-        to_add.get_members().append(u_id)
+        to_add.add_member(u_id)
 
     return {}
 
@@ -129,10 +129,10 @@ def channel_leave(token, channel_id):
     # attempt to remove the user from the channel, if they are also an
     # owner of the channel remove them from tha list as well
     if is_user_member(u_id, channel_id):
-        channel.get_members().remove(u_id)
+        channel.remove_member(u_id)
 
     if is_user_owner(u_id, channel_id):
-        channel.get_owners().remove(u_id)
+        channel.remove_owner(u_id)
 
     # always return an empty dictionary
     return {}
@@ -195,7 +195,7 @@ def channel_removeowner(token, channel_id, u_id):
 
     # finally remove the u_id as an owner of the channel requested, we
     # will need to interact with a database to handle this
-    to_remove.get_owners().remove(u_id)
+    to_remove.remove_owner(u_id)
 
     return {}
 
@@ -270,7 +270,6 @@ def channels_listall(token):
 
         # if the channel is private do not add it if we are a regular
         # user who is not a member of it
-        print(f'Channel {channel_id} is public? {channel.is_public()}')
         if not channel.is_public() and not (user.is_global_admin() or
                                             user.is_slackr_owner() or
                                             is_user_member(u_id, channel_id)):

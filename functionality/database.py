@@ -29,20 +29,6 @@ class User:
         self._slackr_owner = False
         self._profile_img_url = "static/profile_images/default.jpg"
 
-    def get_user_data(self):
-        return {
-            "u_id" : self._u_id,
-            "first_name" : self._first_name,
-            "last_name" : self._last_name,
-            "password" : self._password,
-            "email" : self._email,
-            "handle_str" : self._handle,
-            "profile_img_url" : self._profile_img_url
-        }
-
-    def update_id(self, new_id):
-        self._u_id = new_id
-
     def update_first_name(self, new_fname):
         self._first_name = new_fname
 
@@ -130,18 +116,6 @@ class Channel:
         # get clashing ids
         self._message_id_max = 1
 
-    def get_channel_data(self):
-        return {
-            "channel_id" : self._channel_id,
-            "channel_name" : self._channel_name,
-            "messages" : self._messages,
-            "owners" : self._owners,
-            "members" : self._members,
-            "public" : self._public,
-            "standup" : self._standup,
-        }
-
-
     def frontend_format(self):
         return {
             "channel_id" : self._channel_id,
@@ -161,7 +135,9 @@ class Channel:
         return self._members
 
     def get_owners(self):
-        return self._owners
+        return list(set(self._owners + list(
+            filter(lambda x: is_user_member(x, self.get_id()), get_admins())
+        )))
 
     def is_public(self):
         return self._public
@@ -182,9 +158,6 @@ class Channel:
 
         raise Value_Error(description="Message does not exist")
 
-    def set_id(self, new_id):
-        self._channel_id = new_id
-
     def set_name(self, name):
         self._channel_name = name
 
@@ -197,8 +170,14 @@ class Channel:
     def add_member(self, member):
         self._members.append(member)
 
+    def remove_member(self, member):
+        self._members.remove(member)
+
     def add_owner(self, owner):
         self._owners.append(owner)
+
+    def remove_owner(self, owner):
+        self._owners.remove(owner)
 
     def set_public(self, public):
         self._public = public
@@ -236,26 +215,14 @@ class Messages:
 
         self._pinned = False                # bool of whether the message is pinned or not
 
-
-    def get_message_data(self):
+    def frontend_format(self, u_id):
         return {
-            "message_id" : self._message_id,
-            "u_id" : self._u_id,
-            "channel_id" : self._channel_id,
-            "text" : self._text,
-            "time_sent" : self._time_sent,
-            'reacts': self._reacts,
-            'is_pinned': self._pinned,
-        }
-
-    def frontend_format(self):
-        return {
-            'message_id': self._message_id,
-            'u_id': self._u_id,
-            'message': self._text,
-            'time_created': self._time_sent,
-            'reacts': self._reacts,
-            'is_pinned': self._pinned,
+            "message_id": self.get_m_id(),
+            "u_id": self.get_u_id(),
+            "message": self.get_text(),
+            "time_created": self.get_time_sent().timestamp(),
+            "reacts": self.get_reacts_frontend(u_id),
+            "is_pinned": self.is_pinned()
         }
 
     def get_m_id(self):
@@ -443,14 +410,7 @@ def get_message_list(channel, start, end, u_id):
     # them in chronological order
     messages = channel.get_messages()[::-1]
     for message in messages[start:end]:
-        return_messages.append({
-            "message_id" : message.get_m_id(),
-            "u_id" : message.get_u_id(),
-            "message" : message.get_text(),
-            "time_created" : message.get_time_sent().timestamp(),
-            "reacts" :  message.get_reacts_frontend(u_id),
-            "is_pinned" : message.is_pinned()
-        })
+        return_messages.append(message.frontend_format(u_id))
 
     return return_messages
 
@@ -515,6 +475,21 @@ def check_reset_code(reset_code):
         return email
 
     raise Value_Error("Reset code incorrect!")
+
+
+def get_admins():
+    # get all the admins/slackr owners, they have
+    # permissions in all channels so we should add
+    # them to the owners list
+    admins = []
+    users = get_data()["users"]
+
+    for u_id in get_data()["users"]:
+        user = users[u_id]
+        if user.is_global_admin() or user.is_slackr_owner():
+            admins.append(u_id)
+
+    return admins
 
 
 clear_data()
