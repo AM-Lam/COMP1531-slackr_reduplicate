@@ -88,15 +88,15 @@ def message_edit(token, message_id, message):
 
     message_user = None
     to_edit = None
-    channel = None
+    channel_id = -1
 
-    for channel_id in channels:
-        potential_channel = get_channel(channel_id)
+    for c_id in channels:
+        channel = get_channel(c_id)
 
         try:
-            to_edit = potential_channel.get_message(message_id)
+            to_edit = channel.get_message(message_id)
             message_user = get_user(to_edit.get_u_id())
-            channel = potential_channel
+            channel_id = c_id
             break
         except Value_Error:
             continue
