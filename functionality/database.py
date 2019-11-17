@@ -248,15 +248,14 @@ class Messages:
             'is_pinned': self._pinned,
         }
 
-    def frontend_format(self):
+    def frontend_format(self, u_id):
         return {
-            'message_id': self._message_id,
-            'u_id': self._u_id,
-            'message': self._text,
-            'time_created': self._time_sent,
-            'reacts': self._reacts,
-            'is_pinned': self._pinned,
-        }
+            "message_id": self.get_m_id(),
+            "u_id": self.get_u_id(),
+            "message": self.get_text(),
+            "time_created": self.get_time_sent().timestamp(),
+            "reacts": self.get_reacts_frontend(u_id),
+            "is_pinned": self.is_pinned()}
 
     def get_m_id(self):
         return self._message_id
@@ -443,14 +442,7 @@ def get_message_list(channel, start, end, u_id):
     # them in chronological order
     messages = channel.get_messages()[::-1]
     for message in messages[start:end]:
-        return_messages.append({
-            "message_id" : message.get_m_id(),
-            "u_id" : message.get_u_id(),
-            "message" : message.get_text(),
-            "time_created" : message.get_time_sent().timestamp(),
-            "reacts" :  message.get_reacts_frontend(u_id),
-            "is_pinned" : message.is_pinned()
-        })
+        return_messages.append(message.frontend_format(u_id))
 
     return return_messages
 

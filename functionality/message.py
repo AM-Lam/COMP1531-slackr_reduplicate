@@ -314,13 +314,6 @@ def search(token, query_str):
 
         for message in channel.get_messages():
             if query_str in message.get_text():
-                message_match["messages"].append({
-                    "message_id" : message.get_m_id(),
-                    "u_id" : message.get_u_id(),
-                    "message" : message.get_text(),
-                    "time_created" : message.get_time_sent(),
-                    "reacts" : message.get_reacts_frontend(u_id),
-                    "is_pinned" : message.is_pinned()
-                })
+                message_match["messages"].append(message.frontend_format(u_id))
 
     return message_match
