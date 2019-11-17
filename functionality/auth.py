@@ -99,7 +99,7 @@ def auth_passwordreset_reset(reset_code, new_password):
             del get_data()["reset"][reset_code]
 
             return {}
-    
+
     # make an assumption that if, somehow, a user manages to get a valid reset
     # code but the associated email no longer exists an error is raised
     raise Value_Error(description="The user does not exist")
@@ -179,9 +179,9 @@ def admin_userpermission_change(token, u_id, p_id):
         raise AccessError(description="You do not have permissions to do this")
 
     # raise a Value_Error if the given permission ID is not valid
-    if not (1 <= p_id <= 3):
+    if not 1 <= p_id <= 3:
         raise Value_Error(description=f"{p_id} is not a valid permission id")
-    
+
     # global admins cannot change the perms of slackr owners
     if not request_user.is_slackr_owner() and user.is_slackr_owner():
         raise AccessError(description="You do not have permissions to do this")
@@ -205,5 +205,5 @@ def admin_userpermission_change(token, u_id, p_id):
         # possible if we reach this point
         user.set_slackr_owner(False)
         user.set_global_admin(False)
-    
+
     return {}

@@ -2,10 +2,8 @@
 Functions that relate to standup functionality.
 """
 
-import time
 from datetime import datetime, timedelta
 from threading import Timer
-import jwt
 from .message import send_message
 from .database import (get_channel, check_valid_token, is_user_member,
                        get_user, Messages)
@@ -20,16 +18,16 @@ def standup_end(channel):
     print("Standup just ended")
 
     standup_data = channel.get_standup()
-    
+
     start_user = standup_data["start_user"]
     message_text = standup_data["messages"]
-    
+
     m_id = channel.get_m_id()
     channel.increment_m_id()
-    
+
     standup_message = Messages(m_id, start_user.get_u_id(), message_text,
                                channel.get_id(), datetime.now(), [])
-    
+
     send_message(channel, standup_message, datetime.now())
 
     # now reset the channel standup data
@@ -127,7 +125,7 @@ def standup_send(token, channel_id, message):
 
     # append the message to the standup message variable
     channel.get_standup()["messages"] += f'{user.get_handle()}: {message}\n'
-    
+
     print(channel.get_standup())
 
     return {}
@@ -158,5 +156,5 @@ def standup_active(token, channel_id):
         "time_finish": time_finish,
         "is_active": channel.get_standup()["is_active"]
     }
-    
+
     return status
