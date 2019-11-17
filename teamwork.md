@@ -20,8 +20,8 @@ _Your reflection should, at a minimum, include:_
 
 # From last iteration
 - Things should be done last iteration
-    Modifying the database and all the functions in the last iteration.
-    Making the frontend connected with backend
+  Modifying the database and all the functions in the last iteration.
+  Making the frontend connected with backend
 
 # meeting detail
 - 06/11 60 minutes Talked about what we can modify from last iteration and how can we improve the database.py.
