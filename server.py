@@ -10,8 +10,8 @@ from flask_cors import CORS
 from flask import Flask, request
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
-from functionality import (auth, user, database, channel, message,
-                           standup, access_error)
+from server import (auth, user, database, channel, message, standup,
+                    access_error)
 
 
 def default_handler(err):
