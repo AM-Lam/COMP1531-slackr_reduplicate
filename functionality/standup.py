@@ -68,7 +68,7 @@ def standup_start(token, channel_id, length):
 
     # check if there is an active standup session
     if channel.get_standup()["is_active"]:
-        raise AccessError(description="There is already an active standup.")
+        raise Value_Error(description="There is already an active standup.")
 
     # set the standup end time to be X amount of time from now
     time_finish = datetime.now() + timedelta(seconds=length)

@@ -27,7 +27,10 @@ def test_standup_start(users, channels):
 
     assert (predicted_finish_time -
             datetime.fromtimestamp(finish_time["time_finish"])) <= timedelta(6)
-
+    
+    # try to start a new standup while this one is active
+    pytest.raises(Value_Error, standup_start, user1["token"],
+                  channel["channel_id"], dev_time)
     # returns a Value_Error if the channel doesn't exist
     pytest.raises(Value_Error, standup_start, user1["token"],
                   "not_a_real_channel", dev_time)
