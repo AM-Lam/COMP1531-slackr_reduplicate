@@ -27,9 +27,11 @@ def test_standup_start(users, channels):
     dev_time = 5
 
     predicted_finish_time = datetime.now() + timedelta(seconds=dev_time)
-    finish_time = standup_start(user1["token"], channel["channel_id"], dev_time)
+    finish_time = standup_start(user1["token"], channel["channel_id"],
+                                dev_time)
 
-    assert predicted_finish_time - finish_time <= timedelta(6)
+    assert (predicted_finish_time -
+            datetime.fromtimestamp(finish_time["time_finish"])) <= timedelta(6)
 
     # returns a Value_Error if the channel doesn't exist
     pytest.raises(Value_Error, standup_start, user1["token"],
@@ -44,11 +46,9 @@ def test_standup_start(users, channels):
 #######################################################################
 @setup_data(user_num=2, channel_num=1)
 def test_standup_send(users, channels):
-
     dev_time = 5
 
     user1 = users[0]
-    user2 = users[1]
     channel = channels[0]
 
     predicted_finish = datetime.now() + timedelta(seconds=dev_time + 1)
@@ -94,8 +94,10 @@ def test_standup_active(users, channels):
 
     # this test should pass with no issue
     new_standup = standup_active(user1["token"], channel["channel_id"])
+    
     assert new_standup["is_active"]
-    assert new_standup["time_finish"] - predicted_finish <= timedelta(seconds=1)
+    assert (datetime.fromtimestamp(new_standup["time_finish"]) 
+            - predicted_finish) <= timedelta(seconds=1)
 
     # raises a Value_Error if channel does not exist
     pytest.raises(Value_Error, standup_active, user1["token"], "not_a_real_channel")
