@@ -136,21 +136,21 @@ def channel_messages_e():
 @APP.route('/channels/create', methods=["POST"])
 def run_channels_create():
     """
-        run the channels_create function to make a new channel and
-        add it to the  server database
+    Run the channels_create function to make a new channel and
+    add it to the  server database
     """
     request_data = request.form
     return_value = channel.channels_create(request_data["token"],
                                            request_data["name"],
-                                           bool(request_data["is_public"]))
+                                           request_data["is_public"] == 'true')
 
     return dumps(return_value)
 
 @APP.route('/message/send', methods=["POST"])
 def run_message_send():
     """
-        run the message_send function to send a message and
-        add it to the  server database
+    Run the message_send function to send a message and
+    add it to the  server database
     """
     request_data = request.form
     return_value = message.message_send(request_data["token"],
@@ -163,8 +163,8 @@ def run_message_send():
 @APP.route('/message/remove', methods=["DELETE"])
 def run_message_remove():
     """
-        run the message_remove function to remove a message and
-        update the server database
+    Run the message_remove function to remove a message and
+    update the server database
     """
     request_data = request.form
     return_value = message.message_remove(request_data["token"],
@@ -176,8 +176,8 @@ def run_message_remove():
 @APP.route('/message/edit', methods=["PUT"])
 def run_message_edit():
     """
-        run the message_edit function to edit a message and
-        update the server database
+    Run the message_edit function to edit a message and
+    update the server database
     """
     request_data = request.form
     return_value = message.message_edit(request_data["token"],
@@ -190,8 +190,8 @@ def run_message_edit():
 @APP.route('/message/react', methods=["POST"])
 def run_message_react():
     """
-        run the message_react function to react a message and
-        add it to the server database
+    Run the message_react function to react a message and
+    add it to the server database
     """
     request_data = request.form
     return_value = message.message_react(request_data["token"],
@@ -204,8 +204,8 @@ def run_message_react():
 @APP.route('/message/unreact', methods=["POST"])
 def run_message_unreact():
     """
-        run the message_react function to react a message and
-        add it to the server database
+    Run the message_react function to react a message and
+    add it to the server database
     """
     request_data = request.form
     return_value = message.message_unreact(request_data["token"],
@@ -218,8 +218,8 @@ def run_message_unreact():
 @APP.route('/message/pin', methods=["POST"])
 def run_message_pin():
     """
-        run the message_react function to react a message and
-        add it to the server database
+    Run the message_react function to react a message and
+    add it to the server database
     """
     request_data = request.form
     return_value = message.message_pin(request_data["token"],
@@ -231,8 +231,8 @@ def run_message_pin():
 @APP.route('/message/unpin', methods=["POST"])
 def run_message_unpin():
     """
-        run the message_react function to react a message and
-        add it to the server database
+    Run the message_react function to react a message and
+    add it to the server database
     """
     request_data = request.form
 
@@ -245,8 +245,8 @@ def run_message_unpin():
 @APP.route('/user/profile', methods=["GET"])
 def run_user_profile():
     """
-        run the message_react function to react a message and
-        add it to the server database
+    Run the message_react function to react a message and
+    add it to the server database
     """
     request_data = request.args
     return_value = user.user_profile(request_data["token"],
@@ -313,7 +313,7 @@ def run_channel_addowner():
 @APP.route('/channel/removeowner', methods=["POST"])
 def run_channel_removeowner():
     request_data = request.form
-    return_value = channel.channel_addowner(
+    return_value = channel.channel_removeowner(
         request_data["token"],
         int(request_data["channel_id"]),
         int(request_data["u_id"])
