@@ -80,8 +80,10 @@ def test_admin_user(users, channels):
     user2_obj = get_user(users[1]["u_id"])
     user2_obj.set_global_admin(True)
 
-    channel = channels_create(users[0]["token"], "Channel 1", True)
-    message_1 = message_send(users[0]["token"], channel["channel_id"], "Hello")
+    channel_join(users[1]["token"], channels[0]["channel_id"])
+
+    message_1 = message_send(users[0]["token"], channels[0]["channel_id"],
+                             "Hello")
 
     # delete the message
     assert message_remove(users[1]["token"], message_1['message_id']) == {}

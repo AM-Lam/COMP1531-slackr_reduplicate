@@ -270,7 +270,6 @@ def channels_listall(token):
 
         # if the channel is private do not add it if we are a regular
         # user who is not a member of it
-        print(f'Channel {channel_id} is public? {channel.is_public()}')
         if not channel.is_public() and not (user.is_global_admin() or
                                             user.is_slackr_owner() or
                                             is_user_member(u_id, channel_id)):

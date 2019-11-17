@@ -88,13 +88,15 @@ def message_edit(token, message_id, message):
 
     message_user = None
     to_edit = None
+    channel = None
 
     for channel_id in channels:
-        channel = get_channel(channel_id)
+        potential_channel = get_channel(channel_id)
 
         try:
-            to_edit = channel.get_message(message_id)
+            to_edit = potential_channel.get_message(message_id)
             message_user = get_user(to_edit.get_u_id())
+            channel = potential_channel
             break
         except Value_Error:
             continue
@@ -103,7 +105,8 @@ def message_edit(token, message_id, message):
         raise Value_Error(description="Message does not exist")
 
     # if user is not the poster or admin
-    if request_user != message_user and not request_user.is_global_admin():
+
+    if request_user != message_user and not is_user_owner(u_id, channel_id):
         raise AccessError(description="You do not have permission to edit this message")
 
     # update the database with new message
@@ -136,8 +139,10 @@ def message_remove(token, message_id):
     if message is None:
         raise Value_Error(description="Message does not exist")
 
-    # if user is not the poster or admin
-    if request_user != message_user and not request_user.is_global_admin():
+    # if user is not the poster or a channel owner, global admin or
+    # slackr owner
+    channel_id = channel.get_id()
+    if request_user != message_user and not is_user_owner(u_id, channel_id):
         raise AccessError(description="You do not have permission to edit this message")
 
     # remove the message to the server database
@@ -150,8 +155,6 @@ def message_pin(token, message_id):
     channels = get_data()["channels"]
 
     u_id = check_valid_token(token)
-
-    user = get_user(u_id)
 
     channel = None
     message = None
@@ -169,7 +172,7 @@ def message_pin(token, message_id):
     if message is None:
         raise Value_Error(description="Message does not exist")
 
-    if not user.is_global_admin() and not is_user_owner(u_id, channel.get_id()):
+    if not is_user_owner(u_id, channel.get_id()):
         raise Value_Error(description="Only admins and owners can pin messages!")
 
     # Message with ID message_id is already pinned raises an error
@@ -188,7 +191,6 @@ def message_unpin(token, message_id):
     channels = get_data()["channels"]
 
     u_id = check_valid_token(token)
-    user = get_user(u_id)
 
     channel = None
     message = None
@@ -206,7 +208,7 @@ def message_unpin(token, message_id):
     if message is None:
         raise Value_Error(description="Message does not exist")
 
-    if not user.is_global_admin() and not is_user_owner(u_id, channel.get_id()):
+    if not is_user_owner(u_id, channel.get_id()):
         raise Value_Error(description="Only admins and owners can unpin messages!")
 
     if not message.is_pinned():
@@ -285,6 +287,7 @@ def message_unreact(token, message_id, react_id):
             return {}
 
     raise Value_Error(description="Not a valid react id")
+
 
 def search(token, query_str):
     """
