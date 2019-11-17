@@ -271,7 +271,7 @@ def test_message_sendlater(users, channels):
                   404, "Message", datetime.now() + timedelta(minutes=1))
 
     # now try to send a valid message in the future
-    time_sent = datetime.utcnow() + timedelta(seconds=5)
+    time_sent = datetime.now() + timedelta(seconds=5)
     assert message_sendlater(users[0]["token"], channels[0]["channel_id"], "Message",
                              time_sent) == {"message_id" : 1}
 
@@ -281,13 +281,13 @@ def test_message_sendlater(users, channels):
     # wait until the time has passed then check if the message was sent
     # (wait a little longer just to ensure that we aren't checking for the
     # message at the same time as it is sent)
-    while datetime.utcnow() < time_sent + timedelta(seconds=1):
+    while datetime.now() < time_sent + timedelta(seconds=1):
         continue
 
     assert len(channel_obj.get_messages()) == 1
 
     # try to send a message in a channel we do not have access to
-    time_sent = datetime.utcnow() + timedelta(seconds=5)
+    time_sent = datetime.now() + timedelta(seconds=5)
     pytest.raises(AccessError, message_sendlater, users[1]["token"],
                   channels[0]["channel_id"], "message", time_sent)
 

@@ -329,7 +329,7 @@ def run_message_sendlater():
         request_data["token"],
         int(request_data["channel_id"]),
         request_data["message"],
-        datetime.utcfromtimestamp(int(request_data["time_sent"]) / 1000)
+        datetime.fromtimestamp(int(request_data["time_sent"]))
     )
 
     return dumps(return_value)
@@ -388,10 +388,11 @@ def run_profile_uploadphoto():
 @APP.route('/standup/start', methods=["POST"])
 def run_standup_start():
     request_data = request.form
+
     return_value = standup.standup_start(
         request_data["token"],
         int(request_data["channel_id"]),
-        int(request_data["length"] / 1000)
+        int(request_data["length"])
     )
 
     return dumps(return_value)
@@ -399,6 +400,7 @@ def run_standup_start():
 
 @APP.route('/standup/send', methods=["POST"])
 def run_standup_send():
+    print("blaaaaah")
     request_data = request.form
     return_value = {}
 
@@ -410,6 +412,16 @@ def run_standup_send():
 
     return dumps(return_value)
 
+@APP.route('/standup/active', methods=["GET"])
+def run_standup_active():
+    request_data = request.args
+
+    return_value = standup.standup_active(request_data["token"],
+                                          int(request_data["channel_id"]))
+
+    return dumps(return_value)
+
+
 @APP.route('/search', methods=["GET"])
 def run_search():
     request_data = request.args
@@ -419,6 +431,7 @@ def run_search():
     )
 
     return dumps(return_value)
+
 
 @APP.route('/admin/userpermission/change', methods=["POST"])
 def run_admin_userpermission_change():
@@ -431,12 +444,6 @@ def run_admin_userpermission_change():
         int(request_data["permission_id"]))
 
     return dumps(return_value)
-
-
-@APP.route('/standup/active', methods=["GET"])
-def run_standup_active():
-    # to suppress errors just always return an inactive standup
-    return dumps({"is_active" : False, "time_finish" : None})
 
 
 @APP.route('/users/all', methods=['GET'])
