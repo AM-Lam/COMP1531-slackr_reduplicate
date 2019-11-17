@@ -27,7 +27,7 @@ def test_standup_start(users, channels):
 
     assert (predicted_finish_time -
             datetime.fromtimestamp(finish_time["time_finish"])) <= timedelta(6)
-    
+
     # try to start a new standup while this one is active
     pytest.raises(Value_Error, standup_start, user1["token"],
                   channel["channel_id"], dev_time)
@@ -81,10 +81,10 @@ def test_standup_send(users, channels):
 #######################################################################
 ###  STANDUP_ACTIVE TESTS HERE ########################################
 #######################################################################
-@setup_data(user_num=1, channel_num=1)
+@setup_data(user_num=1, channel_num=2)
 def test_standup_active(users, channels):
 
-    dev_time = 5
+    dev_time = 10
 
     user1 = users[0]
     channel = channels[0]
@@ -92,9 +92,11 @@ def test_standup_active(users, channels):
     predicted_finish = datetime.now() + timedelta(seconds=dev_time + 1)
 
     # start the standup
-    threading.Thread(target=standup_start, args=(user1["token"],
-                                                 channel["channel_id"],
-                                                 dev_time)).start()
+    standup_start(user1["token"], channel["channel_id"], dev_time)
+
+    # check that a different channel has no standup
+    assert standup_active(user1["token"], channels[1]["channel_id"]) == \
+    {"is_active": False, "time_finish": None}
 
     # this test should pass with no issue
     new_standup = standup_active(user1["token"], channel["channel_id"])
