@@ -7,6 +7,7 @@ messages
 
 import threading
 from datetime import datetime
+from time import sleep
 from .database import (check_valid_token, get_data, get_channel,
                        is_user_member, is_user_owner, get_user, Messages)
 from .access_error import AccessError, Value_Error
@@ -14,8 +15,8 @@ from .access_error import AccessError, Value_Error
 
 def send_message(channel, message, time_sent):
     # wait until we have passed beyond the desired time to send the message
-    while datetime.utcnow() < time_sent:
-        continue
+    while datetime.now() < time_sent:
+        sleep(0.1)
 
     # now just append the message we created earlier to the provided channel
     channel.add_message(message)
@@ -37,12 +38,12 @@ def message_send(token, channel_id, message):
     # now create the message we will be sending
     message_id = channel.get_m_id()
     to_send = Messages(message_id, u_id, message, channel_id,
-                       datetime.utcnow(), [])
+                       datetime.now(), [])
 
     # increment the channel's max message id
     channel.increment_m_id()
 
-    send_message(channel, to_send, datetime.utcnow())
+    send_message(channel, to_send, datetime.now())
 
     # return the new message's id
     return {"message_id" : message_id}
@@ -62,13 +63,13 @@ def message_sendlater(token, channel_id, message, time_sent):
         raise AccessError(description="You don't have access in this channel")
 
     # if the time to send is in the past raise an error
-    if time_sent < datetime.utcnow():
+    if time_sent < datetime.now():
         raise Value_Error(description="Cannot send a message in the past")
 
     # now create the message we will be sending
     message_id = channel.get_m_id()
     to_send = Messages(message_id, u_id, message, channel_id,
-                       datetime.utcnow(), [])
+                       datetime.now(), [])
 
     # increment the channel's max message id
     channel.increment_m_id()
@@ -89,11 +90,10 @@ def message_edit(token, message_id, message):
     to_edit = None
 
     for channel_id in channels:
-        potential_channel = get_channel(channel_id)
+        channel = get_channel(channel_id)
 
         try:
-            to_edit = potential_channel.get_message(message_id)
-            channel = potential_channel
+            to_edit = channel.get_message(message_id)
             message_user = get_user(to_edit.get_u_id())
             break
         except Value_Error:
@@ -281,7 +281,7 @@ def message_unreact(token, message_id, react_id):
                 raise Value_Error(description="You have not reacted to this\
                                   message with this react")
             react["u_ids"].remove(u_id)
-            
+
             return {}
 
     raise Value_Error(description="Not a valid react id")
@@ -302,7 +302,7 @@ def search(token, query_str):
     assert u_id is not None
 
     # initialise an empty list
-    message_match = { "messages": [] }
+    message_match = {"messages": []}
 
     for channel_id in get_data()["channels"]:
         # check that the user has access to this channel

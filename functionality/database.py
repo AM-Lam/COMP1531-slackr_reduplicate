@@ -17,7 +17,8 @@ SECRET = "AVENGERS_SOCKS"
 
 
 class User:
-    def __init__(self, u_id, first_name, last_name, password, email, global_admin=False, profile_img_url=None):
+    def __init__(self, u_id, first_name, last_name, password, email,
+                 global_admin=False):
         self._u_id = u_id
         self._first_name = first_name
         self._last_name = last_name
@@ -65,7 +66,7 @@ class User:
 
     def set_slackr_owner(self, owner):
         self._slackr_owner = owner
-        
+
     def get_u_id(self):
         return self._u_id
 
@@ -89,43 +90,45 @@ class User:
 
     def is_slackr_owner(self):
         return self._slackr_owner
-    
+
     def get_profile_img_url(self):
         return self._profile_img_url
 
 
 class Channel:
     def __init__(self, channel_id, channel_name, messages, creator, public):
-        self._channel_id = channel_id       # id of the channel, increases
-                                            # sequentially
+        self._channel_id = channel_id
+        self._channel_name = channel_name
 
-        self._channel_name = channel_name   # channel name, string
+        # messages, list of Messages objects
+        self._messages = messages
 
-        self._messages = messages           # messages in the channel, list
-                                            # of Message objects
-
-        self._members = creator             # members of the channel, just a list
-                                            # of u_ids
+        # members of the channel, list of uids
+        self._members = creator
 
         self._pinned_messages = []
 
-        self._owners = creator.copy()       # owners of the channel, initially set to
-                                            # the creator of the channel, this must
-                                            # be a copy so that changing it doesn't
-                                            # change members and vice-versa
+        # owners of the channel, initially just the creator, this is
+        # a copy so that changing it doesn't affect the members and
+        # vice-versa
+        self._owners = creator.copy()
 
-        self._public = public               # is the channel public, boolean
-                                            # val
+        # is the channel public? boolean value
+        self._public = public
 
-        self._standup = None                # when standup is active, gives time when
-                                            # standup finishes
-                                            # else it's None
+        # a dictionary representing the status of a standup, has the
+        # structure:
+        # {time_finish : time,
+        #  is_active : bool,
+        #  messages : str,
+        #  start_user : User}
+        self._standup = {"time_finish": None, "is_active": False,
+                         "messages": "", "start_user": None}
 
-        self._message_id_max = 1            # a value we need to use to keep
-                                            # track of the current messages id
-                                            # since message_sendlater is concurrent
-                                            # we need to keep track of this explicitly
-
+        # keeps track of the next message_id to be given out, stored
+        # like this so that message_sendlater and message_send don't
+        # get clashing ids
+        self._message_id_max = 1
 
     def get_channel_data(self):
         return {
@@ -269,7 +272,7 @@ class Messages:
 
     def get_time_sent(self):
         return self._time_sent
-    
+
     def get_reacts(self):
         return self._reacts
 

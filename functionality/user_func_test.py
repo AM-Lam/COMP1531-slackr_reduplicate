@@ -1,6 +1,7 @@
 # pylint: disable=C0114
 # pylint: disable=C0116
 # pylint: disable=W0611
+# pylint: disable=W0613
 
 
 import pytest
@@ -39,10 +40,12 @@ def test_user_profile_sethandle(users, channels):
     assert user_profile_sethandle(users[0]["token"], "handle") == {}
 
     # return a Value_Error if the handle is too long
-    pytest.raises(Value_Error, user_profile_sethandle, users[0]["token"], "abcdefghijklmnopqrstuvwxyz")
+    pytest.raises(Value_Error, user_profile_sethandle, users[0]["token"],
+                  "abcdefghijklmnopqrstuvwxyz")
 
     # if the handle (tested by "handle1") is already in use
-    pytest.raises(Value_Error, user_profile_sethandle, users[1]["token"], "handle")
+    pytest.raises(Value_Error, user_profile_sethandle, users[1]["token"],
+                  "handle")
 
 
 #######################################################################
@@ -88,7 +91,7 @@ def test_user_profile1(users, channels):
         'handle_str': "user1last1",
         'profile_img_url': 'static/profile_images/default.jpg'
         }
-    
+
     # try to get the data of a user that does not exist
     pytest.raises(Value_Error, user_profile, users[0]["token"], 589)
 
@@ -103,6 +106,7 @@ def test_user_profile1(users, channels):
 
 @setup_data(user_num=1)
 def test_user_profiles_uploadphoto(users, channels):
+    # pylint: disable=C0301
     sample = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/16x16%2BR.jpg/256px-16x16%2BR.jpg"
 
     # checking for invalid URL
@@ -124,10 +128,10 @@ def test_user_profiles_uploadphoto(users, channels):
     # checking if selection is a square
     pytest.raises(Value_Error, user_profiles_uploadphoto, users[0]["token"],
                   sample, 0, 0, 199, 179)
-    
+
     pytest.raises(Value_Error, user_profiles_uploadphoto, users[0]["token"],
                   sample, 50, 0, 199, 199)
-    
+
     # try to load an image with an invalid type
     invalid_img = "https://upload.wikimedia.org/wikipedia/commons/1/1b/Square_200x200.png"
     pytest.raises(Value_Error, user_profiles_uploadphoto, users[0]["token"],
@@ -145,67 +149,67 @@ def test_user_profiles_uploadphoto(users, channels):
 def test_users_all(users, channels):
     # testing good functionality (all users should have access):
     assert users_all(users[0]['token']) == {'users': [
-            {'u_id': 1,
-             'email': 'user1@valid.com',
-             'name_first': 'user1',
-             'name_last': 'last1',
-             'handle_str': 'user1last1',
-             'profile_img_url': 'static/profile_images/default.jpg'},
-            {'u_id': 2,
-             'email': 'user2@valid.com',
-             'name_first': 'user2',
-             'name_last': 'last2',
-             'handle_str': 'user2last2',
-             'profile_img_url': 'static/profile_images/default.jpg'},
-            {'u_id': 3,
-             'email': 'user3@valid.com',
-             'name_first': 'user3',
-             'name_last': 'last3',
-             'handle_str': 'user3last3',
-             'profile_img_url': 'static/profile_images/default.jpg'}
+        {'u_id': 1,
+         'email': 'user1@valid.com',
+         'name_first': 'user1',
+         'name_last': 'last1',
+         'handle_str': 'user1last1',
+         'profile_img_url': 'static/profile_images/default.jpg'},
+        {'u_id': 2,
+         'email': 'user2@valid.com',
+         'name_first': 'user2',
+         'name_last': 'last2',
+         'handle_str': 'user2last2',
+         'profile_img_url': 'static/profile_images/default.jpg'},
+        {'u_id': 3,
+         'email': 'user3@valid.com',
+         'name_first': 'user3',
+         'name_last': 'last3',
+         'handle_str': 'user3last3',
+         'profile_img_url': 'static/profile_images/default.jpg'}
         ]}
-    
+
     assert users_all(users[1]['token']) == {'users': [
-            {'u_id': 1,
-             'email': 'user1@valid.com',
-             'name_first': 'user1',
-             'name_last': 'last1',
-             'handle_str': 'user1last1',
-             'profile_img_url': 'static/profile_images/default.jpg'},
-            {'u_id': 2,
-             'email': 'user2@valid.com',
-             'name_first': 'user2',
-             'name_last': 'last2',
-             'handle_str': 'user2last2',
-             'profile_img_url': 'static/profile_images/default.jpg'},
-            {'u_id': 3,
-             'email': 'user3@valid.com',
-             'name_first': 'user3',
-             'name_last': 'last3',
-             'handle_str': 'user3last3',
-             'profile_img_url': 'static/profile_images/default.jpg'}
+        {'u_id': 1,
+         'email': 'user1@valid.com',
+         'name_first': 'user1',
+         'name_last': 'last1',
+         'handle_str': 'user1last1',
+         'profile_img_url': 'static/profile_images/default.jpg'},
+        {'u_id': 2,
+         'email': 'user2@valid.com',
+         'name_first': 'user2',
+         'name_last': 'last2',
+         'handle_str': 'user2last2',
+         'profile_img_url': 'static/profile_images/default.jpg'},
+        {'u_id': 3,
+         'email': 'user3@valid.com',
+         'name_first': 'user3',
+         'name_last': 'last3',
+         'handle_str': 'user3last3',
+         'profile_img_url': 'static/profile_images/default.jpg'}
         ]}
-    
+
     assert users_all(users[2]['token']) == {'users': [
-            {'u_id': 1,
-             'email': 'user1@valid.com',
-             'name_first': 'user1',
-             'name_last': 'last1',
-             'handle_str': 'user1last1',
-             'profile_img_url': 'static/profile_images/default.jpg'},
-            {'u_id': 2,
-             'email': 'user2@valid.com',
-             'name_first': 'user2',
-             'name_last': 'last2',
-             'handle_str': 'user2last2',
-             'profile_img_url': 'static/profile_images/default.jpg'},
-            {'u_id': 3,
-             'email': 'user3@valid.com',
-             'name_first': 'user3',
-             'name_last': 'last3',
-             'handle_str': 'user3last3',
-             'profile_img_url': 'static/profile_images/default.jpg'}
+        {'u_id': 1,
+         'email': 'user1@valid.com',
+         'name_first': 'user1',
+         'name_last': 'last1',
+         'handle_str': 'user1last1',
+         'profile_img_url': 'static/profile_images/default.jpg'},
+        {'u_id': 2,
+         'email': 'user2@valid.com',
+         'name_first': 'user2',
+         'name_last': 'last2',
+         'handle_str': 'user2last2',
+         'profile_img_url': 'static/profile_images/default.jpg'},
+        {'u_id': 3,
+         'email': 'user3@valid.com',
+         'name_first': 'user3',
+         'name_last': 'last3',
+         'handle_str': 'user3last3',
+         'profile_img_url': 'static/profile_images/default.jpg'}
         ]}
-    
+
     # invalid token test:
     pytest.raises(Value_Error, users_all, 'fjngnbfdk')

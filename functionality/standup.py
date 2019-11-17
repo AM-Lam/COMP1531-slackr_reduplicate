@@ -2,14 +2,42 @@
 Functions that relate to standup functionality.
 """
 
-import jwt
-import time
 from datetime import datetime, timedelta
-from .message import message_send
-from .database import get_channel, check_valid_token, is_user_member
+from threading import Timer
+from .message import send_message
+from .database import (get_channel, check_valid_token, is_user_member,
+                       get_user, Messages)
 from .access_error import AccessError, Value_Error
 
-MESSAGE_STANDUP = ""
+
+def standup_end(channel):
+    """
+    Set the standup to inactive and send the messages that were sent
+    during the standup to the channel.
+    """
+    print("Standup just ended")
+
+    standup_data = channel.get_standup()
+
+    start_user = standup_data["start_user"]
+    message_text = standup_data["messages"]
+
+    m_id = channel.get_m_id()
+    channel.increment_m_id()
+
+    standup_message = Messages(m_id, start_user.get_u_id(), message_text,
+                               channel.get_id(), datetime.now(), [])
+
+    send_message(channel, standup_message, datetime.now())
+
+    # now reset the channel standup data
+    channel.set_standup({
+        "time_finish" : None,
+        "is_active" : False,
+        "start_user" : None,
+        "messages" : ""
+    })
+
 
 
 def standup_start(token, channel_id, length):
@@ -32,24 +60,32 @@ def standup_start(token, channel_id, length):
     u_id = check_valid_token(token)
 
     # check if the channel exists
-    get_channel(channel_id)
+    channel = get_channel(channel_id)
 
     # if the user is not a member of this channel, raise an AccessError
     if not is_user_member(u_id, channel_id):
         raise AccessError(description="You are not a member of this channel.")
 
     # check if there is an active standup session
-    if get_channel(channel_id).get_standup() != None:
+    if channel.get_standup()["is_active"]:
         raise AccessError(description="There is already an active standup.")
 
     # set the standup end time to be X amount of time from now
     time_finish = datetime.now() + timedelta(seconds=length)
 
     # give the channel this new standup time
-    get_channel(channel_id).set_standup(time_finish)
+    get_channel(channel_id).set_standup({
+        "time_finish" : time_finish,
+        "is_active" : True,
+        "messages" : "",
+        "start_user" : get_user(u_id)
+    })
+
+    # start a timer to end the standup after length seconds have elapsed
+    Timer(length, standup_end, args=(channel,)).start()
 
     # return the finish time for the standup
-    return {time_finish}
+    return {"time_finish": time_finish.timestamp()}
 
 ######################################################################################
 
@@ -61,35 +97,39 @@ def standup_send(token, channel_id, message):
         - Channel (based on ID) does not exist,
         - Message is more than 1000 characters,
     AccessError when:
-        - The authorised user is not a member of the channel that the message is within,
+        - The authorised user is not a member of the channel that the
+          message is within,
         - If the standup time has stopped
-    Description: Sending a message to get buffered in the standup queue, assuming a standup is currently active
+    Description: Sending a message to get buffered in the standup queue
+    assuming a standup is currently active
     """
-
-    global MESSAGE_STANDUP
 
     # check if the token is valid and decode it
     u_id = check_valid_token(token)
+    user = get_user(u_id)
 
     # check if the channel exists
-    get_channel(channel_id)
+    channel = get_channel(channel_id)
 
     # if the user is not a member of this channel, raise an AccessError
     if not is_user_member(u_id, channel_id):
         raise AccessError(description="You are not a member of this channel.")
 
     # check if there is an active standup session
-    if get_channel(channel_id).get_standup() == None:
+    if not channel.get_standup()["is_active"]:
         raise AccessError(description="There are no active standups.")
 
     # check if the message meets length requirements
     if len(message) > 1000:
         raise Value_Error(description="Message is too long.")
 
-    # append the message to MESSAGE_STANDUP
-    MESSAGE_STANDUP += f'{u_id} : {message}'
+    # append the message to the standup message variable
+    channel.get_standup()["messages"] += f'{user.get_handle()}: {message}\n'
+
+    print(channel.get_standup())
 
     return {}
+
 
 def standup_active(token, channel_id):
     """
@@ -97,28 +137,24 @@ def standup_active(token, channel_id):
     return { is_active, time_finish }
     Exception: Value_Error when:
         - Channel ID is not a valid channel
-    Description: For a given channel, return whether a standup is active in it, and what time the standup finishes. If no standup is active, then time_finish returns None
+    Description: For a given channel, return whether a standup is
+    active in it, and what time the standup finishes. If no standup is
+    active, then time_finish returns None
     """
 
-    global MESSAGE_STANDUP
+    # check if the token is valid and get the channel object we need
+    check_valid_token(token)
+    channel = get_channel(channel_id)
 
-    # check if the token is valid and decode it
-    u_id = check_valid_token(token)
+    # format the datetime object in a way JS can understand if it is
+    # active
+    time_finish = channel.get_standup()["time_finish"]
+    if time_finish is not None:
+        time_finish = time_finish.timestamp()
 
-    # assign default values to status (initally assuming standup is active)
-    status = {"is_active" : True, "time_finish" : get_channel(channel_id).get_standup()}
-
-    # if the standup time is over
-    if status["time_finish"] >= datetime.now():
-        # set the channel's standup to None
-        get_channel(channel_id).set_standup(None)
-        status["time_finish"] = None
-        # send the full message
-        message_send(token, channel_id, MESSAGE_STANDUP)
-        MESSAGE_STANDUP = ""
-
-    # if time_finish is equal to None
-    if status["time_finish"] == None:
-        status["is_active"] = False
+    status = {
+        "time_finish": time_finish,
+        "is_active": channel.get_standup()["is_active"]
+    }
 
     return status

@@ -23,24 +23,23 @@ def test_channel_addowner(users, channels):
     # first add a user as an owner to a channel we own
     assert channel_addowner(users[0]["token"], channels[0]["channel_id"],
                             users[1]["u_id"]) == {}
-    
+
     # now ensure that we can add a user to a channel as an owner after we have
     # been added to it as an owner ourselves (ensure the adding is actually
     # working properly)
     assert channel_addowner(users[1]["token"], channels[0]["channel_id"],
                             users[2]["u_id"]) == {}
-    
+
     # try to add a user as an owner to a channel they are already an owner
     # on
     pytest.raises(Value_Error, channel_addowner, users[0]["token"],
                   channels[0]["channel_id"], users[1]["u_id"])
-    
+
     # try to add a user as an owner to a channel we do not own
     pytest.raises(AccessError, channel_addowner, users[1]["token"],
                   channels[1]["channel_id"], users[2]["u_id"])
-    
-    
-    # try to add a user as an owner to a channel we do not own, as a slackr 
+
+    # try to add a user as an owner to a channel we do not own, as a slackr
     # owner
 
     # somehow make user2 an owner of the slackr, commented until we add global
@@ -61,22 +60,22 @@ def test_channel_details(users, channels):
         get_channel(invalid_channel)
 
     # user2 is not a part of the channel
-    assert is_user_member(users[1]["u_id"], channels[0]["channel_id"]) == False
+    assert not is_user_member(users[1]["u_id"], channels[0]["channel_id"])
 
     # adding user 2 to the channel
     channel_join(users[1]["token"], channels[0]["channel_id"])
-    
+
     # search details
     detaildict = channel_details(users[1]["token"], channels[0]["channel_id"])
     assert detaildict['name'] == "Channel 1"
     assert detaildict['owner_members'] == [
-        {'u_id': 1,'name_first': 'user1', 'name_last': 'last1',
+        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1',
          'profile_img_url': 'static/profile_images/default.jpg'}]
 
     assert detaildict['all_members'] == [
-        {'u_id': 1,'name_first': 'user1', 'name_last': 'last1',
+        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1',
          'profile_img_url': 'static/profile_images/default.jpg'},
-        {'u_id': 2,'name_first': 'user2', 'name_last': 'last2',
+        {'u_id': 2, 'name_first': 'user2', 'name_last': 'last2',
          'profile_img_url': 'static/profile_images/default.jpg'}]
 
     # add user 3
@@ -87,17 +86,17 @@ def test_channel_details(users, channels):
     assert detaildict2['name'] == "Channel 1"
 
     assert detaildict2['owner_members'] == [
-        {'u_id': 1,'name_first': 'user1', 'name_last': 'last1',
+        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1',
          'profile_img_url': 'static/profile_images/default.jpg'}]
 
     assert detaildict2['all_members'] == [
-        {'u_id': 1,'name_first': 'user1', 'name_last': 'last1',
+        {'u_id': 1, 'name_first': 'user1', 'name_last': 'last1',
          'profile_img_url': 'static/profile_images/default.jpg'},
-        {'u_id': 2,'name_first': 'user2', 'name_last': 'last2',
+        {'u_id': 2, 'name_first': 'user2', 'name_last': 'last2',
          'profile_img_url': 'static/profile_images/default.jpg'},
-        {'u_id': 3,'name_first': 'user3', 'name_last': 'last3',
+        {'u_id': 3, 'name_first': 'user3', 'name_last': 'last3',
          'profile_img_url': 'static/profile_images/default.jpg'}]
-    
+
     # try to get the details of a channel we do not have access to
     pytest.raises(AccessError, channel_details, users[3]["token"],
                   channels[0]["channel_id"])
@@ -110,23 +109,23 @@ def test_channel_details(users, channels):
 @setup_data(user_num=3, channel_num=1)
 def test_channel_invite(users, channels):
     # test if the user is invalid.
-    with pytest.raises(Value_Error , match=r"*"):
+    with pytest.raises(Value_Error, match=r"*"):
         channel_invite('3131313133', channels[0]["channel_id"],
                        users[0]["u_id"])
 
     # test if user does not exist on application database
-    with pytest.raises(Value_Error , match=r"*"):
+    with pytest.raises(Value_Error, match=r"*"):
         channel_invite(users[0]["token"], channels[0]["channel_id"],
                        'jl mackie')
 
     # user exists but is already a part of that channel then invite
     # should raise Value_Error
-    with pytest.raises(Value_Error , match=r"*"):
+    with pytest.raises(Value_Error, match=r"*"):
         channel_invite(users[0]["token"], channels[0]["channel_id"],
                        users[0]["u_id"])
 
     # what if the channel does not exist?
-    with pytest.raises(Value_Error , match=r"*"):
+    with pytest.raises(Value_Error, match=r"*"):
         channel_invite(users[0]["token"], "does not exist",
                        users[0]["u_id"])
 
@@ -135,9 +134,9 @@ def test_channel_invite(users, channels):
 
     # user 2 is already a part of that channel the invite should raise
     # Value_Error
-    with pytest.raises(Value_Error , match=r"*"):
+    with pytest.raises(Value_Error, match=r"*"):
         channel_invite(users[0]["token"], "does not exist", users[1]["u_id"])
-    
+
     # try to invite a user to a channel that we are not an owner of
     pytest.raises(AccessError, channel_invite, users[1]["token"],
                   channels[0]["channel_id"], users[2]["u_id"])
@@ -152,15 +151,15 @@ def test_channel_join(users, channels):
 
     # first try to join a public server that exists
     assert channel_join(users[1]['token'], channels[0]['channel_id']) == {}
-    
+
     # now try to join a server that does not exist, this should fail with an
     # access error
     pytest.raises(Value_Error, channel_join, users[1]['token'], 404)
-    
+
     # try to join a server that exists, but is private as a regular user
-    pytest.raises(AccessError, channel_join, users[1]['token'], 
+    pytest.raises(AccessError, channel_join, users[1]['token'],
                   channels[1]['channel_id'])
-    
+
     # try to join a server that exists, but is private as an admin
     # first we'll have to make the second user an admin, not sure how this will
     # work yet
@@ -269,28 +268,28 @@ def test_channel_removeowner(users, channels):
 
     # now add user2 as an owner to channel1
     channel_addowner(users[0]["token"], channels[0]["channel_id"], users[1]["u_id"])
-    
+
     # test removing user2 as an owner
     assert channel_removeowner(users[0]["token"], channels[0]["channel_id"],
                                users[1]["u_id"]) == {}
-    
+
     # test removing user2 when they are not an owner
     pytest.raises(Value_Error, channel_removeowner, users[0]["token"],
                   channels[0]["channel_id"], users[1]["u_id"])
-    
+
     # add user2 as an owner to channel1 again
     channel_addowner(users[0]["token"], channels[0]["channel_id"], users[1]["u_id"])
-    
+
     # attempt to remove user2 from channel1 as a user that does not have permis
     # -sions to do so
-    pytest.raises(AccessError, channel_removeowner, users[2]["token"], 
+    pytest.raises(AccessError, channel_removeowner, users[2]["token"],
                   channels[0]["channel_id"], users[1]["u_id"])
-    
+
     # test removing user2 from channel1 as a slackr owner
     user3_obj.set_global_admin(True)
     assert channel_removeowner(users[2]["token"], channels[0]["channel_id"],
                                users[1]["u_id"]) == {}
-    
+
     # try to remove an owner from a channel that does not exist
     pytest.raises(Value_Error, channel_removeowner, users[0]["token"], 128,
                   users[1]["u_id"])
@@ -302,14 +301,16 @@ def test_channel_removeowner(users, channels):
 
 @setup_data(user_num=1)
 def test_channels_create(users, channels):
+    # pylint: disable=W0613
+
     # try to create a valid, public channel
     assert channels_create(users[0]["token"], "Channel 1", True) == {"channel_id" : 1}
 
     # try to create a valid, private channel
     assert channels_create(users[0]["token"], "Channel 1", True) == {"channel_id" : 2}
-    
+
     # try to create a channel with an invalid name
-    pytest.raises(Value_Error, channels_create, users[0]["token"], 
+    pytest.raises(Value_Error, channels_create, users[0]["token"],
                   "123456789012345678901", False)
 
 
@@ -468,8 +469,8 @@ def test_channels_listall():
         }
     ]}
 
-    # ensure that channels_listall shows private channels that you do not belong
-    # to
+    # ensure that channels_listall does not show private channels that
+    # you do not belong to
     assert channels_listall(user2["token"]) == {"channels" : [
         {
             "channel_id" : channel1["channel_id"],
@@ -478,10 +479,6 @@ def test_channels_listall():
         {
             "channel_id" : channel2["channel_id"],
             "name" : "Channel 2"
-        },
-        {
-            "channel_id" : channel3["channel_id"],
-            "name" : "Channel 3"
         }
     ]}
 

@@ -36,7 +36,6 @@ def channel_addowner(token, channel_id, u_id):
     return {}
 
 
-
 def channel_details(token, channel_id, live_str=""):
     """
     Select a channel by id and return its details. live_str is only
@@ -73,7 +72,6 @@ def channel_details(token, channel_id, live_str=""):
     return {"name" : channel.get_name(),
             "owner_members" : channel_owners,
             "all_members" : channel_members}
-
 
 
 def channel_invite(token, channel_id, u_id):
@@ -121,14 +119,11 @@ def channel_join(token, channel_id):
 
 def channel_leave(token, channel_id):
     """
-    Take a channel by id and, if we are a member, leave the channe.
+    Take a channel by id and, if we are a member, leave the channel.
     Ensure that member's also lose their owner status, if the user is
     not a member fail silently.
     """
     u_id = check_valid_token(token)
-    channel = get_channel(channel_id)
-
-    # get the channel itself
     channel = get_channel(channel_id)
 
     # attempt to remove the user from the channel, if they are also an
@@ -265,15 +260,23 @@ def channels_listall(token):
     Return a list of all channels in the slackr.
     """
 
-    # this is pretty simple, just grab the "database"
-    channels_raw = get_data()["channels"]
-
     # make sure the token is valid
-    check_valid_token(token)
+    u_id = check_valid_token(token)
+    user = get_user(u_id)
 
-    channels = [
-        channels_raw[c_id].frontend_format() for c_id in channels_raw
-    ]
+    channels = []
+    for channel_id in get_data()["channels"]:
+        channel = get_channel(channel_id)
+
+        # if the channel is private do not add it if we are a regular
+        # user who is not a member of it
+        print(f'Channel {channel_id} is public? {channel.is_public()}')
+        if not channel.is_public() and not (user.is_global_admin() or
+                                            user.is_slackr_owner() or
+                                            is_user_member(u_id, channel_id)):
+            continue
+
+        channels.append(channel.frontend_format())
 
     # quick little list comprehension to return the channels in the
     # format we need

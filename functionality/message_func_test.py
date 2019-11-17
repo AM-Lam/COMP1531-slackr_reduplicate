@@ -4,9 +4,8 @@
 
 from datetime import datetime, timedelta
 import pytest
-from .database import get_data, clear_data, get_channel, get_user
+from .database import get_channel, get_user
 from .decorators import setup_data
-from .auth import auth_register
 from .channel import channel_join, channels_create
 from .message import (message_edit, message_send, message_remove, message_pin,
                       message_react, message_sendlater, message_unpin,
@@ -41,7 +40,7 @@ def test_message_send_basic(users, channels):
 
     # reset message_1
     message_1 = None
-    
+
     # the message is over 1000 characters
     pytest.raises(Value_Error, message_send, users[0]["token"],
                   channels[0]["channel_id"], "X" * 1001)
@@ -71,13 +70,13 @@ def test_invalid_user(users, channels):
     message_1 = message_send(users[0]["token"], channels[0]["channel_id"],
                              "Hello")
 
-
     # try to remove a message you did not send
     pytest.raises(AccessError, message_remove, users[1]["token"], message_1['message_id'])
 
 
 @setup_data(user_num=2, channel_num=1)
 def test_admin_user(users, channels):
+    # pylint: disable=W0613
     user2_obj = get_user(users[1]["u_id"])
     user2_obj.set_global_admin(True)
 
@@ -106,7 +105,7 @@ def test_message_edit(users, channels):
 
     # edit a message we created, and check that it updated correctly
     assert message_edit(users[0]["token"], message1['message_id'], "Hi") == {}
-    
+
     assert get_message_text(channels[0]["channel_id"],
                             message1["message_id"]) == "Hi"
 
@@ -117,7 +116,7 @@ def test_message_edit(users, channels):
     # try to edit a message we did not send as an owner
     assert message_edit(users[0]["token"],
                         message2['message_id'], "Chomsky is good") == {}
-    
+
     assert get_message_text(channels[0]["channel_id"],
                             message2["message_id"]) == "Chomsky is good"
 
@@ -145,17 +144,17 @@ def test_message_pin(users, channels):
 
     # try to create a valid message
     message1 = message_send(users[0]["token"], channels[0]["channel_id"],
-                             "Hello")
-    
+                            "Hello")
+
     message2 = message_send(users[1]["token"], channels[0]["channel_id"],
-                             "Hi")
+                            "Hi")
 
     assert message_pin(users[0]["token"], message1['message_id']) == {}
 
     # try to pin a message that is already pinned
     pytest.raises(Value_Error, message_pin, users[0]["token"],
                   message1["message_id"])
-    
+
     # try to pin a message as a regular user
     pytest.raises(Value_Error, message_pin, users[1]["token"],
                   message2["message_id"])
@@ -169,12 +168,12 @@ def test_message_pin(users, channels):
 @setup_data(user_num=2, channel_num=1)
 def test_message_unpin(users, channels):
     channel_join(users[1]["token"], channels[0]["channel_id"])
-    
+
     message1 = message_send(users[0]["token"], channels[0]["channel_id"],
-                             "Hello")
+                            "Hello")
 
     message_pin(users[0]["token"], message1['message_id'])
-    
+
     assert message_unpin(users[0]["token"], message1['message_id']) == {}
 
     # try to unpin a message that is not pinned
@@ -182,7 +181,7 @@ def test_message_unpin(users, channels):
                   message1["message_id"])
 
     message_pin(users[0]["token"], message1['message_id'])
-    
+
     # try to unpin a pinned message as a regular user
     pytest.raises(Value_Error, message_unpin, users[1]["token"],
                   message1["message_id"])
@@ -198,20 +197,20 @@ def test_message_react(users, channels):
 
     # try to create a valid message
     message1 = message_send(users[0]["token"], channels[0]["channel_id"],
-                             "Hello")
+                            "Hello")
     react_id = 1
-    
+
     assert message_react(users[0]["token"], message1['message_id'],
                          react_id) == {}
-    
+
     # add the same react to the same message from a different user
     assert message_react(users[1]["token"], message1['message_id'],
                          react_id) == {}
-    
+
     # add a different react to the same message
     assert message_react(users[1]["token"], message1['message_id'],
                          2) == {}
-    
+
     # try to react to a message that we have already reacted to, with
     # the same react
     pytest.raises(Value_Error, message_react, users[1]["token"],
@@ -229,18 +228,18 @@ def test_message_unreact(users, channels):
     message_1 = message_send(users[0]["token"], channels[0]["channel_id"],
                              "Hello")
     react_id = 1
-    
+
     message_react(users[0]["token"], message_1['message_id'], 2)
     message_react(users[0]["token"], message_1['message_id'], 3)
-    message_react(users[0]["token"], message_1['message_id'], 1)    
-    
+    message_react(users[0]["token"], message_1['message_id'], 1)
+
     assert message_unreact(users[0]["token"], message_1['message_id'],
                            react_id) == {}
-    
+
     # try to unreact a message that we have not reacted to
     pytest.raises(Value_Error, message_unreact, users[0]["token"],
                   message_1['message_id'], react_id)
-    
+
     # try to unreact from a message that does not exist
     pytest.raises(Value_Error, message_unreact, users[0]["token"],
                   message_1['message_id'], 4)
@@ -271,7 +270,7 @@ def test_message_sendlater(users, channels):
                   404, "Message", datetime.now() + timedelta(minutes=1))
 
     # now try to send a valid message in the future
-    time_sent = datetime.utcnow() + timedelta(seconds=5)
+    time_sent = datetime.now() + timedelta(seconds=5)
     assert message_sendlater(users[0]["token"], channels[0]["channel_id"], "Message",
                              time_sent) == {"message_id" : 1}
 
@@ -281,13 +280,13 @@ def test_message_sendlater(users, channels):
     # wait until the time has passed then check if the message was sent
     # (wait a little longer just to ensure that we aren't checking for the
     # message at the same time as it is sent)
-    while datetime.utcnow() < time_sent + timedelta(seconds=1):
+    while datetime.now() < time_sent + timedelta(seconds=1):
         continue
 
     assert len(channel_obj.get_messages()) == 1
 
     # try to send a message in a channel we do not have access to
-    time_sent = datetime.utcnow() + timedelta(seconds=5)
+    time_sent = datetime.now() + timedelta(seconds=5)
     pytest.raises(AccessError, message_sendlater, users[1]["token"],
                   channels[0]["channel_id"], "message", time_sent)
 
@@ -301,7 +300,7 @@ def test_message_sendlater(users, channels):
 def test_search_basic(users, channels):
     # try to create a valid message
     message_send(users[0]["token"], channels[0]["channel_id"], "hello there")
-    
+
     # try to create a message in a private chat
     message_send(users[1]["token"], channels[1]["channel_id"], "whats this")
 
