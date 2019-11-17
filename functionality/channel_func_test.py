@@ -287,6 +287,8 @@ def test_channel_removeowner(users, channels):
 
     # test removing user2 from channel1 as a slackr owner
     user3_obj.set_global_admin(True)
+    channel_join(users[2]["token"], channels[0]["channel_id"])
+
     assert channel_removeowner(users[2]["token"], channels[0]["channel_id"],
                                users[1]["u_id"]) == {}
 

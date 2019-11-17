@@ -135,7 +135,9 @@ class Channel:
         return self._members
 
     def get_owners(self):
-        return self._owners
+        return list(set(self._owners + list(
+            filter(lambda x: is_user_member(x, self.get_id()), get_admins())
+        )))
 
     def is_public(self):
         return self._public
@@ -167,13 +169,13 @@ class Channel:
 
     def add_member(self, member):
         self._members.append(member)
-    
+
     def remove_member(self, member):
         self._members.remove(member)
 
     def add_owner(self, owner):
         self._owners.append(owner)
-    
+
     def remove_owner(self, owner):
         self._owners.remove(owner)
 
@@ -473,6 +475,21 @@ def check_reset_code(reset_code):
         return email
 
     raise Value_Error("Reset code incorrect!")
+
+
+def get_admins():
+    # get all the admins/slackr owners, they have
+    # permissions in all channels so we should add
+    # them to the owners list
+    admins = []
+    users = get_data()["users"]
+
+    for u_id in get_data()["users"]:
+        user = users[u_id]
+        if user.is_global_admin() or user.is_slackr_owner():
+            admins.append(u_id)
+
+    return admins
 
 
 clear_data()
