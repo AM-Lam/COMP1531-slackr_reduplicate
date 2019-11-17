@@ -4,9 +4,9 @@ Functions that relate to the creation, modification and deletion of users.
 
 # pylint: disable=R0913
 # pylint: disable=W0613
+# pylint: disable=C0116
 
 import urllib
-import jwt
 from PIL import Image
 from .database import (is_email_valid, check_email_database, check_valid_token,
                        get_data, get_user, is_handle_in_use)
@@ -174,7 +174,7 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     # check if the image selection is a square
     side1 = x_end - x_start
     side2 = y_end - y_start
-    
+
     if side1 != side2:
         raise Value_Error(description="Co-ordinate selection is not a square.")
 
@@ -184,7 +184,7 @@ def user_profiles_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     cropped.save(img_url, "JPEG")
 
     get_user(u_id).set_profile_img_url(img_url)
-    
+
     return {}
 
 
@@ -200,6 +200,6 @@ def users_all(token, live_str=""):
     user_list = []
     for u_id in get_data()["users"]:
         user_list.append(user_profile(token, u_id, live_str))
-    
+
     print(user_list)
     return {"users" : user_list}

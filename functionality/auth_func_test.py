@@ -1,10 +1,11 @@
 # pylint: disable=C0114
 # pylint: disable=C0116
+# pylint: disable=W0613
 
 
 import hashlib
 import pytest
-from .database import clear_data, get_data, get_user
+from .database import get_data, get_user
 from .auth import (auth_login, auth_register, auth_logout,
                    auth_passwordreset_request, auth_passwordreset_reset,
                    admin_userpermission_change)
@@ -33,7 +34,7 @@ def test_auth_logout1(users, channels):
 def test_auth_logout2(users, channels):
     # validtoken test should pass
     tokenlog = users[0]["token"]
-    assert(auth_logout(tokenlog)['is_success']) == True
+    assert auth_logout(tokenlog)['is_success']
 
 
 @setup_data()
@@ -63,7 +64,7 @@ def test_login2(users, channels):
     # here we assume that an existing database has logged the
     # information of user1 and user2 created above
     # what if the email does not exist in the database -->
-    pytest.raises(Value_Error, auth_login, 'INVALIDeMAIL@valid.com', '111111')   
+    pytest.raises(Value_Error, auth_login, 'INVALIDeMAIL@valid.com', '111111')
 
     # user forgot to put the .au domain in the address-->
     pytest.raises(Value_Error, auth_login, 'user3@valid.com.au', '111111')
@@ -79,11 +80,11 @@ def test_login3(users, channels):
     pytest.raises(Value_Error, auth_login, 'user1@valid.com', '')
 
     # what is password has a valid length but is incorrect? -->
-    pytest.raises(Value_Error, auth_login, 'user1@valid.com' , '222222')
+    pytest.raises(Value_Error, auth_login, 'user1@valid.com', '222222')
 
     # what if the password exists on the server but is not correctly
     # matched to the provided email -->
-    pytest.raises(Value_Error, auth_login, 'user2@valid.com.au' , '111111')
+    pytest.raises(Value_Error, auth_login, 'user2@valid.com.au', '111111')
 
 
 ###############################################################################
@@ -222,11 +223,11 @@ def test_admin_userpermission_change(users, channels):
     # fail
     pytest.raises(Value_Error, admin_userpermission_change, users[1]["token"],
                   users[3]["u_id"], 4)
-    
+
     # as a slackr owner make another user a slackr owner
     assert admin_userpermission_change(users[0]["token"],
                                        users[1]["u_id"], 1) == {}
-    
+
     # as a slackr owner make a user a regular user
     assert admin_userpermission_change(users[0]["token"],
                                        users[1]["u_id"], 3) == {}
