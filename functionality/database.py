@@ -29,20 +29,6 @@ class User:
         self._slackr_owner = False
         self._profile_img_url = "static/profile_images/default.jpg"
 
-    def get_user_data(self):
-        return {
-            "u_id" : self._u_id,
-            "first_name" : self._first_name,
-            "last_name" : self._last_name,
-            "password" : self._password,
-            "email" : self._email,
-            "handle_str" : self._handle,
-            "profile_img_url" : self._profile_img_url
-        }
-
-    def update_id(self, new_id):
-        self._u_id = new_id
-
     def update_first_name(self, new_fname):
         self._first_name = new_fname
 
@@ -130,18 +116,6 @@ class Channel:
         # get clashing ids
         self._message_id_max = 1
 
-    def get_channel_data(self):
-        return {
-            "channel_id" : self._channel_id,
-            "channel_name" : self._channel_name,
-            "messages" : self._messages,
-            "owners" : self._owners,
-            "members" : self._members,
-            "public" : self._public,
-            "standup" : self._standup,
-        }
-
-
     def frontend_format(self):
         return {
             "channel_id" : self._channel_id,
@@ -182,9 +156,6 @@ class Channel:
 
         raise Value_Error(description="Message does not exist")
 
-    def set_id(self, new_id):
-        self._channel_id = new_id
-
     def set_name(self, name):
         self._channel_name = name
 
@@ -196,9 +167,15 @@ class Channel:
 
     def add_member(self, member):
         self._members.append(member)
+    
+    def remove_member(self, member):
+        self._members.remove(member)
 
     def add_owner(self, owner):
         self._owners.append(owner)
+    
+    def remove_owner(self, owner):
+        self._owners.remove(owner)
 
     def set_public(self, public):
         self._public = public
@@ -236,18 +213,6 @@ class Messages:
 
         self._pinned = False                # bool of whether the message is pinned or not
 
-
-    def get_message_data(self):
-        return {
-            "message_id" : self._message_id,
-            "u_id" : self._u_id,
-            "channel_id" : self._channel_id,
-            "text" : self._text,
-            "time_sent" : self._time_sent,
-            'reacts': self._reacts,
-            'is_pinned': self._pinned,
-        }
-
     def frontend_format(self, u_id):
         return {
             "message_id": self.get_m_id(),
@@ -255,7 +220,8 @@ class Messages:
             "message": self.get_text(),
             "time_created": self.get_time_sent().timestamp(),
             "reacts": self.get_reacts_frontend(u_id),
-            "is_pinned": self.is_pinned()}
+            "is_pinned": self.is_pinned()
+        }
 
     def get_m_id(self):
         return self._message_id
